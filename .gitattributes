@@ -1,0 +1,28 @@
+# Normalize text files to LF in the repository.
+* text=auto
+
+# MATLAB and Simulink source files
+*.m text eol=lf
+*.mlx binary
+*.mdl text eol=lf
+*.slx binary
+*.sldd binary
+*.mlapp binary
+*.prj text eol=lf
+*.mlproj text eol=lf
+
+# MATLAB data, figures, packages, and compiled extensions
+*.mat binary
+*.fig binary
+*.p binary
+*.mex* binary
+*.mltbx binary
+
+# Common text-based supporting files
+*.txt text eol=lf
+*.csv text eol=lf
+*.json text eol=lf
+*.xml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf

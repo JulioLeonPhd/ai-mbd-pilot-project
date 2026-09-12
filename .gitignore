@@ -1,0 +1,36 @@
+# MATLAB / Simulink generated files
+slprj/
+sfprj/
+codegen/
+*_rtw/
+*_ert_rtw/
+*_grt_rtw/
+*.slxc
+*.autosave
+*.asv
+*.m~
+
+# MATLAB build and binary artifacts
+*.mex*
+*.p
+*.mltbx
+*.log
+
+# MATLAB/Simulink reports and coverage output
+slcov_output/
+code_coverage_report/
+
+# Editor and operating-system files
+.#*
+*.swp
+*.swo
+*.bak
+*.orig
+.DS_Store
+Thumbs.db
+
+# Temporary MATLAB folders/files
+temp/
+tmp/
+matlab_crash_dump.*
+java.log.*
