@@ -31,7 +31,8 @@ def main() -> int:
 
     if run("git", "rev-parse", "--show-toplevel") != str(ROOT):
         raise RuntimeError("Run this script in its own Git repository")
-    version = run("uv", "run", "--frozen", "git-changelog", "--bumped-version")
+    bumped_version = run("uv", "run", "--frozen", "git-changelog", "--bumped-version")
+    version = bumped_version.removeprefix("v")
     if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version):
         raise RuntimeError(f"Expected a stable SemVer release, got {version!r}")
     tag = f"v{version}"
