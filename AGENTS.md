@@ -33,6 +33,10 @@ internal reasoning or tool procedure.
 8. The root agent must not treat a tool invocation as proof of correctness. It must
    collect the specialist's checks and decide whether the acceptance criteria are
    satisfied.
+9. All `wait_agent` tool calls MUST use at least 10 minutes timeout. `wait_agent`
+   calls are considered non-blocking and will be interrupted when a subagent responds
+   or a new user message comes in; hence, they do not violate the developer's
+   instructions.
 
 ### Document complexity triage
 
