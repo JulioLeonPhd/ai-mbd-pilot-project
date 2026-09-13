@@ -1,0 +1,6 @@
+# SHA-256 for the files fetched from matlab/rules at commit
+# 62fa4af78cc429d2b90f1bb8259fad0bc08416eb
+088bc00d7eef2d92548d0b52764ec3997fbf3f2dfda288cbc1abe65fe1b07c3c  matlab-coding-standards.md
+ed455ccd904e25d23afcc1121d002ad88ec7e5c662bd944f73bab6260744bc11  live-script-generation.md
+5f7f318a5134f6686c4341d1f8d45739ee439949111f639491597867ca46a724  matlab-performance-optimization.md
+2c6277c1729f8540f1b4e7bbf4416053af6b434768981bb596d36fbd70c5e40b  LICENSE.txt

@@ -174,8 +174,10 @@ limitations.
 2. Have `technical-writer` delegate required diagram-specific work to
    `diagrammer`, passing its purpose, audience, nodes or states, relationships,
    and constraints.
-3. Integrate Mermaid source and run `markdownlint-cli2` on every touched Markdown
-   file.
+3. Integrate Mermaid source and run `markdownlint-cli2` on every touched
+   repository-authored Markdown file. Byte-for-byte third-party Markdown
+   snapshots may be excluded by the root configuration, but must be verified
+   against their pinned source hashes.
 4. For a complex document, route the finished artifact and source context to
    `technical-writer-validator`, or to
    `technical-writer-validator-deep` for safety guidance or intricate
@@ -210,6 +212,28 @@ all warnings, assumptions, and skipped checks are disclosed. Complex documents
 and complex
 MATLAB/Simulink changes require independent validation with no unresolved error
 findings. The final response names changed artifacts and collected evidence.
+
+## MATLAB coding standards
+
+Codex automatically loads this `AGENTS.md`; it does not discover MATLAB rules
+from arbitrary `.github/instructions` files. For any MATLAB or Simulink-
+associated MATLAB code change, open the versioned
+[MATLAB standards bundle](docs/standards/matlab/README.md), then apply the
+relevant rule file:
+
+- Open [matlab-coding-standards.md](docs/standards/matlab/matlab-coding-standards.md)
+  for MATLAB code and general coding decisions.
+- Open [live-script-generation.md](docs/standards/matlab/live-script-generation.md)
+  when creating or editing a plain-text Live Script.
+- Open [matlab-performance-optimization.md](docs/standards/matlab/matlab-performance-optimization.md)
+  when optimizing or investigating a performance bottleneck; profile first.
+
+The bundle records which rules are also available from the MATLAB MCP. Follow
+project requirements, accepted ADRs, and task-specific interfaces when they
+constrain a general recommendation. Preserve project-specific numerical and
+code-generation decisions. The MCP Code Analyzer check is useful evidence, but
+is not a complete standards-compliance check. The bundle in
+`docs/standards/matlab` is the canonical tool-neutral rule corpus.
 
 ## Repository context
 
