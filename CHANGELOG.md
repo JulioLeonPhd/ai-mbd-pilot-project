@@ -1,6 +1,6 @@
 # Changelog
 
-<!-- markdownlint-disable MD013 MD033 -->
+<!-- markdownlint-disable MD013 MD024 MD033 -->
 
 All notable changes to this project will be documented in this file.
 
@@ -8,6 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.2.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.2.0) - 2026-09-13
+
+<small>[Compare with v0.1.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.1.0...v0.2.0)</small>
+
+### Added
+
+- Added: vendor MATLAB coding standards for agents ([c377517](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c377517a16ca92dbc2f3ced81f0fc3497c16b92e) by Julio Leon). SemVer impact: none
+
+### Fixed
+
+- Fixed: accept prefixed changelog versions during release ([69788bc](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/69788bc580f2aad38060d6dc3f61ae3cef15e297) by Julio Leon). SemVer impact: none
+
 ## [v0.1.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.1.0) - 2026-09-13
 
 <small>[Compare with first commit](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/6beb95964f5040ff4303812fbad1691d48064d1c...v0.1.0)</small>
