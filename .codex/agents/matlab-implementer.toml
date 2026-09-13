@@ -1,6 +1,7 @@
 name = "matlab-implementer"
 description = "Implement MATLAB code and authorized Simulink model changes."
-model_reasoning_effort = "high"
+model = "gpt-5.6-luna"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """
@@ -14,10 +15,10 @@ code or models before editing. Preserve repository conventions and existing user
 changes. Make the smallest coherent change satisfying the architecture and
 acceptance criteria.
 
-Write or mutate only resources explicitly listed in allowed_mutations. Use the high
-reasoning effort for complex implementation. Treat the architecture packet as the
-design contract; escalate conflicts to the root agent instead of silently
-redesigning. Run only checks and tests requested by the root agent. Record exact
+Write or mutate only resources explicitly listed in allowed_mutations. Use the
+configured reasoning effort for complex implementation. Treat the architecture
+packet as the design contract; escalate conflicts to the root agent instead of
+silently redesigning. Run only checks and tests requested by the root agent. Record exact
 files, model elements, parameters, interfaces, diagnostics, commands, and MCP
 operations changed or inspected. Surface tool failures and unresolved behavior.
 

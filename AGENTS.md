@@ -136,9 +136,10 @@ required), and `complete` with warnings.
 manifest JSON files, from an approved brief, source material, or implementation
 result.
 
-**Model profile:** Low-cost model suitable for synthesis, editing, formatting, and
-mechanical consistency. Escalate content questions to the root agent or
-`matlab-architect`; do not compensate for missing technical certainty by guessing.
+**Model profile:** GPT-5.6 Luna with Low reasoning, suitable for synthesis,
+editing, formatting, and mechanical consistency. Escalate content questions to
+the root agent or `matlab-architect`; do not compensate for missing technical
+certainty by guessing.
 
 **Owns:** Markdown structure, prose clarity, terminology consistency, links,
 examples, tables, document-level organization, and the mechanical creation of
@@ -185,8 +186,8 @@ touches only JSON does not require Markdown linting.
 **Purpose:** Generate focused Mermaid diagrams that communicate a specified
 relationship, sequence, architecture, or state transition.
 
-**Model profile:** Low-cost or medium-cost model optimized for precise structured
-output. Use higher reasoning only when the diagram encodes a genuinely complex
+**Model profile:** GPT-5.6 Luna with Low reasoning, optimized for precise structured
+output. Use medium reasoning only when the diagram encodes a genuinely complex
 technical model.
 
 **Owns:** Mermaid source, diagram layout choices, labels, direction, and visual
@@ -227,6 +228,10 @@ architecture, algorithm selection, subsystem boundaries, execution semantics,
 data typing, solver/sample-time interactions, code-generation constraints, and
 other MATLAB/Simulink questions where a superficial answer is risky.
 
+**Preferred models:** As a basis start with `GPT-5.6 Sol` with Medium reasoning.
+Escalate up to Extra High and/or `GPT-6 Astra` up to Medium for really complex
+architecture design.
+
 **Owns:** Requirements interpretation, architecture alternatives, interfaces,
 invariants, tradeoffs, assumptions, risks, and acceptance criteria for the
 implementation stage.
@@ -261,9 +266,11 @@ design must be returned to the root agent as `needs-input`.
 **Purpose:** Independently review Markdown for semantic, conceptual, and technical
 correctness.
 
-**Model profile:** Medium- or high-reasoning model depending on the technical risk
-of the document. Independence is more important than speed for design and safety
-content.
+**Model profile:** Low-cost model with medium up to high reasoning, depending on
+the technical risk of the document. Independence is more important than speed
+for design and safety content.
+
+**Preferred models**: `GPT-5.6 Luna` on Medium up to Extra High.
 
 **Owns:** Review findings, severity, evidence, omissions, contradictions, and
 traceability from the document to its supplied requirements or sources.
@@ -300,6 +307,10 @@ creation, editing, configuration, and integration work.
 **Model profile:** High-reasoning model for complex implementation. Use the
 architecture packet as the primary design contract and ask the root agent to resolve
 conflicts rather than silently redesigning the system.
+
+**Preferred models:** As a basis start with `GPT-5.6 Luna` with Extra High reasoning.
+Escalate to `GPT-5.6 Sol` from Medium up to High for complex Simulink implementations
+requiring good understanding of the MCP interface.
 
 **Owns:** MATLAB source changes, Simulink model changes, integration details,
 implementation-level diagnostics, and the evidence needed for validation.
@@ -340,6 +351,9 @@ appropriate concision.
 reasoning for control logic, numerical algorithms, solver behavior, model
 architecture, safety-related behavior, and code-generation concerns.
 
+**Preferred models:** As a basis start with `GPT-5.6 Luna` with Extra High reasoning.
+Escalate to `GPT-5.6 Sol` Low to Medium depending on risk.
+
 **Owns:** Validation findings, standards checks, behavioral reasoning, test evidence,
 and release readiness recommendations.
 
@@ -372,14 +386,26 @@ must record the lightweight review it performed instead.
 
 ## Tool and authority matrix
 
-| Agent | Tier | Writes | MCP access | Verification |
-| --- | --- | --- | --- | --- |
-| `technical-writer` | Low | Markdown/JSON | No | Markdown; JSON schema |
-| `diagrammer` | Low/medium | Diagrams or temp files | No | `mmdc` |
-| `matlab-architect` | High | None | Read-only | Design review |
-| `technical-writer-validator` | Medium/high | None | No | Semantic review |
-| `matlab-implementer` | High | Code/model | Mutation | Implementation checks |
-| `matlab-validator` | Medium/high | None | Read-only | Requirements/standards |
+| Agent | Default model | Reasoning |
+| --- | --- | --- |
+| `technical-writer` | GPT-5.6 Luna | Low |
+| `diagrammer` | GPT-5.6 Luna | Low; Medium for complex diagrams |
+| `matlab-architect` | GPT-5.6 Sol | Medium |
+| `technical-writer-validator` | GPT-5.6 Luna | Medium |
+| `matlab-implementer` | GPT-5.6 Luna | Extra High |
+| `matlab-validator` | GPT-5.6 Luna | Extra High |
+
+The specialist profiles above define when to raise reasoning effort or change
+models for a particular task.
+
+| Agent | Writes | MCP access | Verification |
+| --- | --- | --- | --- |
+| `technical-writer` | Markdown/JSON | No | Markdown; JSON schema |
+| `diagrammer` | Diagrams or temp files | No | `mmdc` |
+| `matlab-architect` | None | Read-only | Design review |
+| `technical-writer-validator` | None | No | Semantic review |
+| `matlab-implementer` | Code/model | Mutation | Implementation checks |
+| `matlab-validator` | None | Read-only | Requirements/standards |
 
 Tool availability is part of the result contract. An unavailable required tool is
 not a pass. The root agent must decide whether to install/configure the tool, route
