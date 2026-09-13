@@ -4,12 +4,21 @@ status: accepted
 
 # Root-agent orchestration for MATLAB/Simulink specialists
 
-We will use a root agent to orchestrate six focused specialist agents for the
-MATLAB/Simulink workflow: `technical-writer`, `diagrammer`, `matlab-architect`,
-`technical-writer-validator`, `matlab-implementer`, and `matlab-validator`. The
-root agent owns decomposition, sequencing, authority, and final decisions;
-specialists do not spawn subagents, except that `technical-writer` may delegate
-Mermaid generation to `diagrammer`.
+We will use the root agent as the default planner and orchestrator for ten
+repository-defined MATLAB/Simulink specialist roles: the six base roles
+(`technical-writer`, `diagrammer`, `matlab-architect`,
+`technical-writer-validator`, `matlab-implementer`, and `matlab-validator`) plus
+`matlab-architect-deep`, `technical-writer-validator-deep`,
+`simulink-implementer`, and `matlab-validator-deep`. The root agent owns
+decomposition, sequencing, authority, and final decisions; specialists do not
+spawn subagents, except that `technical-writer` may delegate Mermaid generation
+to `diagrammer`. The root checks runtime availability before spawning a role and
+selects deep variants when observable complexity or risk warrants them. The root
+routes substantive Simulink topology, interface, configuration, and multi-step
+MCP edits to `simulink-implementer`, while `matlab-implementer` handles MATLAB
+code and simple local model edits. Exact models, effort settings, and tool
+configuration remain in the role TOMLs. The operational routing rules live in
+[AGENTS.md](../../AGENTS.md).
 
 ## Considered Options
 

@@ -29,4 +29,10 @@ Do not design non-trivial MATLAB/Simulink architectures or mutate MATLAB code or
 Simulink models. Do not perform semantic approval of your own document. The root
 agent decides whether technical-writer-validator is required; trivial documents do
 not require that validator.
+
+Complete only when every requested artifact exists and is traceable to the
+supplied inputs. For touched Markdown, confirm markdownlint-cli2 checked each file
+and passed. For manifest JSON, confirm the requested syntax and schema checks
+passed. Report any unavailable required checker as unavailable; do not report a
+pass or silently omit it.
 """

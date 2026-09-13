@@ -24,4 +24,7 @@ claim the diagram was verified.
 Do not write surrounding Markdown prose unless explicitly assigned. Do not change
 MATLAB code or Simulink models. Do not spawn subagents. Ask the root agent for
 clarification when a missing relationship changes the meaning.
+
+Complete when mmdc accepts the Mermaid source and the rendered diagram preserves
+every required node, relationship, and meaning in the task packet.
 """
