@@ -14,14 +14,16 @@ A representative radar processing system used to demonstrate the MBD workflow.
 
 **Device under test (DUT)**:
 The radar processing portion evaluated from digitized channel samples through
-target-list generation.
+detection-list generation.
 
-**Target list**:
+**Detection list**:
 The structured set of detected target outputs produced by the DUT.
 
 **Test vector**:
-A saved MAT-file containing generated stimulus and associated data for a test.
+A saved MAT-file containing generated stimulus and associated data for a test,
+including the exact radar-configuration and target-scenario versions used.
 
 **Target scenario**:
-The JSON-defined set of targets used to generate a test vector, including each
-target's radar cross section, Cartesian position, and velocity.
+The input JSON-defined target list used to generate a test vector, including
+each target's radar cross section, Cartesian position, and velocity. For the
+MVP, target velocity and RCS remain constant over a scan.

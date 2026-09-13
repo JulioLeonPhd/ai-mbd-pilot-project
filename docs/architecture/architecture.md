@@ -8,8 +8,8 @@ implementation is treated as a reference design.
 ## Scope
 
 The radar is a demonstrator for the workflow, rather than the primary mission
-system. The intended processing boundary is from ADC samples through a target
-list. Tracking and classification are outside the current scope.
+system. The intended processing boundary is from ADC samples through a
+detection list. Tracking and classification are outside the current scope.
 
 ## Agreed decisions
 
@@ -29,6 +29,8 @@ Related decisions: [ADR 0002](../adr/0002-radar-demonstrator-scope.md),
   half-wavelength element spacing of approximately 0.05 m.
 - Use the accepted 16×4 single-panel array baseline, with 16 horizontal
   azimuth elements and 4 vertical elements; see [ADR 0007](../adr/0007-adopt-3ghz-16x4-half-wave-array-baseline.md).
+- Use a single coherent boresight transmit beam for the MVP. Transmit scan and
+  the method for illuminating the provisional 90° sector remain undecided.
 - At 3 GHz and approximately 0.05 m half-wave spacing, the horizontal
   center-to-center aperture span is 15 × 0.05 m = 0.75 m. This is an aperture
   span, not a claim about the physical panel width.
@@ -38,18 +40,44 @@ Related decisions: [ADR 0002](../adr/0002-radar-demonstrator-scope.md),
   containing RCS in m², Cartesian position, and velocity; save generated test
   vectors in MAT files.
 - Include DDC and decimation, fast-time and slow-time processing, CFAR,
-  simple clustering, and conversion to a target list in the DUT boundary.
+  simple clustering, and conversion to a detection list in the DUT boundary.
 - Defer HDL work.
+
+## Accepted MVP requirements
+
+- Maximum instrumented range is 100 km; the primary case is a constant-RCS
+  10 m² target at 100 km and approximately 800 km/h radial speed.
+- Native unambiguous radial velocity is at least ±40 m/s. Range ambiguity must
+  also be resolved, and true velocity must be reported after unfolding through
+  ±800 km/h.
+- CA-CFAR over range-Doppler cells is the first detector. Monte Carlo trials
+  estimate Pd and per-cell Pfa with confidence bounds, targeting Pd ≥ 0.9 and
+  Pfa ≤ 10^-6.
+- An ideal mid-range, high-input-SNR test resolves two moving equal-RCS targets
+  with shared nonzero radial velocity, separated by 1 m in range, and emits two
+  detection-list reports. Additional velocity-separated and
+  unfolded-velocity cases are required.
+- Azimuth and elevation receive beamforming are simultaneous; elevation does
+  not scan. Boresight angle accuracy is the first acceptance case.
+- A 90° azimuth sector (±45°) and one-second sector update are provisional
+  timing/coverage goals, not established ±45° performance requirements, until
+  illumination and steering are established.
+- A configurable near-zero-Doppler band removes static clutter. Its cutoff is
+  unresolved; stationary and near-zero-radial-speed targets are out of scope.
+- Radar-configuration JSON is authoritative for reproducible waveform, array,
+  RF/ADC, processing, scan, blanking, and random-seed parameters. A separate
+  target-scenario JSON contains the target list. Test vectors record exact
+  radar-configuration and target-scenario versions. The DUT output is a
+  detection list with range, radial velocity, azimuth, elevation, and a
+  documented detection statistic.
+
+These decisions are recorded in [ADR 0009](../adr/0009-radar-mvp-acceptance-and-ambiguity-requirements.md).
 
 ## Provisional proposals
 
-- Use a provisional 90° azimuth sector (±45°), pending angle and coverage
-  performance requirements and evaluation.
-- Use a 100 km reference scenario with a 10 m² large jet.
-- Treat 1 m range separability as a provisional reference objective. An ideal
-  c/(2B) range-resolution estimate gives approximately 150 MHz of chirp
-  bandwidth; this omits windowing and implementation losses and is not a
-  guarantee of separability or an approved requirement.
+- Treat the 1 m test as an acceptance objective. Required bandwidth, timing,
+  PRFs, pulse count, CPI, and sample rate remain to be derived; no bandwidth
+  estimate is currently claimed sufficient.
 - Use the following scenario assumptions: 0.05 m² drone, 2 m² helicopter,
   5 m² small jet, and 10 m² large jet.
 
@@ -79,26 +107,27 @@ evaluation.
 
 The planned data flow is:
 
-1. MATLAB generates waveform and scenario-driven test vectors.
+1. MATLAB generates waveform and scenario-driven test vectors, recording exact
+   configuration and scenario versions.
 2. ADC inputs provide digitized samples for each channel.
 3. The DUT applies DDC and decimation.
 4. Fast-time and slow-time processing produces detection features.
 5. CFAR produces detections, simple clustering groups them, and the DUT emits a
-   target list.
+   detection list.
 
 The exact algorithms, interfaces, rates, units, and numerical settings remain
 open unless stated above as an agreed decision.
 
-## Open questions
+## Derived items still open
 
-- What scan and angle-performance targets should be established after the beam
-  pattern study?
-- What sampled IF and sample rate are required?
-- What power, noise, and link-budget assumptions apply?
-- What probability-of-detection and probability-of-false-alarm targets apply?
-- What PRF, pulse width, and CPI should be used?
-- What velocity envelope and unfolding behavior are required?
-- What are the exact semantics and fields of the report and target-list outputs?
+- What sampled IF, ADC rate, powers, gains, noise figure, losses, and other
+  physical values are internally consistent?
+- What PRF set (starting with 4–5 distinct PRFs), pulse width, pulse count per
+  look, CPI, and processing schedule meet ambiguity and timing requirements?
+- What look spacing follows from measured 3 dB beamwidth, and what angle,
+  elevation-sector, Doppler-error, and velocity tolerances follow from studies?
+- What clutter cutoff and detection-statistic definition make results
+  reproducible, including Monte Carlo trial and confidence methods?
 
-Decisions on these questions should be recorded before they are presented as
-implementation requirements.
+The latest MATLAB MCP feasibility calculation was unavailable; these values
+must be derived and verified before implementation.
