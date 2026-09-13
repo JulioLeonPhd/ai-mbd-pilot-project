@@ -34,3 +34,6 @@ temp/
 tmp/
 matlab_crash_dump.*
 java.log.*
+
+# Handoff Documents
+docs/handoffs/**/*
