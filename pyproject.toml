@@ -1,0 +1,28 @@
+[project]
+name = "ai-mbd-pilot-project"
+version = "0.1.0"
+description = "AI-assisted model-based design pilot project"
+requires-python = ">=3.10"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "git-changelog>=2.9.7,<3",
+]
+
+[tool.uv]
+# This repository is not a Python package; uv manages the tooling environment.
+package = false
+
+[tool.git-changelog]
+bump = "auto"
+convention = "basic"
+include-all = true
+in-place = true
+marker-line = "<!-- insertion marker -->"
+output = "CHANGELOG.md"
+parse-trailers = true
+sections = ["add", "change", "fix", "remove", "merge", "doc"]
+template = "keepachangelog"
+versioning = "semver"
+zerover = true

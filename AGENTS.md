@@ -221,6 +221,13 @@ AGENTS.md
 
 ## Agent skills
 
+### Releases
+
+When the user requests a release, run `uv run python scripts/release.py` from a
+clean worktree. Review the resulting changelog, release commit, and annotated
+SemVer tag before reporting completion. The script creates a local release only;
+push the commit and tag when the user requests publication.
+
 ### Issue tracker
 
 Read [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md) before creating,

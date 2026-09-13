@@ -35,5 +35,10 @@ tmp/
 matlab_crash_dump.*
 java.log.*
 
+# uv-managed Python tooling environment
+.venv/
+__pycache__/
+*.pyc
+
 # Handoff Documents
 docs/handoffs/**/*
