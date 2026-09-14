@@ -54,7 +54,7 @@ Related decisions: [ADR 0002](../adr/0002-radar-demonstrator-scope.md),
   estimate Pd and per-cell Pfa with confidence bounds, targeting Pd ≥ 0.9 and
   Pfa ≤ 10^-6.
 - An ideal mid-range, high-input-SNR test resolves two moving equal-RCS targets
-  with shared nonzero radial velocity, separated by 1 m in range, and emits two
+  with shared nonzero radial velocity, separated by 50 m in range, and emits two
   detection-list reports. Additional velocity-separated and
   unfolded-velocity cases are required.
 - Azimuth and elevation receive beamforming are simultaneous; elevation does
@@ -71,13 +71,17 @@ Related decisions: [ADR 0002](../adr/0002-radar-demonstrator-scope.md),
   detection list with range, radial velocity, azimuth, elevation, and a
   documented detection statistic.
 
-These decisions are recorded in [ADR 0009](../adr/0009-radar-mvp-acceptance-and-ambiguity-requirements.md).
+These decisions are recorded in [ADR 0009](../adr/0009-radar-mvp-acceptance-and-ambiguity-requirements.md),
+with the separability and waveform/rate candidates updated by [ADR 0012](../adr/0012-adopt-50m-separability-and-narrowband-ddc-candidate.md)
+and [ADR 0013](../adr/0013-adopt-150msps-50mhz-if-and-direct-adc-stimulus.md).
 
 ## Provisional proposals
 
-- The G1 250 MHz/4× ideal range-grid candidate supports the 1 m test in a
-  finite ideal sweep. Sampled end-to-end separation and two detection reports
-  remain WP6b/WP8 acceptance work.
+- The current waveform/DDC candidate is a 10 MHz complex chirp spanning -5 to
+  +5 MHz, a 50 MHz IF center, and multistage decimation from 150 MS/s real ADC
+  samples through 50 MS/s complex to 12.5 MS/s complex. The nominal range
+  resolution is approximately 15 m; sampled separation, filter response, and
+  two detection reports remain WP6b/WP8 acceptance work under [ADR 0012](../adr/0012-adopt-50m-separability-and-narrowband-ddc-candidate.md).
 - Use the following scenario assumptions: 0.05 m² drone, 2 m² helicopter,
   5 m² small jet, and 10 m² large jet.
 
@@ -115,21 +119,70 @@ The planned data flow is:
 5. CFAR produces detections, simple clustering groups them, and the DUT emits a
    detection list.
 
+The proposed signal chain and its current rate boundaries are shown below.
+The RF/stimulus path is external to the DUT; the DUT boundary begins with the
+ADC samples. The fast-time/range and slow-time/Doppler ordering is provisional
+pending the WP4 processing contract.
+
+<!-- markdownlint-disable MD013 -->
+```mermaid
+flowchart LR
+    GEN["MVP target generator<br/>direct 64-channel ADC vectors<br/>3 GHz RF phase model"] --> ADC["DUT input: 64 real 16-bit ADC channels<br/>150 MS/s/channel; 50 MHz IF"]
+    ADC --> DDC["Multistage DDC<br/>complex mix/filter + /3 to 50 MS/s<br/>filter + /4 to 12.5 MS/s"]
+    DDC --> BB["Complex baseband candidate<br/>12.5 MS/s/channel; Nyquist +/-6.25 MHz"]
+    BB --> FT["Fast-time/range processing<br/>10 MHz waveform; nominal ~15 m resolution"]
+    BB --> ST["Slow-time/Doppler processing<br/>five approximate PRFs:<br/>1700, 1900, 2150, 2450, 2700 Hz<br/>128 usable returns targeted per PRF"]
+    FT --> RD["Range-Doppler feature formation<br/>fast-time/slow-time order provisional"]
+    ST --> RD
+    RD --> BF["Azimuth/elevation receive beamforming"]
+    BF --> AR["Multi-PRF ambiguity resolution<br/>+ post-unfolding near-zero-Doppler clutter veto"]
+    AR --> CFAR["Range-Doppler CA-CFAR"]
+    CFAR --> CL["Simple clustering"]
+    CL --> DL["Detection list<br/>range, radial velocity, azimuth,<br/>elevation, detection statistic"]
+
+    subgraph DUT["DUT boundary: ADC samples to detection list"]
+        ADC
+        DDC
+        BB
+        FT
+        ST
+        RD
+        BF
+        AR
+        CFAR
+        CL
+        DL
+    end
+```
+<!-- markdownlint-enable MD013 -->
+
+The generator abstracts the 3 GHz RF waveform and analog conversion; it emits
+sampled 50 MHz IF directly with coherent delay, Doppler, and array phase. The
+five-PRF set and 128-return count are simulation targets that remain
+subject to G2 verification. The diagram does not freeze the sampled DDC
+implementation, DSP interfaces, or the full transition schedule. The 50 MHz IF
+is distinct from the 50 MS/s complex intermediate; a real-only /3 followed by
+IQ recovery is rejected because it aliases the IF to DC. G2 must also
+verify filter alias rejection, transient and group-delay handling, decimator
+phase across PRIs, and near-range gating: the 6.80 km lower range edge is only
+about 0.365 us beyond the 40 us blanking plus 5 us guard.
+
 The exact algorithms, interfaces, rates, units, and numerical settings remain
 open unless stated above as an agreed decision.
 
 ## G2 and downstream items still open
 
-- Can the G1 IF, ADC rate, PRF set, pulse count, and processing schedule produce
-  128 usable returns per PRF with the specified blanking, guard, priming, and
-  transitions?
+- Can the G1 50 MHz IF, 150 MS/s ADC rate, PRF set, pulse count, and
+  processing schedule produce 128 usable returns per PRF with the specified
+  blanking, guard, priming, and transitions?
 - What look spacing follows from the ideal 3 dB beamwidth, and what noisy
   angle, elevation-sector, Doppler-error, and velocity tolerances apply?
 - What clutter cutoff and detection-statistic definition make results
   reproducible, including Monte Carlo trial and confidence methods?
 
-WP2's bounded simulation baseline passed G1 on 2026-09-14; see
-[ADR 0011](../adr/0011-adopt-v1-simulation-timing-baseline.md) and the
-[feasibility report](../research/radar-v1-feasibility.md). This architecture
-overview has not yet been expanded into the WP4 DSP/timing contracts. G2 must
-prove the full return and transition schedule before those interfaces freeze.
+WP2's bounded simulation baseline passed the historical G1 review on 2026-09-14;
+see [ADR 0011](../adr/0011-adopt-v1-simulation-timing-baseline.md) and the
+[feasibility report](../research/radar-v1-feasibility.md). G1 is reopened for
+the revised waveform and DDC rate claims. Revised evidence must precede
+freezing WP3/WP4 DSP and timing contracts; G2 must then prove the full return,
+filter, and transition schedule.

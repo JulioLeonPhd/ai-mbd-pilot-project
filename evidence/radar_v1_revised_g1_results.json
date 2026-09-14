@@ -1,0 +1,231 @@
+{
+  "schemaVersion": "radar-v1-revised-g1-v1",
+  "status": "passed",
+  "studyType": "revised-g1-feasibility",
+  "scope": "Analytic timing, ideal DDC identity, and ideal finite-LFM separability",
+  "requirement": "RAD-V1-023",
+  "decisionRecords": [
+    "ADR 0012",
+    "ADR 0013"
+  ],
+  "resultsPath": "/Users/julio/projects/ai-mbd-pilot-project/evidence/radar_v1_revised_g1_results.json",
+  "failure": {
+    "stage": "",
+    "identifier": "",
+    "message": ""
+  },
+  "limitations": [
+    "The front end and image-removal filter are ideal abstractions around 50 MHz.",
+    "No finite DDC filter, group delay, filter state, or decimator phase is modeled; /4 validation is deferred to G2.",
+    "No hardware, ENOB, clock jitter, noise, SNR, Pd, Pfa, or real-time claim is made.",
+    "The 128-return schedule, receive-window priming, and PRF transitions remain G2 work.",
+    "The two-target result is an ideal matched-filter waveform-stage result only."
+  ],
+  "candidate": {
+    "speedOfLightMPerS": 2.99792458E+8,
+    "carrierFrequencyHz": 3.0E+9,
+    "wavelengthM": 0.099930819333333337,
+    "adcSampleRateHz": 1.5E+8,
+    "intermediateRateHz": 5.0E+7,
+    "ddcOutputRateHz": 1.25E+7,
+    "ifCenterHz": 5.0E+7,
+    "bandwidthHz": 1.0E+7,
+    "chirpStartHz": -5.0E+6,
+    "chirpStopHz": 5.0E+6,
+    "pulseWidthSeconds": 4E-5,
+    "adcChannelCount": 64,
+    "adcWordLengthBits": 16,
+    "requestedPrfHz": [
+      1700,
+      1900,
+      2150,
+      2450,
+      2700
+    ],
+    "priSampleCounts": [
+      88236,
+      78948,
+      69768,
+      61224,
+      55560
+    ],
+    "priSeconds": [
+      0.00058824,
+      0.00052632,
+      0.00046512,
+      0.00040816,
+      0.0003704
+    ],
+    "actualPrfHz": [
+      1699.9864001087992,
+      1899.9848001215989,
+      2149.9828001375986,
+      2450.0196001568011,
+      2699.7840172786177
+    ],
+    "unambiguousRangeM": [
+      88174.95774695999,
+      78893.383247280013,
+      69719.73403248,
+      61181.644828640005,
+      55521.5632216
+    ],
+    "nativeUnambiguousSpeedMPerS": [
+      42.470258454599033,
+      47.466759449257736,
+      53.712385692581122,
+      61.208116506598714,
+      67.44790721742261
+    ],
+    "minimumNativeUnambiguousSpeedMPerS": 42.470258454599033,
+    "blankingTimeSeconds": 4E-5,
+    "guardTimeSeconds": 5E-6,
+    "reportedRangeDomainM": [
+      6800,
+      100000
+    ],
+    "internalMaxRangeM": 100050,
+    "numberOfUsableReturns": 128,
+    "numberOfPrimingPri": 1,
+    "radialSpeedMPerS": 222.22222222222223,
+    "dwellDurationSeconds": 0.30185472,
+    "primingDurationSeconds": 0.00235824,
+    "transitionGapSeconds": 0.00071246175449150221,
+    "scanDurationSeconds": 0.30706280701796607,
+    "motionHalfRangeM": 34.1180896686629,
+    "nominalBlindHalfWidthM": 6745.330305,
+    "expandedBlindHalfWidthM": 6779.4483946686632,
+    "endpointToleranceM": 4.6566128730773926E-10,
+    "sampleEpochPolicy": "One global t=0 is shared by all channels, PRFs, and DDC stages.",
+    "scheduleStatus": "128 usable returns, priming, and transitions are retained as G2 checks."
+  },
+  "dataVolume": {
+    "bytesPerSample": 2,
+    "rawBytesPerSecond": 1.92E+10,
+    "rawDecimalGbPerSecond": 19.2,
+    "usableReturnBytes": 5.795610624E+9,
+    "usableReturnDecimalGb": 5.795610624,
+    "primedCaptureBytes": 5.840888832E+9,
+    "primedCaptureDecimalGb": 5.840888832,
+    "maximumFullPulseSlabBytes": 1.1294208E+7,
+    "maximumFullPulseSlabDecimalMb": 11.294208,
+    "volumeScope": "64-channel real int16 ADC vectors; no framing or derived-stage storage"
+  },
+  "coverage": {
+    "domainM": [
+      6800,
+      100000
+    ],
+    "domainKm": [
+      6.8,
+      100
+    ],
+    "guardedBlindHalfWidthM": 6779.4483946686632,
+    "nominalBlindHalfWidthM": 6745.330305,
+    "requiredCompletePrfCount": 3,
+    "maximumInvalidPrfCount": 2,
+    "minimumCompletePrfCount": 3,
+    "allOpenIntervalsPass": true,
+    "allClosedBoundariesPass": true,
+    "partitionBoundaryCount": 12,
+    "openIntervalCount": 11,
+    "worstOpenIntervalMidpointM": 58351.60402512,
+    "worstClosedBoundaryM": 54402.196433971345,
+    "closedBoundaryPolicy": "Guarded bands use <= at every partition boundary, including domain endpoints.",
+    "passed": true
+  },
+  "ddcIdentity": {
+    "inputIsRealAdc": true,
+    "toneFrequenciesHz": [
+      -4.0E+6,
+      0,
+      4.0E+6
+    ],
+    "complexMixDecimationFactor": 3,
+    "complexOutputRateHz": 5.0E+7,
+    "imageRemovalMethod": "Ideal analytic-signal image removal: negative DFT bins are zeroed and positive bins doubled.",
+    "amplitudeErrorTolerance": 1E-10,
+    "phaseErrorToleranceDeg": 1E-8,
+    "sampleErrorTolerance": 1E-10,
+    "toneResults": [
+      {
+        "toneFrequencyHz": -4.0E+6,
+        "inputFrequencyHz": 4.6E+7,
+        "amplitudeError": 2.1850679011447407E-14,
+        "phaseErrorDeg": 1.2496224436340845E-12,
+        "maximumSampleError": 6.0077905079873441E-13,
+        "passed": true
+      },
+      {
+        "toneFrequencyHz": 0,
+        "inputFrequencyHz": 5.0E+7,
+        "amplitudeError": 1.243748217517687E-14,
+        "phaseErrorDeg": 7.1261523640682551E-13,
+        "maximumSampleError": 4.7421664304811075E-13,
+        "passed": true
+      },
+      {
+        "toneFrequencyHz": 4.0E+6,
+        "inputFrequencyHz": 5.4E+7,
+        "amplitudeError": 2.837886466499452E-13,
+        "phaseErrorDeg": 1.6259767298306986E-11,
+        "maximumSampleError": 1.1068463035138111E-12,
+        "passed": true
+      }
+    ],
+    "maximumComplexMixError": 1.1068463035138111E-12,
+    "complexMixIdentityPassed": true,
+    "unfilteredFailure": {
+      "toneFrequenciesHz": [
+        -4.0E+6,
+        4.0E+6
+      ],
+      "desiredProjectionMagnitude": [
+        0.50000000000000333,
+        0.49999999999999978
+      ],
+      "imageProjectionMagnitude": [
+        0.50000000000000189,
+        0.50000000000000122
+      ],
+      "maximumImageProjectionMagnitude": 0.50000000000000189,
+      "demonstrated": true,
+      "conclusion": "Without ideal image removal, real ADC tones retain an image that aliases into the /3 complex output."
+    },
+    "unfilteredFailureDemonstrated": true,
+    "fourToOneDecimationValidationDeferred": true,
+    "actualFiniteFiltersDeferredToG2": true,
+    "conclusion": "Ideal image removal followed by complex mixing and /3 preserves -4, 0, and +4 MHz baseband tones."
+  },
+  "finiteLfmSweep": {
+    "idealOnly": true,
+    "model": "Finite rectangular-LFM autocorrelation with 40 us support and 10 MHz sweep",
+    "targetRangesM": [
+      0,
+      50
+    ],
+    "targetSeparationM": 50,
+    "nativeBandwidthHz": 1.25E+7,
+    "relativePhasesDeg": "0:1:359",
+    "nativeGridOffsetCount": 16,
+    "nativeRangeSpacingM": 11.99169832,
+    "outputRangeSpacingM": 11.99169832,
+    "peakWindowHalfWidthM": 12.5,
+    "valleyCriterionDb": -3,
+    "passCount": 5760,
+    "caseCount": 5760,
+    "worstValleyDb": -11.164950850515933,
+    "passed": true
+  },
+  "acceptance": {
+    "closedBoundaryCoveragePass": true,
+    "nativeDopplerPass": true,
+    "finiteLfm50mPass": true,
+    "complexMixIdentityPass": true,
+    "unfilteredImageFailureDemonstrated": true,
+    "ratesAndDataVolumeRecorded": true,
+    "g2ScheduleDeferred": true,
+    "passed": true
+  },
+  "completedUtc": "2026-09-14T15:51:47Z"
+}

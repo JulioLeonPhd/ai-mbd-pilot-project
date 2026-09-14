@@ -90,6 +90,10 @@ verification seams, and required diagrams.
 **Deliverable:** Seeded JSON-driven generator and reproducible MAT fixtures for
 primary and edge cases.
 
+The MVP generator emits 64 real int16 ADC channels at 150 MS/s with a 50 MHz
+IF directly. It retains coherent delay, Doppler, and array phase from the 3 GHz
+RF parameter without sampling 3 GHz or modeling analog downconversion.
+
 **Acceptance criteria:**
 
 - Re-running a seed reproduces identical fixture content.
@@ -120,6 +124,11 @@ selected ambiguity-resolution method.
 
 **Deliverable:** DDC and decimation implementation with unit tests.
 
+The current candidate is 150 MS/s real through 50 MS/s complex (/3) to 12.5 MS/s
+complex (/4) at 50 MHz IF. Evaluate multistage filtering and a three-phase
+complex mixer or polyphase equivalent; decimation alone is not IQ demodulation,
+and a real-only /3 followed by IQ recovery is invalid.
+
 **Acceptance criteria:**
 
 - Known tones meet agreed output rate, frequency, amplitude, and phase checks.
@@ -137,7 +146,7 @@ selected ambiguity-resolution method.
 **Acceptance criteria:**
 
 - Known LFM echoes map to the expected range bins.
-- An ideal high-SNR fixture preserves two peaks separated by 1 m.
+- An ideal and sampled high-SNR fixture preserves two peaks separated by 50 m.
 - Output dimensions and calibration metadata conform to the contract.
 
 **Proposed label:** `needs-triage`
@@ -232,7 +241,7 @@ report formatting.
 **Acceptance criteria:**
 
 - The primary fixture uses a 10 m² target at 100 km at the common scan midpoint
-  approximately 800 km/h, with motion and range migration across the CPI; 1 m
+  approximately 800 km/h, with motion and range migration across the CPI; 50 m
   two-target, velocity-separated, and unfolded cases run reproducibly.
 - Contract, sign, invalid-input, and detection-list checks pass.
 - Monte Carlo Pd/Pfa estimates include seeds, trials, method, estimates, and

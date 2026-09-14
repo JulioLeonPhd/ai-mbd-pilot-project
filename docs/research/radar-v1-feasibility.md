@@ -1,16 +1,24 @@
 # Radar V1 feasibility study
 
+> Historical-status notice: the former 625 MS/s, 156.25 MHz IF, and 250 MHz
+> baseline results are historical evidence for [ADR 0011](../adr/0011-adopt-v1-simulation-timing-baseline.md).
+> They are superseded by [ADR 0012](../adr/0012-adopt-50m-separability-and-narrowband-ddc-candidate.md)
+> for the waveform and [ADR 0013](../adr/0013-adopt-150msps-50mhz-if-and-direct-adc-stimulus.md)
+> for the ADC/IF, and do not validate the current candidate.
+
 ## Purpose and status
 
-This report records the WP2 simulation baseline adopted at G1 and its MATLAB
-MCP evidence. The results are analytic or idealized studies; they are not a
+This report records the revised WP2 candidate that passed bounded G1 under
+[ADR 0014](../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md), plus
+historical WP2 evidence retained for traceability. All results are analytic or
+idealized studies; they are not a
 simulated DUT result, hardware feasibility claim, or real-time implementation.
 The bounded-memory streaming proxy completed; the full streaming design remains
 WP4 work. Noisy multi-target ambiguity unfolding remains a downstream risk.
 
-## Candidate baseline
+## Historical baseline evidence: B250 and 625 MS/s
 
-The candidate uses a 3 GHz carrier and a 250 MHz, 40 us LFM. The proposed IF is
+The historical candidate used a 3 GHz carrier and a 250 MHz, 40 us LFM. Its IF was
 156.25 MHz, sampled at 625 MS/s as real 16-bit data on 64 channels. DDC would
 produce complex samples at 312.5 MS/s. Each of five PRFs targets 128 usable
 returns per PRF, unverified until G2; the even ADC-sample PRI counts and
@@ -29,10 +37,10 @@ uses a design target of 128 usable pulses per PRF, one priming PRI per PRF, and
 four 0.712462 ms quiet gaps. Under those assumptions, the analytic scan
 acquisition duration before processing and steering is 0.307058 s.
 
-These are the G1 simulation baseline parameters, subject to the G2 timing and
-contract checks. They are not yet a frozen implementation contract.
+These parameters are retained as historical ADR 0011 evidence. They are not
+the current candidate or an implementation contract.
 
-## Range, timing, and coverage evidence
+## Historical B250 range, timing, and coverage evidence
 
 At the common scan midpoint, the public reported reference-epoch range domain
 is 6.80–100.00 km. Internal generation and search extend to 100.05 km. At
@@ -79,9 +87,10 @@ under each true-velocity hypothesis before coherent Doppler processing, and
 apply the near-zero-Doppler veto only after velocity unfolding. The expected
 range migration is approximately 10.5–16.7 m per dwell.
 
-## Range resolution and angle evidence
+## Historical B250 range-resolution and angle evidence
 
-For the B250 candidate, the nominal range resolution is 0.5996 m and the
+For the historical B250 candidate, the nominal range resolution is 0.5996 m
+and the
 baseband sample spacing is 0.4797 m. The [tracked ideal range-resolution
 study](../../evidence/radar_v1_range_resolution_study.m) and [results
 JSON](../../evidence/radar_v1_range_resolution_results.json) ran through MATLAB
@@ -125,9 +134,10 @@ intervals (approximately 0.301850 s), excluding priming and quiet gaps. This is
 an illustrative simulation/RF assumption; hardware, implementation, and
 real-time claims require separate evidence.
 
-## Data volume and streaming evidence
+## Historical B250 data-volume and streaming evidence
 
-Raw input is approximately 80 GB/s. Five 128-pulse full-PRI ADC dwells over
+For the historical B250 candidate, raw input is approximately 80 GB/s. Five
+128-pulse full-PRI ADC dwells over
 0.30185 s total 24.148 GB under the candidate sample-count model; this is not a
 separately evidenced receive-only volume. With 16 GB host RAM and 533 GiB free
 disk, a full vector cannot fit in RAM; a pulse slab is approximately 47 MB raw.
@@ -156,25 +166,41 @@ WP5 fixtures and WP6 integration are frozen.
 
 ## G1 decision and next work
 
-G1 passed for the bounded simulation baseline in
+### Revised G1 result
+
+The revised candidate passed bounded G1 for analytic timing, ideal DDC
+identity, and ideal finite-LFM separability under
+[ADR 0014](../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md).
+The [revised study](../../evidence/radar_v1_revised_g1_study.m) and
+[results](../../evidence/radar_v1_revised_g1_results.json) pass all 5760 of
+5760 ideal 50 m cases on the 11.99169832 m native grid; the worst valley is
+-11.164950851 dB. Guarded coverage has at least three complete PRFs over
+6.80–100.00 km, and the minimum native unambiguous speed is 42.4703 m/s.
+Ideal real-ADC image removal before /3 passes the tone identity checks, while
+the unfiltered image failure is demonstrated.
+
+This revised G1 result accepts the candidate for WP3 and WP4 work. It does not
+accept finite filters, /4 behavior, filter state or delay, alias rejection,
+near-range gating, hardware, ENOB, clock jitter, SNR, Pd, Pfa, real-time
+performance, ambiguity resolution, sampled two-report separation, or the full
+128-return schedule. The 6.8 km case has approximately 0.1371 us of edge after
+guard and motion allowance. The ideal front-end bandpass excludes 95–105 MHz
+alias energy only as an abstraction; finite rejection remains a G2 check.
+
+The historical G1 result for the former baseline remains recorded in
 [ADR 0011](../adr/0011-adopt-v1-simulation-timing-baseline.md). The four
-tracked MATLAB MCP studies ran and passed Code Analyzer without errors or
-warnings; independent numerical review confirmed the coverage, range,
+tracked historical MATLAB MCP studies ran and passed Code Analyzer without
+errors or warnings; independent numerical review confirmed the coverage, range,
 angle, and streaming evidence without unresolved errors. Independent semantic
-review found no unresolved errors. G1 accepts the 250 MHz waveform, sampled
-rates, five quantized PRIs, reference-epoch range domain, and a target of 128
-usable returns per PRF for WP3/WP4 contract work. It does not certify the full
-128-return schedule, priming, or transitions; WP4 must prove those at G2 and
-reopen G1 if the baseline fails. The 4× range output grid and ≤0.1° ideal angle
-unit tolerance are study-backed candidates for WP4/WP6, with the narrow scopes
-stated above.
+review found no unresolved errors. Those historical conclusions apply to ADR
+0011's former 250 MHz waveform and rates, not to the revised candidate.
 
 The WP6e noisy multi-target unfolding study and sampled end-to-end confirmation
-of the 1 m two-target result are downstream validation risks. They belong to the
+of the 50 m two-target result are downstream validation risks. They belong to the
 G3/G4 gates after G2; a failure may reopen G1 or G2 through the documented gate
 process, but neither is a predecessor of G1.
 
 WP4 should incorporate receive-window priming, true-velocity range alignment,
 candidate retention, post-unfolding clutter veto, and streaming boundaries.
-WP3 and WP4 may begin after the user's package-level go-ahead. No downstream
-performance claim is implied by G1 acceptance.
+WP3 and WP4 may begin under the revised G1 decision. No downstream performance
+claim is implied by G1 acceptance.
