@@ -8,11 +8,19 @@ dependencies = []
 [dependency-groups]
 dev = [
     "git-changelog>=2.9.7,<3",
+    "ruff>=0.13,<1",
 ]
 
 [tool.uv]
 # This repository is not a Python package; uv manages the tooling environment.
 package = false
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
 
 [tool.git-changelog]
 bump = "auto"

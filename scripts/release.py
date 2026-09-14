@@ -12,7 +12,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 VERSION_PATTERN = re.compile(r'(?m)^(version = ")([0-9]+\.[0-9]+\.[0-9]+)(")$')
 
@@ -20,13 +19,18 @@ VERSION_PATTERN = re.compile(r'(?m)^(version = ")([0-9]+\.[0-9]+\.[0-9]+)(")$')
 def run(*args: str) -> str:
     result = subprocess.run(args, cwd=ROOT, text=True, capture_output=True, check=False)
     if result.returncode:
-        raise RuntimeError(f"{' '.join(args)} failed:\n{result.stderr or result.stdout}")
+        message = result.stderr or result.stdout
+        raise RuntimeError(f"{' '.join(args)} failed:\n{message}")
     return result.stdout.strip()
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dry-run", action="store_true", help="show the next version without changing files")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="show the next version without changing files",
+    )
     args = parser.parse_args()
 
     if run("git", "rev-parse", "--show-toplevel") != str(ROOT):
@@ -42,7 +46,8 @@ def main() -> int:
     changelog = ROOT / "CHANGELOG.md"
     existing_entry = re.search(rf"(?m)^## \[{re.escape(tag)}\]", changelog.read_text())
     if args.dry_run:
-        print(f"Would release {tag}; changelog entry {'exists' if existing_entry else 'will be generated'}")
+        entry_status = "exists" if existing_entry else "will be generated"
+        print(f"Would release {tag}; changelog entry {entry_status}")
         return 0
 
     if run("git", "status", "--porcelain"):

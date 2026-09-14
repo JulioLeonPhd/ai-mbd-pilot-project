@@ -231,9 +231,25 @@ relevant rule file:
 The bundle records which rules are also available from the MATLAB MCP. Follow
 project requirements, accepted ADRs, and task-specific interfaces when they
 constrain a general recommendation. Preserve project-specific numerical and
-code-generation decisions. The MCP Code Analyzer check is useful evidence, but
-is not a complete standards-compliance check. The bundle in
+code-generation decisions. The MCP Code Analyzer check is required when
+available, but is not a complete standards-compliance check. The bundle in
 `docs/standards/matlab` is the canonical tool-neutral rule corpus.
+
+For every generated or edited MATLAB source file (`.m`, `.mlx`, or MATLAB code
+embedded in another artifact), invoke the MATLAB Code Analyzer through the MCP
+when that capability is available. Resolve all reported errors and warnings
+before reporting completion, and rerun the analyzer after fixes. Record the
+analyzer operation and result as validation evidence. If the MATLAB MCP or Code
+Analyzer operation is unavailable, record the check as unavailable and disclose
+that limitation; an unavailable check is not a pass.
+
+## Python linting
+
+Ruff is the canonical linter and formatter for Python scripts. Whenever creating
+or editing a `.py` file, run `uv run --frozen ruff check <path>` and
+`uv run --frozen ruff format --check <path>` before reporting completion. Apply
+Ruff fixes with `uv run --frozen ruff check --fix <path>` and
+`uv run --frozen ruff format <path>` when appropriate, then review the diff.
 
 ## Repository context
 
