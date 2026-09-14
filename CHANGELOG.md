@@ -8,6 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.3.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.3.0) - 2026-09-14
+
+<small>[Compare with v0.2.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.2.0...v0.3.0)</small>
+
+### Added
+
+- Added: record revised radar V1 G1 progress ([23b6d02](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/23b6d023f8d939e1363e1143c12b0ac5c46c06aa) by Julio Leon). SemVer impact: none
+- Added: record WP2 radar V1 feasibility evidence and G1 baseline ([920bcd3](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/920bcd3394d4a008181d8b26532e29507dd5c874) by Julio Leon). SemVer impact: none
+- Added: define radar V1 requirements and Pd/Pfa demonstration gate ([3e0ecb5](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/3e0ecb57e4c09b3c2fc304bf31565c3043052317) by Julio Leon). SemVer impact: none
+- Added: save radar V1 work-package plan ([dca5a83](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/dca5a839b5903a26ba1630c1bbd537025b8d624f) by Julio Leon). SemVer impact: none
+
+### Changed
+
+- Changed: enforce Ruff and MATLAB Code Analyzer checks ([75dcc3b](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/75dcc3b5070458bacfa0bd3bb6e040e278aebf0c) by Julio Leon). SemVer impact: none
+
 ## [v0.2.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.2.0) - 2026-09-13
 
 <small>[Compare with v0.1.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.1.0...v0.2.0)</small>
