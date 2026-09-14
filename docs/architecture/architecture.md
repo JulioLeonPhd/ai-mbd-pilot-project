@@ -115,14 +115,23 @@ The planned data flow is:
    configuration and scenario versions.
 2. ADC inputs provide digitized samples for each channel.
 3. The DUT applies DDC and decimation.
-4. Fast-time and slow-time processing produces detection features.
+4. Fast-time processing produces per-pulse range data. Before coherent
+   slow-time processing, those results receive migration-aware alignment or
+   handling for the moving-target hypotheses under consideration. Slow-time
+   processing then forms Doppler data from the usable pulse ensemble for each
+   azimuth look.
 5. CFAR produces detections, simple clustering groups them, and the DUT emits a
    detection list.
 
 The proposed signal chain and its current rate boundaries are shown below.
 The RF/stimulus path is external to the DUT; the DUT boundary begins with the
-ADC samples. The fast-time/range and slow-time/Doppler ordering is provisional
-pending the WP4 processing contract.
+ADC samples. Fast-time/range processing precedes slow-time/Doppler processing.
+A Doppler map for an azimuth look is formed only after the usable pulses for
+that look are available and migration-aware alignment or handling has been
+applied for the relevant candidate hypotheses. Implementations may stream and
+accumulate per-pulse fast-time results while the look is being collected.
+Whether alignment uses candidate true-velocity hypotheses, iteration, or
+another approved method, along with the exact sequencing, remains WP4 work.
 
 <!-- markdownlint-disable MD013 -->
 ```mermaid
@@ -131,9 +140,8 @@ flowchart LR
     ADC --> DDC["Multistage DDC<br/>complex mix/filter + /3 to 50 MS/s<br/>filter + /4 to 12.5 MS/s"]
     DDC --> BB["Complex baseband candidate<br/>12.5 MS/s/channel; Nyquist +/-6.25 MHz"]
     BB --> FT["Fast-time/range processing<br/>10 MHz waveform; nominal ~15 m resolution"]
-    BB --> ST["Slow-time/Doppler processing<br/>five approximate PRFs:<br/>1700, 1900, 2150, 2450, 2700 Hz<br/>128 usable returns targeted per PRF"]
-    FT --> RD["Range-Doppler feature formation<br/>fast-time/slow-time order provisional"]
-    ST --> RD
+    FT --> ST["Migration-aware alignment/handling<br/>then slow-time/Doppler processing<br/>usable fast-time pulse results for each azimuth look;<br/>five approximate PRFs: 1700, 1900, 2150, 2450, 2700 Hz<br/>128 usable returns targeted per PRF"]
+    ST --> RD["Range-Doppler feature formation<br/>aligned pulse ensemble to Doppler map"]
     RD --> BF["Azimuth/elevation receive beamforming"]
     BF --> AR["Multi-PRF ambiguity resolution<br/>+ post-unfolding near-zero-Doppler clutter veto"]
     AR --> CFAR["Range-Doppler CA-CFAR"]
@@ -159,10 +167,11 @@ flowchart LR
 The generator abstracts the 3 GHz RF waveform and analog conversion; it emits
 sampled 50 MHz IF directly with coherent delay, Doppler, and array phase. The
 five-PRF set and 128-return count are simulation targets that remain
-subject to G2 verification. The diagram does not freeze the sampled DDC
-implementation, DSP interfaces, or the full transition schedule. The 50 MHz IF
-is distinct from the 50 MS/s complex intermediate; a real-only /3 followed by
-IQ recovery is rejected because it aliases the IF to DC. G2 must also
+subject to G2 verification; 128 usable pulses per PRF per azimuth look is a
+scheduling target, not verified performance. The diagram does not freeze the
+sampled DDC implementation, DSP interfaces, or the full transition schedule.
+The 50 MHz IF is distinct from the 50 MS/s complex intermediate; a real-only /3
+followed by IQ recovery is rejected because it aliases the IF to DC. G2 must also
 verify filter alias rejection, transient and group-delay handling, decimator
 phase across PRIs, and near-range gating: the 6.80 km lower range edge is only
 about 0.365 us beyond the 40 us blanking plus 5 us guard.
@@ -182,7 +191,8 @@ open unless stated above as an agreed decision.
 
 WP2's bounded simulation baseline passed the historical G1 review on 2026-09-14;
 see [ADR 0011](../adr/0011-adopt-v1-simulation-timing-baseline.md) and the
-[feasibility report](../research/radar-v1-feasibility.md). G1 is reopened for
-the revised waveform and DDC rate claims. Revised evidence must precede
-freezing WP3/WP4 DSP and timing contracts; G2 must then prove the full return,
-filter, and transition schedule.
+[feasibility report](../research/radar-v1-feasibility.md). [ADR 0014](../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md)
+accepted revised G1 for WP3 data contracts and WP4 DSP/timing architecture.
+WP3 and WP4 are therefore the next work packages, with G2 required to prove
+the full return, filter, priming, and transition schedule before those
+contracts are accepted.
