@@ -9,8 +9,9 @@ Use this skill only as the root agent's finalization step. The root agent owns
 the interpretation, scope, and authorization of the commit. The spawned worker
 owns the Git operations and must not broaden the change.
 
-Do not use this skill to push, tag, merge, rebase, amend, reset, clean, or
-otherwise rewrite history. Do not modify version files unless the root agent
+Do not use this skill to push, tag, merge, rebase, reset, clean, or otherwise
+rewrite history. Amending is prohibited unless the user explicitly authorizes
+amending a named commit. Do not modify version files unless the root agent
 explicitly includes them in the allowed scope.
 
 ## Prepare the bounded handoff
@@ -44,6 +45,8 @@ task:
   allowed_paths: ["path/to/in-scope-file"]
   excluded_paths: ["path/to/unrelated-file"]
   include_staged_changes: false
+  operation: "new"
+  target_commit: null
   branch: "expected-branch"
   semver_impact: "minor"
   references: ["issue or work-item reference"]
@@ -52,26 +55,33 @@ task:
 
 If the scope or compatibility impact is unresolved, resolve it before spawning;
 do not ask the worker to infer product intent from an ambiguous diff.
+Use `operation: "new"` for the normal workflow and set `target_commit` to
+`null`. Use `operation: "amend"` only when the user explicitly authorizes
+amending the named commit in `target_commit`.
 
 ## Spawn the commit worker
 
-Call `multi_agent_v1__spawn_agent` with:
+The root agent remains the orchestrator. A spawned worker is the delegated
+commit executor; the root agent must not perform the commit itself. Call
+`collaboration.spawn_agent` with:
 
 ```yaml
-agent_type: worker
+task_name: commit-worker
+message: <bounded task packet>
+fork_turns: none
 model: gpt-5.6-luna
 reasoning_effort: low
-fork_context: false
 ```
 
 Put the bounded packet in the initial message. The worker starts without the
 root conversation, so include every fact it needs. Tell it to operate on the
 current branch and working tree, preserve other agents' edits, and return the
-commit SHA plus a compact structured result. Wait for that worker's result and
-close it with `multi_agent_v1__close_agent` when finished.
+commit SHA plus a compact structured result. Wait with
+`collaboration.wait_agent`; use `collaboration.followup_task` only when a
+bounded follow-up is required. There is no separate close-agent step.
 
-If the spawn or worker-management tools are unavailable, return `blocked`; do
-not silently perform the commit in the root agent.
+If the delegation tool is unavailable, return `blocked`; do not silently
+perform the commit in the root agent.
 
 The worker must:
 
@@ -84,10 +94,21 @@ The worker must:
 3. Stage only the explicitly allowed paths, while preserving in-scope staged
    content as directed by the packet.
 4. Run the requested checks, including `git diff --cached --check` when
-   requested, then create exactly one new commit without amending another
-   commit or pushing anywhere.
+   requested. For `operation: "new"`, create exactly one new commit. For
+   `operation: "amend"`, amend only the named `target_commit`; do not create a
+   different commit. In either case, write the exact intended multiline
+   message to a temporary file and invoke `git commit --file
+   <temporary-file>` (with the appropriate amend option only for the named
+   target). Do not construct a multiline message with `JSON.stringify`, shell
+   escapes, or an inline representation that can preserve a literal backslash
+   followed by `n` (the byte sequence `0x5C 0x6E`).
 5. Report the commit SHA, message, paths included, checks, and any post-commit
    working-tree changes.
+
+After committing, validate the raw stored message before reporting success,
+for example with `git cat-file commit <sha>` or `git show --format=raw
+--no-patch <sha>`. Confirm that intended line breaks are actual newlines and
+that the message contains no unintended `0x5C 0x6E` byte sequence.
 
 ## Commit-message rules
 
