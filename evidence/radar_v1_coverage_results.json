@@ -1,0 +1,346 @@
+{
+  "schemaVersion": "radar-v1-continuous-coverage-v1",
+  "status": "passed",
+  "studyType": "analytic-continuous-guarded-coverage",
+  "scope": "Timing and echo-window coverage only; no noisy detection or unfolding",
+  "resultsPath": "/Users/julio/projects/ai-mbd-pilot-project/evidence/radar_v1_coverage_results.json",
+  "failure": {
+    "stage": "",
+    "identifier": "",
+    "message": ""
+  },
+  "candidate": {
+    "speedOfLightMPerS": 2.99792458E+8,
+    "samplingRateHz": 6.25E+8,
+    "requestedPrfHz": [
+      1700,
+      1900,
+      2150,
+      2450,
+      2700
+    ],
+    "priSampleCounts": [
+      367648,
+      328948,
+      290698,
+      255102,
+      231482
+    ],
+    "priSeconds": [
+      0.0005882368,
+      0.0005263168,
+      0.0004651168,
+      0.0004081632,
+      0.0003703712
+    ],
+    "actualPrfHz": [
+      1699.9956480111412,
+      1899.9963520070039,
+      2149.9975920026968,
+      2450.0003920000627,
+      2699.9939520135476
+    ],
+    "unambiguousRangeM": [
+      88174.478079027191,
+      78892.9035793472,
+      69719.2543645472,
+      61182.1244965728,
+      55517.2462102048
+    ],
+    "blankingTimeSeconds": 4E-5,
+    "guardTimeSeconds": 5E-6,
+    "internalMaxRangeM": 100050,
+    "numberOfPulsesPerPrf": 128,
+    "reportedRangeDomainM": [
+      6800,
+      100000
+    ],
+    "speedMagnitudeMPerS": 222.22222222222223,
+    "dwellDurationSeconds": 0.30185021440000004,
+    "primingDurationSeconds": 0.0023582048000000003,
+    "quietGapSeconds": 0.00071246175449150221,
+    "scanDurationSeconds": 0.30705826621796606,
+    "motionHalfRangeM": 34.117585135329563,
+    "nominalBlindHalfWidthM": 6745.330305,
+    "expandedBlindHalfWidthM": 6779.4478901353295,
+    "endpointToleranceM": 4.6566128730773926E-10
+  },
+  "method": {
+    "invalidDefinition": "A PRF is invalid when a closed guarded blind band contains the range.",
+    "blindBandDefinition": "For nonnegative integer n, the band is [n*Ru-H, n*Ru+H].",
+    "expandedHalfWidthDefinition": "H includes blanking, guard, and half-scan target motion.",
+    "partitionConstruction": "Use every band endpoint intersecting the reported domain, plus its endpoints.",
+    "openIntervalProof": "The invalid mask is constant on every open partition interval; its midpoint is tested.",
+    "boundaryPolicy": "Band endpoints are tested separately with <= and a finite-point tolerance.",
+    "endpointToleranceM": 4.6566128730773926E-10,
+    "boundaryCount": 12,
+    "claim": "Every range in the reported domain has at least three complete PRFs."
+  },
+  "partition": {
+    "boundaryCount": 12,
+    "openIntervalCount": 11,
+    "boundariesM": [
+      6800,
+      48737.798320069473,
+      54402.676606437468,
+      62296.69410034013,
+      62939.806474411875,
+      67961.572386708125,
+      72113.455689211871,
+      76498.702254682532,
+      81395.030188891862,
+      85672.351469482528,
+      94953.925969162519,
+      100000
+    ]
+  },
+  "evaluation": {
+    "partitions": [
+      {
+        "startRangeM": 6800,
+        "endRangeM": 48737.798320069473,
+        "testedRangeM": 27768.899160034736,
+        "invalidPrfIndices": [],
+        "invalidPrfCount": 0,
+        "completePrfCount": 5
+      },
+      {
+        "startRangeM": 48737.798320069473,
+        "endRangeM": 54402.676606437468,
+        "testedRangeM": 51570.23746325347,
+        "invalidPrfIndices": 5,
+        "invalidPrfCount": 1,
+        "completePrfCount": 4
+      },
+      {
+        "startRangeM": 54402.676606437468,
+        "endRangeM": 62296.69410034013,
+        "testedRangeM": 58349.6853533888,
+        "invalidPrfIndices": [
+          4,
+          5
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 62296.69410034013,
+        "endRangeM": 62939.806474411875,
+        "testedRangeM": 62618.250287376,
+        "invalidPrfIndices": 4,
+        "invalidPrfCount": 1,
+        "completePrfCount": 4
+      },
+      {
+        "startRangeM": 62939.806474411875,
+        "endRangeM": 67961.572386708125,
+        "testedRangeM": 65450.68943056,
+        "invalidPrfIndices": [
+          3,
+          4
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 67961.572386708125,
+        "endRangeM": 72113.455689211871,
+        "testedRangeM": 70037.51403796,
+        "invalidPrfIndices": 3,
+        "invalidPrfCount": 1,
+        "completePrfCount": 4
+      },
+      {
+        "startRangeM": 72113.455689211871,
+        "endRangeM": 76498.702254682532,
+        "testedRangeM": 74306.0789719472,
+        "invalidPrfIndices": [
+          2,
+          3
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 76498.702254682532,
+        "endRangeM": 81395.030188891862,
+        "testedRangeM": 78946.8662217872,
+        "invalidPrfIndices": 2,
+        "invalidPrfCount": 1,
+        "completePrfCount": 4
+      },
+      {
+        "startRangeM": 81395.030188891862,
+        "endRangeM": 85672.351469482528,
+        "testedRangeM": 83533.6908291872,
+        "invalidPrfIndices": [
+          1,
+          2
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 85672.351469482528,
+        "endRangeM": 94953.925969162519,
+        "testedRangeM": 90313.138719322524,
+        "invalidPrfIndices": 1,
+        "invalidPrfCount": 1,
+        "completePrfCount": 4
+      },
+      {
+        "startRangeM": 94953.925969162519,
+        "endRangeM": 100000,
+        "testedRangeM": 97476.96298458126,
+        "invalidPrfIndices": [],
+        "invalidPrfCount": 0,
+        "completePrfCount": 5
+      }
+    ],
+    "boundaries": [
+      {
+        "startRangeM": 6800,
+        "endRangeM": 6800,
+        "testedRangeM": 6800,
+        "invalidPrfIndices": [],
+        "invalidPrfCount": 0,
+        "completePrfCount": 5
+      },
+      {
+        "startRangeM": 48737.798320069473,
+        "endRangeM": 48737.798320069473,
+        "testedRangeM": 48737.798320069473,
+        "invalidPrfIndices": 5,
+        "invalidPrfCount": 1,
+        "completePrfCount": 4
+      },
+      {
+        "startRangeM": 54402.676606437468,
+        "endRangeM": 54402.676606437468,
+        "testedRangeM": 54402.676606437468,
+        "invalidPrfIndices": [
+          4,
+          5
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 62296.69410034013,
+        "endRangeM": 62296.69410034013,
+        "testedRangeM": 62296.69410034013,
+        "invalidPrfIndices": [
+          4,
+          5
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 62939.806474411875,
+        "endRangeM": 62939.806474411875,
+        "testedRangeM": 62939.806474411875,
+        "invalidPrfIndices": [
+          3,
+          4
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 67961.572386708125,
+        "endRangeM": 67961.572386708125,
+        "testedRangeM": 67961.572386708125,
+        "invalidPrfIndices": [
+          3,
+          4
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 72113.455689211871,
+        "endRangeM": 72113.455689211871,
+        "testedRangeM": 72113.455689211871,
+        "invalidPrfIndices": [
+          2,
+          3
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 76498.702254682532,
+        "endRangeM": 76498.702254682532,
+        "testedRangeM": 76498.702254682532,
+        "invalidPrfIndices": [
+          2,
+          3
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 81395.030188891862,
+        "endRangeM": 81395.030188891862,
+        "testedRangeM": 81395.030188891862,
+        "invalidPrfIndices": [
+          1,
+          2
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 85672.351469482528,
+        "endRangeM": 85672.351469482528,
+        "testedRangeM": 85672.351469482528,
+        "invalidPrfIndices": [
+          1,
+          2
+        ],
+        "invalidPrfCount": 2,
+        "completePrfCount": 3
+      },
+      {
+        "startRangeM": 94953.925969162519,
+        "endRangeM": 94953.925969162519,
+        "testedRangeM": 94953.925969162519,
+        "invalidPrfIndices": 1,
+        "invalidPrfCount": 1,
+        "completePrfCount": 4
+      },
+      {
+        "startRangeM": 100000,
+        "endRangeM": 100000,
+        "testedRangeM": 100000,
+        "invalidPrfIndices": [],
+        "invalidPrfCount": 0,
+        "completePrfCount": 5
+      }
+    ],
+    "maximumInvalidPrfCount": 2,
+    "minimumCompletePrfCount": 3,
+    "minimumValidPrfCount": 3,
+    "allOpenIntervalsPass": true,
+    "allBoundariesPass": true
+  },
+  "coverage": {
+    "domainM": [
+      6800,
+      100000
+    ],
+    "domainKm": [
+      6.8,
+      100
+    ],
+    "requiredCompletePrfCount": 3,
+    "maximumInvalidPrfCount": 2,
+    "minimumCompletePrfCount": 3,
+    "minimumValidPrfCount": 3,
+    "allOpenIntervalsPass": true,
+    "allBoundariesPass": true,
+    "passed": true
+  },
+  "completedUtc": "2026-09-14T07:03:29Z"
+}

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "radar-v1-ideal-angle-feasibility-v1",
+  "status": "passed",
+  "scope": "Ideal isotropic uncoupled 16x4 half-wave array; noiseless single target",
+  "carrierFrequencyHz": 3.0E+9,
+  "elementSpacingM": 0.049965409666666669,
+  "azimuthElements": 16,
+  "elevationElements": 4,
+  "azimuthHalfPowerWidthDeg": 6.3587257801601718,
+  "azimuthFirstNullDeg": 7.1807557814582816,
+  "elevationHalfPowerWidthDeg": 26.322952034675897,
+  "elevationFirstNullDeg": 30.000000000000004,
+  "boresightTxVerticalAnglesDeg": [
+    10,
+    15
+  ],
+  "boresightTxVerticalLossDb": [
+    -1.6893955047156417,
+    -3.9962574760504959
+  ],
+  "searchGridAzimuthDeg": "-5:0.1:5",
+  "searchGridElevationDeg": "-15:0.1:15",
+  "angleTests": [
+    {
+      "trueAzimuthDeg": 0,
+      "trueElevationDeg": 0,
+      "estimatedAzimuthDeg": 0,
+      "estimatedElevationDeg": 0,
+      "azimuthErrorDeg": 0,
+      "elevationErrorDeg": 0
+    },
+    {
+      "trueAzimuthDeg": 2,
+      "trueElevationDeg": 5,
+      "estimatedAzimuthDeg": 2,
+      "estimatedElevationDeg": 5,
+      "azimuthErrorDeg": 0,
+      "elevationErrorDeg": 0
+    },
+    {
+      "trueAzimuthDeg": -2,
+      "trueElevationDeg": -5,
+      "estimatedAzimuthDeg": -2,
+      "estimatedElevationDeg": -5,
+      "azimuthErrorDeg": 0,
+      "elevationErrorDeg": 0
+    },
+    {
+      "trueAzimuthDeg": 1.27,
+      "trueElevationDeg": 7.36,
+      "estimatedAzimuthDeg": 1.2999999999999998,
+      "estimatedElevationDeg": 7.3999999999999995,
+      "azimuthErrorDeg": 0.029999999999999805,
+      "elevationErrorDeg": 0.039999999999999147
+    }
+  ],
+  "maximumAbsoluteTestErrorDeg": 0.039999999999999147,
+  "proposedNoiselessUnitToleranceDeg": 0.1,
+  "limitations": "No noise, calibration error, element pattern, mutual coupling, scan loss, or guaranteed elevation coverage"
+}

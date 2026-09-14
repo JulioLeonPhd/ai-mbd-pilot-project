@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "radar-v1-ideal-range-resolution-v1",
+  "status": "passed",
+  "model": "abs(sinc(2*B*r/c)+exp(1j*phi)*sinc(2*B*(r-1)/c))",
+  "scope": "Finite ideal coherent point-spread sweep; not sampled DUT acceptance",
+  "targetRangesM": [
+    0,
+    1
+  ],
+  "relativePhasesDeg": "0:1:359",
+  "nativeGridOffsetCount": 16,
+  "criterion": "Peaks within +/-0.25 m of each target, intervening output sample, valley >=3 dB below weaker peak",
+  "rows": [
+    {
+      "bandwidthHz": 2.0E+8,
+      "oversamplingFactor": 1,
+      "nativeRangeSpacingM": 0.599584916,
+      "outputRangeSpacingM": 0.599584916,
+      "passCount": 1508,
+      "caseCount": 5760,
+      "worstValleyDb": -0.017715616442106417
+    },
+    {
+      "bandwidthHz": 2.0E+8,
+      "oversamplingFactor": 4,
+      "nativeRangeSpacingM": 0.599584916,
+      "outputRangeSpacingM": 0.149896229,
+      "passCount": 3440,
+      "caseCount": 5760,
+      "worstValleyDb": -0.033625386123051361
+    },
+    {
+      "bandwidthHz": 2.5E+8,
+      "oversamplingFactor": 1,
+      "nativeRangeSpacingM": 0.4796679328,
+      "outputRangeSpacingM": 0.4796679328,
+      "passCount": 4273,
+      "caseCount": 5760,
+      "worstValleyDb": -0.0048370069370687382
+    },
+    {
+      "bandwidthHz": 2.5E+8,
+      "oversamplingFactor": 4,
+      "nativeRangeSpacingM": 0.4796679328,
+      "outputRangeSpacingM": 0.1199169832,
+      "passCount": 5760,
+      "caseCount": 5760,
+      "worstValleyDb": -6.9010387292634077
+    }
+  ],
+  "finePhaseSweep": {
+    "phaseSetsDeg": "[-5:0.1:5, 175:0.1:185]",
+    "bandwidthHz": 2.5E+8,
+    "oversamplingFactor": 4,
+    "passCount": 3232,
+    "caseCount": 3232,
+    "worstValleyDb": -6.9010387292634077
+  },
+  "propagationPhaseDeg": -4.984456280083239,
+  "continuousExamples": [
+    {
+      "bandwidthHz": 2.0E+8,
+      "peakRangesM": [
+        0.29670000000000007,
+        0.70329999999999993
+      ],
+      "valleyDb": -0.015877646809674646
+    },
+    {
+      "bandwidthHz": 2.5E+8,
+      "peakRangesM": [
+        -0.096499999999999975,
+        1.0965
+      ],
+      "valleyDb": -7.1825339410820641
+    }
+  ],
+  "headlineMatchesArchitect": true,
+  "limitations": "Finite ideal sinc sweep omits finite-pulse LFM, ADC, DDC, noise, motion, CFAR, and clustering"
+}

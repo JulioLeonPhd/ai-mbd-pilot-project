@@ -75,9 +75,9 @@ These decisions are recorded in [ADR 0009](../adr/0009-radar-mvp-acceptance-and-
 
 ## Provisional proposals
 
-- Treat the 1 m test as an acceptance objective. Required bandwidth, timing,
-  PRFs, pulse count, CPI, and sample rate remain to be derived; no bandwidth
-  estimate is currently claimed sufficient.
+- The G1 250 MHz/4× ideal range-grid candidate supports the 1 m test in a
+  finite ideal sweep. Sampled end-to-end separation and two detection reports
+  remain WP6b/WP8 acceptance work.
 - Use the following scenario assumptions: 0.05 m² drone, 2 m² helicopter,
   5 m² small jet, and 10 m² large jet.
 
@@ -118,16 +118,18 @@ The planned data flow is:
 The exact algorithms, interfaces, rates, units, and numerical settings remain
 open unless stated above as an agreed decision.
 
-## Derived items still open
+## G2 and downstream items still open
 
-- What sampled IF, ADC rate, powers, gains, noise figure, losses, and other
-  physical values are internally consistent?
-- What PRF set (starting with 4–5 distinct PRFs), pulse width, pulse count per
-  look, CPI, and processing schedule meet ambiguity and timing requirements?
-- What look spacing follows from measured 3 dB beamwidth, and what angle,
-  elevation-sector, Doppler-error, and velocity tolerances follow from studies?
+- Can the G1 IF, ADC rate, PRF set, pulse count, and processing schedule produce
+  128 usable returns per PRF with the specified blanking, guard, priming, and
+  transitions?
+- What look spacing follows from the ideal 3 dB beamwidth, and what noisy
+  angle, elevation-sector, Doppler-error, and velocity tolerances apply?
 - What clutter cutoff and detection-statistic definition make results
   reproducible, including Monte Carlo trial and confidence methods?
 
-The latest MATLAB MCP feasibility calculation was unavailable; these values
-must be derived and verified before implementation.
+WP2's bounded simulation baseline passed G1 on 2026-09-14; see
+[ADR 0011](../adr/0011-adopt-v1-simulation-timing-baseline.md) and the
+[feasibility report](../research/radar-v1-feasibility.md). This architecture
+overview has not yet been expanded into the WP4 DSP/timing contracts. G2 must
+prove the full return and transition schedule before those interfaces freeze.
