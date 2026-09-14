@@ -178,7 +178,22 @@ limitations.
    repository-authored Markdown file. Byte-for-byte third-party Markdown
    snapshots may be excluded by the root configuration, but must be verified
    against their pinned source hashes.
-4. For a complex document, route the finished artifact and source context to
+4. When `mmdc` is needed to render a Mermaid diagram, run it outside the
+   command sandbox with Microsoft Edge as the Puppeteer executable:
+
+   ```sh
+   EDGE_BIN='/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
+   PUPPETEER_EXECUTABLE_PATH="$EDGE_BIN" mmdc -i <input.md> -o <output.md> \
+     -a <asset-directory>
+   ```
+
+   This repository rule authorizes the documented rendering procedure; it does
+   not grant platform permission to run outside the sandbox. Request the
+   required command escalation in the execution environment. Do not add
+   `--no-sandbox`. Use temporary output paths unless rendered output is a
+   deliverable. If Edge is unavailable or the render fails, report the check as
+   unavailable or failed rather than passing it.
+5. For a complex document, route the finished artifact and source context to
    `technical-writer-validator`, or to
    `technical-writer-validator-deep` for safety guidance or intricate
    architecture documentation; request revisions for unresolved error findings.
