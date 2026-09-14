@@ -1,0 +1,22 @@
+{
+  "schemaName": "radar.configuration",
+  "schemaVersion": "1.0.0-draft.1",
+  "documentVersion": "0.1.0",
+  "id": "g1-revised-candidate",
+  "createdUtc": "2026-09-14T00:00:00Z",
+  "producer": "wp3-example/0.1.0",
+  "rfCarrierHz": 3000000000,
+  "ifCenterHz": 50000000,
+  "adcSampleRateHz": 150000000,
+  "adcBits": 16,
+  "channelCount": 64,
+  "array": {"azimuthElements": 16, "elevationElements": 4, "elementSpacingWavelengths": 0.5},
+  "waveform": {"pulseWidthSec": 0.00004, "chirpBandwidthHz": 10000000, "chirpStartHz": -5000000, "chirpStopHz": 5000000},
+  "ddc": {"complexIntermediateRateHz": 50000000, "outputRateHz": 12500000, "decimationFactors": [3, 4]},
+  "prfsHz": [1700, 1900, 2150, 2450, 2700],
+  "priSampleCounts": [88236, 78948, 69768, 61224, 55560],
+  "processing": {"maxInstrumentedRangeM": 100000, "rangeDomainM": [6800, 100000], "nearZeroDoppler": {"enabled": false}, "cfar": {"method": "pending-wp7"}, "clustering": {"method": "pending-wp7"}, "ambiguity": {"method": "pending-wp6e"}},
+  "scan": {"azimuthSectorDeg": [-45, 45], "updatePeriodSec": 1},
+  "blanking": {"transmitBlankingSec": 0.00004, "guardSec": 0.000005},
+  "random": {"seed": 12345}
+}

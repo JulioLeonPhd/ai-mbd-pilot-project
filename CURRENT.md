@@ -11,6 +11,12 @@ unresolved errors. The revised G1 evidence is the [study](evidence/radar_v1_revi
 and [results](evidence/radar_v1_revised_g1_results.json). The [V1 plan](docs/plans/radar-matlab-v1.md)
 remains the work package source of truth.
 
+WP3 now has a reviewed draft data-contract document, canonical examples, and
+conformance-checker work in progress: [data contracts](docs/contracts/radar-v1-data-contracts.md)
+and [WP3 examples](contracts/wp3/examples/). Independent document review found
+no unresolved error findings. WP3 remains a draft and G2 is open pending WP4
+timing, filter, and stage decisions plus complete conformance fixtures.
+
 ## Active gate
 
 Revised G1 passed for the bounded analytic and ideal candidate. WP3 data
@@ -57,5 +63,7 @@ vectors without sampling 3 GHz or modeling analog downconversion.
   [result](evidence/radar_v1_range_resolution_results.json)
 - [Angle study](evidence/radar_v1_angle_feasibility.m) and
   [result](evidence/radar_v1_angle_feasibility_results.json)
+- [WP3 data contracts](docs/contracts/radar-v1-data-contracts.md) and
+  [examples/checker directory](contracts/wp3/examples/)
 
 [adr0014]: docs/adr/0014-adopt-revised-v1-analytic-simulation-baseline.md
