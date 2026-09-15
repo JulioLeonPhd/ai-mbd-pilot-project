@@ -21,8 +21,9 @@ delay and alias rejection, receive
 window priming and transitions, the usable-return schedule, migration handling,
 angle and Doppler tolerances, near-zero-Doppler cutoff and suppression
 tolerance, and the exact detection statistic. WP6e must select the ambiguity
-method; this contract does not select clustering, CFAR, ambiguity, or processing
-order beyond the stage seams below.
+method and compare candidate processing orders; this contract defines the
+per-PRF candidate seam and a provisional MVP clustering behavior without
+selecting the final DSP method.
 
 ## Common rules
 
@@ -35,7 +36,9 @@ may accept a lower minor version only after applying
 the documented compatibility rules. It must reject unknown required fields,
 non-finite values, wrong types, wrong dimensions, and unit/sign violations.
 Every producer records `createdUtc` and `producer`; these are provenance, not
-algorithm inputs.
+algorithm inputs. `timeEpoch` is an identifier for the simulation-time origin
+at ADC tick zero, not a UTC timestamp. Reports also identify their common
+five-PRF scan-midpoint tick or offset; `createdUtc` never enters DSP arithmetic.
 
 The radar-centered frame is metres and metres per second: +x is boresight and
 increasing range, +y is radar-left, +z is up, and positive radial velocity is
@@ -58,7 +61,7 @@ parameters. Required top-level fields are:
 | `schemaVersion` | string | `1.x`; this draft is `1.0.0-draft.1` |
 | `id` | string | stable configuration identifier |
 | `createdUtc`, `producer` | string | ISO-8601 timestamp; producer name/version |
-| `rfCarrierHz` | number | Hz; current candidate `3e9` |
+| `rfCarrierHz` | number | Hz; exact current baseline `2997924580` (derive $\lambda=0.1$ m and $d=0.05$ m from ADR 0015) |
 | `ifCenterHz` | number | Hz; current candidate `50e6` |
 | `adcSampleRateHz` | number | samples/s; current candidate `150e6` |
 | `adcBits` | integer | `16` |
@@ -98,17 +101,19 @@ fields are `schemaName: "radar.target-scenario"`, `schemaVersion`, `id`,
 | `velocityMps` | number[3] | `[vx,vy,vz]` in m/s |
 
 The generator derives radial velocity from the target state and preserves the
-3 GHz-derived Doppler and array phase. RCS and velocity remain constant during
-the scan. Acceleration, RCS fluctuation, terrain, occlusion, and terrestrial
-clutter are outside this contract.
+exact ADR 0015 carrier-derived Doppler and array phase. RCS and velocity remain
+constant during the scan. Acceleration, RCS fluctuation, terrain, occlusion,
+and terrestrial clutter are outside this contract.
 
 ## MAT test-vector envelope
 
 The MAT file is a versioned test-vector envelope, not a JSON serialization.
 Its required scalar metadata is `schemaName`, `schemaVersion`, `id`,
 `createdUtc`, `producer`, `configurationId`, `configurationSchemaVersion`,
-`configurationDocumentVersion`, `configurationHash`, `scenarioId`,
-`scenarioSchemaVersion`, `scenarioDocumentVersion`, `scenarioHash`,
+`configurationDocumentVersion`, `scenarioId`, `scenarioSchemaVersion`,
+`scenarioDocumentVersion`, `configurationSnapshot`, `scenarioSnapshot`,
+`generatorRevision`, `generatorVersion`, `generatorSeed`,
+`generationParameters`,
 `sampleRateHz`, `channelCount`, `sampleFormat`, `timeEpoch`, `fixtureScope`, and
 `channelMap`. `sampleFormat` is exactly `real-int16`; `sampleRateHz` is
 `150e6` for the current candidate.
@@ -117,10 +122,20 @@ The repository example `contracts/wp3/examples/test-vector.mat` contains a
 `radarTestVector` struct with one `32x64` zero-valued `int16` slab. It is a
 `unit-only` shape/provenance fixture; it does not represent a complete scan,
 PRI schedule, or V1 acceptance case. Its metadata includes exact
-`configurationSnapshot` and `scenarioSnapshot` UTF-8 JSON bytes,
-`documentVersion` values, and SHA-256 hashes.
+`configurationSnapshot` and `scenarioSnapshot` UTF-8 JSON bytes and
+`documentVersion` values. `generatorRevision` identifies the Git commit used
+for generation, `generatorVersion` identifies the generator interface,
+`generatorSeed` is an integer, and `generationParameters` is a scalar struct.
+The hand-maintained canonical shape example uses `fixture-only` as its revision
+until WP5 supplies a generator. Acceptance fixtures require a committed
+revision. Replay compares sample arrays and meaningful metadata, not MAT-file
+bytes.
 
 Storage uses ordered pulse slabs, so a full scan need not be one giant matrix.
+Routine generated vectors belong under `data/testVectors/` and are ignored by
+Git. Deliberately retained large reference vectors belong under
+`data/retainedTestVectors/` and may use Git LFS. The tiny canonical shape
+example remains tracked until WP5 supplies a generation check.
 `pulseRecords` contains records with `adcSamples` (`int16`, shape
 `[samplesInPulse,64]`), `adcTick` (`uint64`, shape `[samplesInPulse,1]`),
 `pulseStartTick`, `pulseSampleCount`, `prfIndex`, and `prfNominalHz`.
@@ -140,8 +155,8 @@ equal `priSampleCounts(prfIndex)`. The derived actual PRF is
 quantization is permitted. Optional
 generator truth is under `truth`, with `targetId`, `rangeM`,
 `radialVelocityMps`, `azimuthDeg`, and `elevationDeg`; truth is never read by
-the DUT. Missing or mismatched configuration/scenario versions or hashes are
-invalid.
+the DUT. Missing or mismatched configuration/scenario versions or snapshots
+are invalid.
 
 ## Processing-intermediate envelope
 
@@ -158,10 +173,9 @@ arrays. `metadata` records the fixture seed, axis names,
 and stage-specific calibration or index origin. Every fixture declares
 `fixtureScope` as one of `acceptance`, `out-of-domain`, `unit-only`, or
 `provisional`; only `acceptance` fixtures can support a V1 gate. Every fixture carries
-`sourceId`, `sourceSchemaVersion`, `sourceDocumentVersion`, and `sourceHash`.
-`sourceHash` is SHA-256 of the exact stored source MAT-file bytes, or of the
-exact source-content snapshot bytes when the source is not a file; it never
-hashes the envelope containing the hash.
+`sourceId`, `sourceSchemaVersion`, and `sourceDocumentVersion`. Generated
+fixtures also carry generator revision, version, seed, and parameters; hashes
+are not required when code permits semantic replay.
 
 The supported stage seams are `ddc`, `range`, `doppler`, `angle`,
 `candidate-list`, `cfar`, and `cluster`. Their minimum data contracts are:
@@ -173,19 +187,25 @@ The supported stage seams are `ddc`, `range`, `doppler`, `angle`,
 | `range` | `[rangeBin, pulse, channel]` complex | range-bin index plus `rangeBinCentersM` |
 | `doppler` | `[rangeBin, dopplerBin, azimuthLook, elevationLook]` complex or real statistic | `rangeBinCentersM`, `dopplerBinCentersMps` |
 | `angle` | typed struct array shape `[N,1]` with fields `rangeM`, `radialVelocityMps`, `azimuthDeg`, `elevationDeg`, `statistic` | one-based row indices; scalar numeric fields and statistic units are declared |
-| `candidate-list` | typed struct array shape `[N,1]` with `prfIndex`, `rangeM`, `foldedVelocityMps`, `statistic`, `sourceId` | one-based `prfIndex`; scalar numeric fields; no resolver method implied |
-| `cfar` | typed struct array shape `[N,1]` with `rangeBin`, `dopplerBin`, `statistic`, `threshold`, logical `pass` | one-based bin indices; scalar fields; `pass` is logical |
-| `cluster` | typed struct arrays `members` and `candidates`, each shape `[N,1]`; members have string `clusterId`/`memberId`, candidates have one-based `candidateId` | string IDs remain strings; cardinality and merge rules remain WP7-pending |
+| `candidate-list` | typed struct array shape `[N,1]` with unique one-based `candidateId`, one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeM`, `foldedVelocityMps`, `statistic`, `sourceId` | PRF and angle-look indices are one-based and preserved into cross-PRF association and any final report; no resolver method implied |
+| `cfar` | typed struct array shape `[N,1]` with one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeBin`, `dopplerBin`, `sourceCellId`, `statistic`, `threshold`, logical `pass` | look and bin indices are one-based; `sourceCellId` identifies the source range-Doppler cell; `pass` is logical |
+| `cluster` | typed struct arrays `members` and `candidates`, each shape `[N,1]`; rows carry one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`; members have string `clusterId`/`memberId` and `sourceCellId`, candidates have one-based `candidateId` and `sourceCandidateId` | all members of an MVP cluster share PRF and angle-look indices; member `sourceCellId` references the CFAR source cell identity, and candidate `sourceCandidateId` references the unique candidate-list `candidateId`; connected-neighbor adjacency, tolerances, and edge handling are WP4-pending |
 <!-- markdownlint-enable MD013 -->
 
-Stage order, migration alignment, CFAR window/threshold, clustering adjacency
-and merge behavior, and ambiguity method remain open WP4/WP6e/WP7 decisions.
+Stage order, migration alignment, and CFAR window/threshold remain open WP4
+decisions. WP6e compares candidate orders, including per-PRF CFAR and local
+clustering followed by cross-PRF association and unfolding. Three distinct PRFs
+is a provisional support candidate; 4-of-5 is a comparator. Unresolved
+hypotheses produce diagnostics without a definitive report. A confidence score
+may break ties only if WP6e evidence validates it.
 Migration handling preserves a declared pulse axis and source pulse ticks; the
 contract does not prescribe compensation, interpolation, or hypothesis
 iteration. A fixture marked `out-of-domain`, `unit-only`, or `provisional`
 cannot be used as V1 acceptance evidence.
 Implementations must preserve these seams and record the selected method in
 `metadata`; they must not infer an order from an example.
+Candidate PRF and angle-look provenance must remain available through
+association and be preserved in any final report that exposes PRF evidence.
 
 ## Detection-list envelope
 
@@ -193,14 +213,17 @@ The output has `schemaName: "radar.detection-list"`, `schemaVersion`,
 `documentVersion`, `id`, `createdUtc`, `producer`, `configurationId`,
 `testVectorId`, `timeEpoch`,
 `fixtureScope`, `detections`, and `metadata`. Detection examples carry the
-same configuration and test-vector document versions and hashes in metadata;
+same configuration and test-vector document versions in metadata;
 the repository empty example declares a shape-only unit scope and is therefore
 unit-only,
 not V1 acceptance evidence.
 Each detection has required fields `detectionId` (string), `rangeM`,
 `radialVelocityMps`, `azimuthDeg`, `elevationDeg`, and `detectionStatistic`.
 `detectionStatistic` is an object with `name`, `value`, and `units`; its name
-and units are pending the WP7 detector decision. Optional provenance fields
+and units are pending the WP7 detector decision. Acceptance-scope reports must
+include `metadata.scanMidpointTick`, identifying the common five-PRF
+scan-midpoint reference. Unit-only shape examples may omit this field. Optional
+provenance fields
 `clusterId`, `prfEvidence`, and `ambiguityStatus` are present only when the
 selected method defines them. Empty `detections: []` is valid. Duplicate
 `detectionId` values, non-finite values, and reports outside the configured
@@ -220,8 +243,9 @@ performance evidence. Unsupported pending methods return `code:
 
 ## Examples and compatibility
 
-`configurationHash` and `scenarioHash` are SHA-256 hex digests of the exact
-UTF-8 JSON snapshot bytes, including its `documentVersion`.
+Configuration and scenario snapshots are exact UTF-8 JSON bytes, including
+their `documentVersion`; hashes are optional and are not required when
+generator code and metadata permit semantic replay.
 
 Canonical JSON examples belong under `contracts/wp3/examples/` and must use
 the exact field names and versions above. The MAT example must contain the

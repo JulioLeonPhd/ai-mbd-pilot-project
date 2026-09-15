@@ -25,13 +25,13 @@ Related decisions: [ADR 0002](../adr/0002-radar-demonstrator-scope.md),
   design and analysis, and then a Simulink representation.
 - Use a real 16-bit ADC for each channel.
 - Use a pulsed LFM chirp as the stimulus waveform.
-- Use a 3 GHz carrier. This gives an approximate wavelength of 0.1 m and
-  half-wavelength element spacing of approximately 0.05 m.
+- Use the exact ADR 0015 carrier $f_c=2.99792458$ GHz, giving exact free-space
+  wavelength $\lambda=0.1$ m and half-wavelength center spacing $d=0.05$ m.
 - Use the accepted 16×4 single-panel array baseline, with 16 horizontal
   azimuth elements and 4 vertical elements; see [ADR 0007](../adr/0007-adopt-3ghz-16x4-half-wave-array-baseline.md).
 - Use a single coherent boresight transmit beam for the MVP. Transmit scan and
   the method for illuminating the provisional 90° sector remain undecided.
-- At 3 GHz and approximately 0.05 m half-wave spacing, the horizontal
+- At the exact carrier and 0.05 m half-wave spacing, the horizontal
   center-to-center aperture span is 15 × 0.05 m = 0.75 m. This is an aperture
   span, not a claim about the physical panel width.
 - Assume an unobstructed free-space path for the MVP, with no terrain, line of
@@ -41,6 +41,9 @@ Related decisions: [ADR 0002](../adr/0002-radar-demonstrator-scope.md),
   vectors in MAT files.
 - Include DDC and decimation, fast-time and slow-time processing, CFAR,
   simple clustering, and conversion to a detection list in the DUT boundary.
+- Use the authoritative row-major channel map: four elevation channels for
+  each azimuth element, with `k = 1..64` mapping to
+  `(floor((k-1)/4)+1, mod(k-1,4)+1)`.
 - Defer HDL work.
 
 ## Accepted MVP requirements
@@ -136,17 +139,18 @@ another approved method, along with the exact sequencing, remains WP4 work.
 <!-- markdownlint-disable MD013 -->
 ```mermaid
 flowchart LR
-    GEN["MVP target generator<br/>direct 64-channel ADC vectors<br/>3 GHz RF phase model"] --> ADC["DUT input: 64 real 16-bit ADC channels<br/>150 MS/s/channel; 50 MHz IF"]
+    GEN["MVP target generator<br/>direct 64-channel ADC vectors<br/>2.99792458 GHz RF phase model"] --> ADC["DUT input: 64 real 16-bit ADC channels<br/>150 MS/s/channel; 50 MHz IF"]
     ADC --> DDC["Multistage DDC<br/>complex mix/filter + /3 to 50 MS/s<br/>filter + /4 to 12.5 MS/s"]
     DDC --> BB["Complex baseband candidate<br/>12.5 MS/s/channel; Nyquist +/-6.25 MHz"]
     BB --> FT["Fast-time/range processing<br/>10 MHz waveform; nominal ~15 m resolution"]
     FT --> ST["Migration-aware alignment/handling<br/>then slow-time/Doppler processing<br/>usable fast-time pulse results for each azimuth look;<br/>five approximate PRFs: 1700, 1900, 2150, 2450, 2700 Hz<br/>128 usable returns targeted per PRF"]
     ST --> RD["Range-Doppler feature formation<br/>aligned pulse ensemble to Doppler map"]
     RD --> BF["Azimuth/elevation receive beamforming"]
-    BF --> AR["Multi-PRF ambiguity resolution<br/>+ post-unfolding near-zero-Doppler clutter veto"]
-    AR --> CFAR["Range-Doppler CA-CFAR"]
-    CFAR --> CL["Simple clustering"]
-    CL --> DL["Detection list<br/>range, radial velocity, azimuth,<br/>elevation, detection statistic"]
+    BF --> CAND["Per-PRF candidate seam<br/>folded range/velocity + PRF identity"]
+    CAND --> CFAR["Illustrative candidate path: CFAR<br/>and local clustering"]
+    CFAR --> ASSOC["Cross-PRF association and unfolding<br/>provisional support candidate: 3 distinct PRFs"]
+    ASSOC --> DL["Detection list<br/>range, radial velocity, azimuth,<br/>elevation, detection statistic"]
+    CAND -. "design-time decision boundary" .-> ORDER["WP6e compares alternative<br/>orders and ambiguity methods"]
 
     subgraph DUT["DUT boundary: ADC samples to detection list"]
         ADC
@@ -156,15 +160,33 @@ flowchart LR
         ST
         RD
         BF
-        AR
+        CAND
         CFAR
-        CL
+        ASSOC
         DL
     end
 ```
 <!-- markdownlint-enable MD013 -->
 
-The generator abstracts the 3 GHz RF waveform and analog conversion; it emits
+The channel order is row-major across the 16 azimuth by 4 elevation array:
+
+```text
+azimuth 1:   ch 1  ch 2  ch 3  ch 4
+azimuth 2:   ch 5  ch 6  ch 7  ch 8
+...
+azimuth 16:  ch 61 ch 62 ch 63 ch 64
+             el1   el2   el3   el4
+```
+
+The solid path is one candidate arrangement for discussion; it is not a frozen
+runtime order. The dotted link is a design-time decision boundary: WP6e will
+compare alternatives and select the arrangement before implementation freezes
+stage order, cross-PRF support, or confidence tie-breaking. Exact clustering
+adjacency, tolerances, and edge handling remain WP4/G2 decisions; RAD-V1-020 is
+complete only after those decisions are recorded and verified.
+
+The generator abstracts the exact ADR 0015 RF waveform and analog conversion;
+it emits
 sampled 50 MHz IF directly with coherent delay, Doppler, and array phase. The
 five-PRF set and 128-return count are simulation targets that remain
 subject to G2 verification; 128 usable pulses per PRF per azimuth look is a
@@ -173,8 +195,9 @@ sampled DDC implementation, DSP interfaces, or the full transition schedule.
 The 50 MHz IF is distinct from the 50 MS/s complex intermediate; a real-only /3
 followed by IQ recovery is rejected because it aliases the IF to DC. G2 must also
 verify filter alias rejection, transient and group-delay handling, decimator
-phase across PRIs, and near-range gating: the 6.80 km lower range edge is only
-about 0.365 us beyond the 40 us blanking plus 5 us guard.
+phase across PRIs, and near-range gating: the 6.80 km lower range edge has
+approximately 0.1371 us of post-guard edge under the revised ADR 0014 timing
+interpretation.
 
 The exact algorithms, interfaces, rates, units, and numerical settings remain
 open unless stated above as an agreed decision.
@@ -189,10 +212,11 @@ open unless stated above as an agreed decision.
 - What clutter cutoff and detection-statistic definition make results
   reproducible, including Monte Carlo trial and confidence methods?
 
-WP2's bounded simulation baseline passed the historical G1 review on 2026-09-14;
-see [ADR 0011](../adr/0011-adopt-v1-simulation-timing-baseline.md) and the
-[feasibility report](../research/radar-v1-feasibility.md). [ADR 0014](../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md)
-accepted revised G1 for WP3 data contracts and WP4 DSP/timing architecture.
+WP2's revised bounded simulation baseline passed G1 review on 2026-09-14;
+see [ADR 0014](../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md)
+and the [feasibility report](../research/radar-v1-feasibility.md). [ADR 0011](../adr/0011-adopt-v1-simulation-timing-baseline.md)
+is the historical record for the former baseline. ADR 0014 accepted revised
+G1 for WP3 data contracts and WP4 DSP/timing architecture.
 WP3 and WP4 are therefore the next work packages, with G2 required to prove
 the full return, filter, priming, and transition schedule before those
 contracts are accepted.

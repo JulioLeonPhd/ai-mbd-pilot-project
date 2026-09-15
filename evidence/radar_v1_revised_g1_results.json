@@ -3,10 +3,14 @@
   "status": "passed",
   "studyType": "revised-g1-feasibility",
   "scope": "Analytic timing, ideal DDC identity, and ideal finite-LFM separability",
-  "requirement": "RAD-V1-023",
+  "requirements": [
+    "RAD-V1-023",
+    "RAD-V1-024"
+  ],
   "decisionRecords": [
     "ADR 0012",
-    "ADR 0013"
+    "ADR 0013",
+    "ADR 0015"
   ],
   "resultsPath": "/Users/julio/projects/ai-mbd-pilot-project/evidence/radar_v1_revised_g1_results.json",
   "failure": {
@@ -23,8 +27,10 @@
   ],
   "candidate": {
     "speedOfLightMPerS": 2.99792458E+8,
-    "carrierFrequencyHz": 3.0E+9,
-    "wavelengthM": 0.099930819333333337,
+    "carrierFrequencyHz": 2.99792458E+9,
+    "wavelengthM": 0.1,
+    "wavelengthRelationToleranceM": 1E-15,
+    "wavelengthRelationErrorM": 0,
     "adcSampleRateHz": 1.5E+8,
     "intermediateRateHz": 5.0E+7,
     "ddcOutputRateHz": 1.25E+7,
@@ -71,13 +77,13 @@
       55521.5632216
     ],
     "nativeUnambiguousSpeedMPerS": [
-      42.470258454599033,
-      47.466759449257736,
-      53.712385692581122,
-      61.208116506598714,
-      67.44790721742261
+      42.499660002719985,
+      47.499620003039979,
+      53.74957000343997,
+      61.250490003920028,
+      67.494600431965452
     ],
-    "minimumNativeUnambiguousSpeedMPerS": 42.470258454599033,
+    "minimumNativeUnambiguousSpeedMPerS": 42.499660002719985,
     "blankingTimeSeconds": 4E-5,
     "guardTimeSeconds": 5E-6,
     "reportedRangeDomainM": [
@@ -219,6 +225,7 @@
   },
   "acceptance": {
     "closedBoundaryCoveragePass": true,
+    "carrierWavelengthRelationPass": true,
     "nativeDopplerPass": true,
     "finiteLfm50mPass": true,
     "complexMixIdentityPass": true,
@@ -227,5 +234,5 @@
     "g2ScheduleDeferred": true,
     "passed": true
   },
-  "completedUtc": "2026-09-14T15:51:47Z"
+  "completedUtc": "2026-09-15T08:07:03Z"
 }

@@ -11,11 +11,19 @@ unresolved errors. The revised G1 evidence is the [study](evidence/radar_v1_revi
 and [results](evidence/radar_v1_revised_g1_results.json). The [V1 plan](docs/plans/radar-matlab-v1.md)
 remains the work package source of truth.
 
-WP3 now has a reviewed draft data-contract document, canonical examples, and
-conformance-checker work in progress: [data contracts](docs/contracts/radar-v1-data-contracts.md)
-and [WP3 examples](contracts/wp3/examples/). Independent document review found
-no unresolved error findings. WP3 remains a draft and G2 is open pending WP4
-timing, filter, and stage decisions plus complete conformance fixtures.
+WP3 now has accepted interface semantics for the five envelopes, canonical
+examples, an architecture channel-map visual, a clock-epoch glossary entry,
+replay provenance, and ignored/LFS vector storage rules: [data contracts](docs/contracts/radar-v1-data-contracts.md),
+[architecture](docs/architecture/architecture.md), and [WP3 examples](contracts/wp3/examples/).
+The provisional clustering and cross-PRF approach remains subject to WP4/G2
+exact timing and clustering rules; WP6e selects the ambiguity order and method.
+WP3/G2 remains open pending complete valid, invalid, zero-result, version-
+mismatch, and dimension-mismatch conformance coverage.
+
+The JSON subset, MAT example, MATLAB Code Analyzer, Ruff, Markdown lint, and
+Mermaid render checks passed. Independent documentation and code reviews found
+no unresolved errors, with a coverage warning retained for incomplete fixture
+coverage.
 
 ## Active gate
 
@@ -38,13 +46,15 @@ ambiguity method remains WP6e study work. Sampled end-to-end 50 m separation,
 noisy angle accuracy, and detection performance remain downstream gates.
 The ±45° sector and one-second update are provisional. The current 50 MHz IF
 and 150 MS/s ADC are candidates; the MVP generator emits direct ADC-rate
-vectors without sampling 3 GHz or modeling analog downconversion.
+vectors without sampling RF or modeling analog downconversion; coherent phase
+uses the exact ADR 0015 carrier invariant.
 
 ## Next ready packages
 
-- Begin WP3 versioned data contracts and WP4 DSP/timing architecture, with G2
-  as their shared exit gate.
-- Keep the ambiguity-resolution candidate open for WP6e; do not freeze it at G2.
+- Complete WP3 conformance fixtures and checks, then resolve WP4 timing and
+  clustering rules at G2.
+- Keep the ambiguity-resolution candidate open for WP6e; do not freeze its
+  order or method at G2.
 
 ## Evidence
 

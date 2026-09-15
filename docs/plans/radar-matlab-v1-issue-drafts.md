@@ -91,8 +91,8 @@ verification seams, and required diagrams.
 primary and edge cases.
 
 The MVP generator emits 64 real int16 ADC channels at 150 MS/s with a 50 MHz
-IF directly. It retains coherent delay, Doppler, and array phase from the 3 GHz
-RF parameter without sampling 3 GHz or modeling analog downconversion.
+IF directly. It retains coherent delay, Doppler, and array phase from the exact
+ADR 0015 RF parameter without sampling RF or modeling analog downconversion.
 
 **Acceptance criteria:**
 

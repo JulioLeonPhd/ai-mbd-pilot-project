@@ -1,11 +1,11 @@
 {
   "schemaName": "radar.configuration",
   "schemaVersion": "1.0.0-draft.1",
-  "documentVersion": "0.1.0",
+  "documentVersion": "0.2.0",
   "id": "g1-revised-candidate",
   "createdUtc": "2026-09-14T00:00:00Z",
   "producer": "wp3-example/0.1.0",
-  "rfCarrierHz": 3000000000,
+  "rfCarrierHz": 2997924580,
   "ifCenterHz": 50000000,
   "adcSampleRateHz": 150000000,
   "adcBits": 16,

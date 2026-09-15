@@ -6,7 +6,7 @@
   "createdUtc": "2026-09-14T00:00:00Z",
   "producer": "wp3-example/0.1.0",
   "frame": "radar-centered",
-  "timeEpoch": "2026-09-14T00:00:00Z",
+  "timeEpoch": "scan-start",
   "scanDurationSec": 1,
   "targets": [{"id": "target-1", "rcsM2": 10, "positionM": [50000, 0, 0], "velocityMps": [20, 0, 0]}]
 }

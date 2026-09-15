@@ -69,16 +69,20 @@ reopens G1.
 
 For a monostatic radar, radial velocity and Doppler frequency follow
 
-\[
-f_d = \frac{2v}{\lambda}, \qquad \lambda = \frac{c}{f_c}.
-\]
+$$
+f_d = -\frac{2v}{\lambda}, \qquad \lambda = \frac{c}{f_c}.
+$$
+
+Here positive $v$ denotes a receding target under the project’s analytic-signal
+convention; the corresponding Doppler is negative.
 
 Correct transmit-to-return association, all 128 usable returns, and PRF
 transitions are unverified until WP4/G2; a failure reopens G1. The candidate has
 a single-PRF conflict: native coverage of ±40 m/s requires a
-PRF of at least 1601.11 Hz, while 100 km unambiguous range requires a PRF no
-higher than 1498.96 Hz. The five-PRF candidate native spans are approximately
-±42.47 to ±67.45 m/s, so multi-PRF fusion is required for the stated velocity
+PRF of at least 1600 Hz, while 100 km unambiguous range requires a PRF no
+higher than 1498.96 Hz. With the exact wavelength baseline in [ADR 0015](../adr/0015-adopt-exact-10cm-free-space-wavelength.md),
+the five-PRF candidate native spans are approximately ±42.50 to ±67.49 m/s,
+so multi-PRF fusion is required for the stated velocity
 domain.
 
 Noisy multi-target unfolding remains unresolved and is WP6e study work. WP4
@@ -100,7 +104,7 @@ relative phase and 16 native-grid offsets using a study-only split criterion.
 On the native grid, B250 passes 4273/5760 cases; its 4× output-grid candidate
 passes 5760/5760 with a least-deep valley of −6.901 dB. The fine B250 4× sweep
 passes 3232/3232 cases. B200 passes 1508/5760 native cases and 3440/5760 at
-4×. Each bandwidth comparison uses its own native spacing \(c/(2.5B)\): B200
+4×. Each bandwidth comparison uses its own native spacing $c/(2.5B)$: B200
 corresponds to a 500 MS/s real ADC and 250 MS/s complex baseband candidate,
 while B250 uses 625 and 312.5 MS/s. The JSON's `worstValleyDb` includes
 two-peak cases that fail the split criterion; all B250 4× cases pass. The 4×
@@ -175,7 +179,8 @@ The [revised study](../../evidence/radar_v1_revised_g1_study.m) and
 [results](../../evidence/radar_v1_revised_g1_results.json) pass all 5760 of
 5760 ideal 50 m cases on the 11.99169832 m native grid; the worst valley is
 -11.164950851 dB. Guarded coverage has at least three complete PRFs over
-6.80–100.00 km, and the minimum native unambiguous speed is 42.4703 m/s.
+6.80–100.00 km, and the minimum native unambiguous speed is 42.4997 m/s under
+the exact wavelength baseline in [ADR 0015](../adr/0015-adopt-exact-10cm-free-space-wavelength.md).
 Ideal real-ADC image removal before /3 passes the tone identity checks, while
 the unfiltered image failure is demonstrated.
 

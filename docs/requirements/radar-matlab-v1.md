@@ -1,5 +1,5 @@
 ---
-version: 0.1.0
+version: 0.2.0
 status: draft
 ---
 
@@ -47,7 +47,8 @@ radar-left, positive z is up, and positive radial velocity is receding.
 | RAD-V1-020 | Clustering adjacency, merge, and report behavior shall be defined in the WP3/WP4 intermediate and output contracts and verified by WP7 tests. | accepted, contract pending | Contract review and WP7 unit tests |
 | RAD-V1-021 | This requirement refines RAD-V1-014's evidence requirements: statistical verification shall record the confidence level, confidence method, random seed, and trial count for each Pd/Pfa estimate, with confidence bounds. The adequacy of the estimates and the numeric targets are not V1 pass gates. | accepted, method/count pending | Statistical verification report for RAD-V1-014 |
 | RAD-V1-022 | The reported V1 range domain shall use a common five-PRF scan-midpoint reference epoch. The candidate range domain is 6.80–100.00 km with guarded processing support internally extending to 100.05 km for motion; values below 6.80 km are not claimed. WP4 shall verify 128 usable returns per PRF, receive-window priming, transitions, and narrowband-DDC filter state/delay and near-range gating at G2; if that baseline is disproven, G1 shall reopen. | G2 schedule and DDC validation pending | Revised G1 study, ADR 0014, and WP4 timing contract; ADR 0011 is historical |
-| RAD-V1-023 | The current waveform/DDC candidate shall use a 10 MHz complex chirp spanning -5 to +5 MHz, a 50 MHz IF center, and multistage decimation from a 150 MS/s real ADC through 50 MS/s complex (/3) to 12.5 MS/s complex (/4). A real-only /3 followed by IQ recovery is rejected because the IF aliases to DC. The MVP generator emits ADC-rate samples directly while retaining coherent phase derived from the 3 GHz RF parameter. These are candidate parameters pending filter/alias, timing, coverage, SNR/ENOB/jitter, ambiguity, and sampled two-report validation; no automatic SNR or Pd inference is permitted. | revised G1 analytic pass; G2 validation pending | ADR 0012, ADR 0013, ADR 0014, revised G1 study, and WP4/WP5/WP6/WP8 validation |
+| RAD-V1-023 | The current waveform/DDC candidate shall use a 10 MHz complex chirp spanning -5 to +5 MHz, a 50 MHz IF center, and multistage decimation from a 150 MS/s real ADC through 50 MS/s complex (/3) to 12.5 MS/s complex (/4). A real-only /3 followed by IQ recovery is rejected because the IF aliases to DC. The MVP generator emits ADC-rate samples directly while retaining coherent phase derived from the exact ADR 0015 RF invariant. These are candidate parameters pending filter/alias, timing, coverage, SNR/ENOB/jitter, ambiguity, and sampled two-report validation; no automatic SNR or Pd inference is permitted. | revised G1 analytic pass; G2 validation pending | ADR 0012, ADR 0013, ADR 0014, ADR 0015, revised G1 study, and WP4/WP5/WP6/WP8 validation |
+| RAD-V1-024 | The radar configuration shall encode `rfCarrierHz = 2997924580` Hz and derive $\lambda=0.1$ m and $d=0.05$ m from $c=299792458$ m/s and $\lambda=c/f_c$; the exact invariant, 16×4 topology, and array spans shall be verified against ADR 0015 and committed configuration/evidence. | accepted | ADR 0015, configuration contract, and exact-baseline evidence |
 <!-- markdownlint-enable MD013 -->
 
 ## Traceability and gate policy

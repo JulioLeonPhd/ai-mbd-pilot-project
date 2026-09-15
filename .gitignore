@@ -42,3 +42,6 @@ __pycache__/
 
 # Handoff Documents
 docs/handoffs/**/*
+
+# Reproducible generated radar test vectors
+data/testVectors/

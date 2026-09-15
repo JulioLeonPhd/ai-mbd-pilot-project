@@ -1,22 +1,20 @@
 {
   "schemaName": "radar.detection-list",
   "schemaVersion": "1.0.0-draft.1",
-  "documentVersion": "0.1.0",
+  "documentVersion": "0.2.0",
   "id": "empty-detection-example",
   "createdUtc": "2026-09-14T00:00:00Z",
   "producer": "wp3-example/0.1.0",
   "configurationId": "g1-revised-candidate",
   "testVectorId": "example-vector-1",
-  "timeEpoch": "2026-09-14T00:00:00Z",
+  "timeEpoch": "scan-start",
   "fixtureScope": "unit-only",
   "detections": [],
   "metadata": {
     "methodStatus": "pending-wp7",
     "configurationSchemaVersion": "1.0.0-draft.1",
-    "configurationDocumentVersion": "0.1.0",
-    "configurationHash": "591e609d72ff47713d311c4a9aad51c9ce553c855fb752c6361ef515440217f6",
+    "configurationDocumentVersion": "0.2.0",
     "testVectorSchemaVersion": "1.0.0-draft.1",
-    "testVectorDocumentVersion": "0.1.0",
-    "testVectorHash": "74e767e9d225df54c146b80e90fafbe5ea8d333ed581e47d307b70c858083342"
+    "testVectorDocumentVersion": "0.2.0"
   }
 }

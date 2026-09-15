@@ -4,6 +4,9 @@ status: accepted
 
 # Adopt 150 MS/s ADC and direct sampled stimulus abstraction
 
+> Historical carrier wording superseded by ADR 0015. IF, ADC, DDC, waveform,
+> and timing decisions remain current.
+
 This decision supersedes [ADR 0012](0012-adopt-50m-separability-and-narrowband-ddc-candidate.md)
 only for its current-candidate ADC rate, IF, DDC staging, and raw-rate
 consequence. ADR 0012 remains the historical decision record for the 50 m
@@ -13,7 +16,8 @@ separability and 10 MHz waveform candidate.
 
 The 625 MS/s real ADC candidate was inherited from the historical 250 MHz
 waveform. The current candidate is a 10 MHz complex chirp, so the MVP can use
-a lower-rate first-Nyquist-zone IF. The physical RF carrier remains 3 GHz;
+a lower-rate first-Nyquist-zone IF. The physical RF carrier is now the exact
+2.99792458 GHz invariant from ADR 0015;
 50 MHz is the proposed IF center.
 
 ## Decision
@@ -29,7 +33,7 @@ Filtering must precede each decimation stage.
 
 The MVP target generator emits the 64 real int16 ADC channels directly at
 150 MS/s. It preserves coherent delay, Doppler, and array phase derived from
-the 3 GHz carrier parameter without generating sampled 3 GHz or explicit analog
+the exact carrier parameter without generating sampled RF or explicit analog
 downconversion. Configuration distinguishes `rfCarrierHz`, `ifCenterHz`,
 `adcSampleRateHz`, and `ddcOutputRateHz`, with one global time epoch.
 

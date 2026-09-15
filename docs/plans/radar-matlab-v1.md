@@ -22,8 +22,9 @@ WP2 produces evidence.
   intermediate-processing, and detection-list contracts. Intermediate
   contracts must support independent unit-test fixtures for every WP6 stage.
 - Expand the DSP architecture with DUT-boundary, data-shape/processing, and
-  timing/PRF/blanking diagrams. Freeze stage order and interfaces at G2, while
-  leaving the ambiguity-resolution candidate to WP6e.
+  timing/PRF/blanking diagrams. Freeze stable stage interfaces and fixture
+  seams at G2; leave the internal CFAR, clustering, association, and
+  ambiguity-resolution order to WP6e selection.
 
 ## Work packages and gates
 
@@ -40,7 +41,7 @@ feasibility.
 | WP2 — Quantitative feasibility | D3–10 | WP0; parallel with WP1 | MATLAB MCP-backed link budget, waveform/sampling, PRF ambiguity coverage, beam/angle, and timing studies. **G1, with WP1:** approve a feasible baseline or stop for a documented decision. |
 | WP3 — Data contracts | D11–15 | G1 | Versioned contracts, examples, and conformance checks. |
 | WP4 — DSP architecture | D11–16 | G1; parallel with WP3 | Stage order, dimensions/rates, fixture seams, ambiguity-selection criteria, and diagrams. **G2, with WP3:** independent review finds no unresolved errors or contract conflicts. |
-| WP5 — Stimulus and fixtures | D17–24 | G2 | Seeded JSON-driven generator emitting direct 150 MS/s real ADC vectors at 50 MHz IF, with 3 GHz-derived Doppler and array phase present in the generated IF samples. |
+| WP5 — Stimulus and fixtures | D17–24 | G2 | Seeded JSON-driven generator emitting direct 150 MS/s real ADC vectors at 50 MHz IF, with exact ADR 0015 carrier-derived Doppler and array phase present in the generated IF samples. |
 | WP6 — Reference processing | D17–38 | G2; split below | Independently tested processing stages and an ambiguity-resolution decision. |
 | WP7 — Detection and reports | D17–25 | G2; parallel with WP5 and WP6 | CA-CFAR, near-zero-Doppler handling, clustering, and report formatting against synthetic fixtures. **G3:** each implementation package passes focused tests and contract checks. |
 | WP8 — Integration and verification | D39–50 | WP5, all WP6 subpackages, WP7 | End-to-end seeded runs and independent numerical review. **G4:** no unresolved validation errors; measured performance and limitations are reported. |

@@ -4,6 +4,10 @@ status: accepted
 
 # Adopt the 3 GHz 16×4 half-wave array baseline
 
+> Historical baseline. ADR 0015 supersedes this decision only for carrier,
+> wavelength, and physical spacing; the 16×4 topology, half-wave ratio, and
+> normalized beam conclusions remain current.
+
 The reference project adopts a 3 GHz baseline (approximately 0.1 m
 wavelength) with approximately 0.05 m half-wave spacing and a 16-horizontal by
 4-vertical single-panel array. This gives the demonstrator a more useful

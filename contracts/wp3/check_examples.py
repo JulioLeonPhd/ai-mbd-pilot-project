@@ -1,6 +1,5 @@
 """Check the WP3 draft JSON examples and cross-document references."""
 
-import hashlib
 import json
 import math
 import re
@@ -8,6 +7,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent / "examples"
 VERSION = re.compile(r"^\d+\.\d+\.\d+(?:-draft\.\d+)?$")
+DRAFT_SCHEMA_VERSION = "1.0.0-draft.1"
+EXPECTED_DOCUMENT_VERSION = "0.2.0"
+SPEED_OF_LIGHT_M_PER_S = 299_792_458
+EXPECTED_RF_CARRIER_HZ = 2_997_924_580
+EXPECTED_WAVELENGTH_M = 0.1
+EXPECTED_ELEMENT_SPACING_RATIO = 0.5
+EXPECTED_ELEMENT_SPACING_M = 0.05
+FLOAT_TOLERANCE = 1e-15
 
 
 def require(condition: bool, message: str) -> None:
@@ -38,6 +45,10 @@ def envelope(value: dict, name: str) -> None:
             isinstance(value.get(key), str) and VERSION.fullmatch(value[key]),
             f"invalid {key}",
         )
+    require(
+        value["schemaVersion"] == DRAFT_SCHEMA_VERSION,
+        f"unsupported draft schemaVersion: {value['schemaVersion']}",
+    )
     require(isinstance(value.get("id"), str) and bool(value["id"]), "missing id")
 
 
@@ -51,8 +62,45 @@ def check() -> None:
 
     for key in ("rfCarrierHz", "ifCenterHz", "adcSampleRateHz"):
         require(finite_number(config.get(key)) and config[key] > 0, f"invalid {key}")
+    require(
+        config["documentVersion"] == EXPECTED_DOCUMENT_VERSION,
+        "configuration documentVersion must be 0.2.0",
+    )
+    require(
+        config["rfCarrierHz"] == EXPECTED_RF_CARRIER_HZ,
+        "RF carrier must equal the exact 10 cm design carrier",
+    )
+    wavelength_m = SPEED_OF_LIGHT_M_PER_S / config["rfCarrierHz"]
+    require(
+        math.isclose(
+            wavelength_m,
+            EXPECTED_WAVELENGTH_M,
+            rel_tol=0.0,
+            abs_tol=FLOAT_TOLERANCE,
+        ),
+        "derived wavelength must equal 0.1 m",
+    )
     require(config.get("adcBits") == 16, "ADC bit depth must be 16")
     array = config["array"]
+    require(
+        math.isclose(
+            array["elementSpacingWavelengths"],
+            EXPECTED_ELEMENT_SPACING_RATIO,
+            rel_tol=0.0,
+            abs_tol=FLOAT_TOLERANCE,
+        ),
+        "array element spacing must be a half-wavelength",
+    )
+    element_spacing_m = wavelength_m * array["elementSpacingWavelengths"]
+    require(
+        math.isclose(
+            element_spacing_m,
+            EXPECTED_ELEMENT_SPACING_M,
+            rel_tol=0.0,
+            abs_tol=FLOAT_TOLERANCE,
+        ),
+        "derived element spacing must equal 0.05 m",
+    )
     require(
         array["azimuthElements"] * array["elevationElements"]
         == config.get("channelCount")
@@ -115,18 +163,23 @@ def check() -> None:
         output.get("configurationId") == config["id"],
         "detection configurationId disagrees",
     )
+    require(
+        output["documentVersion"] == EXPECTED_DOCUMENT_VERSION,
+        "detection-list documentVersion must be 0.2.0",
+    )
     require(output.get("detections") == [], "expected zero-result example")
     require(output.get("fixtureScope") == "unit-only", "wrong fixture scope")
     metadata = output["metadata"]
     require(
-        metadata["configurationHash"]
-        == hashlib.sha256((ROOT / "configuration.json").read_bytes()).hexdigest(),
-        "configuration hash disagrees",
+        metadata["configurationSchemaVersion"] == config["schemaVersion"]
+        and metadata["configurationDocumentVersion"] == config["documentVersion"],
+        "configuration version disagrees",
     )
     require(
-        metadata["testVectorHash"]
-        == hashlib.sha256((ROOT / "test-vector.mat").read_bytes()).hexdigest(),
-        "MAT hash disagrees",
+        output["testVectorId"] == "example-vector-1"
+        and metadata["testVectorSchemaVersion"] == "1.0.0-draft.1"
+        and metadata["testVectorDocumentVersion"] == EXPECTED_DOCUMENT_VERSION,
+        "test-vector provenance disagrees",
     )
     require(
         output.get("metadata", {}).get("methodStatus") == "pending-wp7",
