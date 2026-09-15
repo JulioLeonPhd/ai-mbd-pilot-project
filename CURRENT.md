@@ -15,7 +15,9 @@ WP3 now has accepted interface semantics for the five envelopes, canonical
 examples, an architecture channel-map visual, a clock-epoch glossary entry,
 replay provenance, and ignored/LFS vector storage rules: [data contracts](docs/contracts/radar-v1-data-contracts.md),
 [architecture](docs/architecture/architecture.md), and [WP3 examples](contracts/wp3/examples/).
-The provisional clustering and cross-PRF approach remains subject to WP4/G2
+[The five-PRF decision and reopened CPI pulse-count rationale](docs/adr/0016-retain-five-prfs-and-reopen-cpi-pulse-count.md)
+are recorded in ADR 0016. The provisional clustering and cross-PRF approach
+remains subject to WP4/G2
 exact timing and clustering rules; WP6e selects the ambiguity order and method.
 WP3/G2 remains open pending complete valid, invalid, zero-result, version-
 mismatch, and dimension-mismatch conformance coverage.
@@ -39,8 +41,9 @@ been published; issue publication does not block technical work.
 
 Revised G1 adopted an analytic and ideal simulation baseline, not verified DUT,
 hardware, or real-time
-performance. WP4/G2 must prove 128 usable returns per PRF, receive-window
-priming, and PRF transitions; a failure reopens G1. The revised 10 MHz waveform
+performance. WP4/WP6e must select usable pulses per PRF and prove timing,
+receive-window priming, PRF transitions, and post-CFAR 3-of-5 fusion; 128
+pulses is reopened by ADR 0016. The revised 10 MHz waveform
 and DDC rate claims passed only their bounded G1 analytic checks. The noisy multi-target
 ambiguity method remains WP6e study work. Sampled end-to-end 50 m separation,
 noisy angle accuracy, and detection performance remain downstream gates.

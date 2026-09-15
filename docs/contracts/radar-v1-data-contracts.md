@@ -178,7 +178,10 @@ fixtures also carry generator revision, version, seed, and parameters; hashes
 are not required when code permits semantic replay.
 
 The supported stage seams are `ddc`, `range`, `doppler`, `angle`,
-`candidate-list`, `cfar`, and `cluster`. Their minimum data contracts are:
+`candidate-list`, `ambiguity-projection`, `cfar`, `fusion`, and `cluster`.
+Projection preserves five separate PRF layers; CFAR emits one decision per
+layer, including explicit invalid/fail states, and fusion votes across those
+five distinct decisions. Their minimum data contracts are:
 
 <!-- markdownlint-disable MD013 -->
 | Stage | `data` shape and meaning | Required units |
@@ -188,14 +191,17 @@ The supported stage seams are `ddc`, `range`, `doppler`, `angle`,
 | `doppler` | `[rangeBin, dopplerBin, azimuthLook, elevationLook]` complex or real statistic | `rangeBinCentersM`, `dopplerBinCentersMps` |
 | `angle` | typed struct array shape `[N,1]` with fields `rangeM`, `radialVelocityMps`, `azimuthDeg`, `elevationDeg`, `statistic` | one-based row indices; scalar numeric fields and statistic units are declared |
 | `candidate-list` | typed struct array shape `[N,1]` with unique one-based `candidateId`, one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeM`, `foldedVelocityMps`, `statistic`, `sourceId` | PRF and angle-look indices are one-based and preserved into cross-PRF association and any final report; no resolver method implied |
-| `cfar` | typed struct array shape `[N,1]` with one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeBin`, `dopplerBin`, `sourceCellId`, `statistic`, `threshold`, logical `pass` | look and bin indices are one-based; `sourceCellId` identifies the source range-Doppler cell; `pass` is logical |
-| `cluster` | typed struct arrays `members` and `candidates`, each shape `[N,1]`; rows carry one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`; members have string `clusterId`/`memberId` and `sourceCellId`, candidates have one-based `candidateId` and `sourceCandidateId` | all members of an MVP cluster share PRF and angle-look indices; member `sourceCellId` references the CFAR source cell identity, and candidate `sourceCandidateId` references the unique candidate-list `candidateId`; connected-neighbor adjacency, tolerances, and edge handling are WP4-pending |
+| `ambiguity-projection` | typed struct array preserving five PRF layers, with common hypothesis coordinates, per-PRF `validityMask`, and `sourceCellId` identities | each hypothesis retains its five-layer eligibility and source-cell provenance before per-PRF CFAR; invalid layers are explicit |
+| `cfar` | typed struct array shape `[N,1]` with one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeBin`, `dopplerBin`, `sourceCellId`, `statistic`, `threshold`, logical `pass`, and `decisionState` | `decisionState` is one of `pass`, `fail`, or `invalid`; invalidity is recorded in the CFAR record and mirrored in the fusion masks |
+| `fusion` | typed struct array shape `[N,1]` with `validityMask`, `supportMask`, `voteCount`, `voteThreshold`, `residual`, `ambiguityStatus`, `sourceCellIds`, and fused `rangeM`/`radialVelocityMps` | masks distinguish eligible, pass, fail, and invalid PRF decisions; source identities preserve contributing PRFs/cells; `voteThreshold` is 3 for the full-domain 3-of-5 baseline; residual and status are declared for unresolved hypotheses |
+| `cluster` | typed struct arrays of fused hypotheses and cluster records, each shape `[N,1]`; records carry fused coordinates, `supportMask`, `validityMask`, and contributing `sourceCellIds` | clusters consume fused hypotheses; no single-`prfIndex` invariant applies; connected-neighbor adjacency, tolerances, and edge handling are WP4-pending |
 <!-- markdownlint-enable MD013 -->
 
-Stage order, migration alignment, and CFAR window/threshold remain open WP4
-decisions. WP6e compares candidate orders, including per-PRF CFAR and local
-clustering followed by cross-PRF association and unfolding. Three distinct PRFs
-is a provisional support candidate; 4-of-5 is a comparator. Unresolved
+The baseline stage order is ambiguity projection/unfolding, per-PRF CFAR,
+M-of-5 binary fusion, then clustering. Migration alignment and CFAR
+window/threshold remain open WP4 decisions. WP6e may compare alternatives, but
+must preserve the five PRF layers and this fusion seam. The full-domain baseline
+is 3-of-5; 4-of-5 is a comparator. Unresolved
 hypotheses produce diagnostics without a definitive report. A confidence score
 may break ties only if WP6e evidence validates it.
 Migration handling preserves a declared pulse axis and source pulse ticks; the
@@ -206,6 +212,7 @@ Implementations must preserve these seams and record the selected method in
 `metadata`; they must not infer an order from an example.
 Candidate PRF and angle-look provenance must remain available through
 association and be preserved in any final report that exposes PRF evidence.
+ADR 0016 records the five-PRF decision and reopened CPI pulse-count trade.
 
 ## Detection-list envelope
 

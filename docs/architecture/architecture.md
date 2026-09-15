@@ -20,6 +20,7 @@ Related decisions: [ADR 0002](../adr/0002-radar-demonstrator-scope.md),
 [ADR 0006](../adr/0006-limit-the-mvp-propagation-model.md),
 [ADR 0007](../adr/0007-adopt-3ghz-16x4-half-wave-array-baseline.md), and
 [ADR 0008](../adr/0008-defer-hdl-generation-and-cosimulation.md).
+The five-PRF and CPI decision is recorded in [ADR 0016](../adr/0016-retain-five-prfs-and-reopen-cpi-pulse-count.md).
 
 - Develop a floating-point MATLAB reference first, followed by fixed-point
   design and analysis, and then a Simulink representation.
@@ -123,8 +124,9 @@ The planned data flow is:
    handling for the moving-target hypotheses under consideration. Slow-time
    processing then forms Doppler data from the usable pulse ensemble for each
    azimuth look.
-5. CFAR produces detections, simple clustering groups them, and the DUT emits a
-   detection list.
+5. Ambiguity projection/unfolding preserves the five PRF layers. Per-PRF CFAR
+   decisions feed non-coherent 3-of-5 binary integration; clustering consumes
+   the fused hypotheses and the DUT emits a detection list.
 
 The proposed signal chain and its current rate boundaries are shown below.
 The RF/stimulus path is external to the DUT; the DUT boundary begins with the
@@ -143,13 +145,15 @@ flowchart LR
     ADC --> DDC["Multistage DDC<br/>complex mix/filter + /3 to 50 MS/s<br/>filter + /4 to 12.5 MS/s"]
     DDC --> BB["Complex baseband candidate<br/>12.5 MS/s/channel; Nyquist +/-6.25 MHz"]
     BB --> FT["Fast-time/range processing<br/>10 MHz waveform; nominal ~15 m resolution"]
-    FT --> ST["Migration-aware alignment/handling<br/>then slow-time/Doppler processing<br/>usable fast-time pulse results for each azimuth look;<br/>five approximate PRFs: 1700, 1900, 2150, 2450, 2700 Hz<br/>128 usable returns targeted per PRF"]
+    FT --> ST["Migration-aware alignment/handling<br/>then slow-time/Doppler processing<br/>usable fast-time pulse results for each azimuth look;<br/>five approximate PRFs: 1700, 1900, 2150, 2450, 2700 Hz<br/>usable pulses per PRF selected at WP4/WP6e"]
     ST --> RD["Range-Doppler feature formation<br/>aligned pulse ensemble to Doppler map"]
     RD --> BF["Azimuth/elevation receive beamforming"]
     BF --> CAND["Per-PRF candidate seam<br/>folded range/velocity + PRF identity"]
-    CAND --> CFAR["Illustrative candidate path: CFAR<br/>and local clustering"]
-    CFAR --> ASSOC["Cross-PRF association and unfolding<br/>provisional support candidate: 3 distinct PRFs"]
-    ASSOC --> DL["Detection list<br/>range, radial velocity, azimuth,<br/>elevation, detection statistic"]
+    CAND --> UNFOLD["Ambiguity projection/unfolding<br/>five PRF layers retained"]
+    UNFOLD --> CFAR["Per-PRF CFAR decisions"]
+    CFAR --> FUSE["Non-coherent binary fusion<br/>3-of-5 baseline; masks and source cells"]
+    FUSE --> CLUST["Clustering<br/>consumes fused hypotheses"]
+    CLUST --> DL["Detection list<br/>range, radial velocity, azimuth,<br/>elevation, detection statistic"]
     CAND -. "design-time decision boundary" .-> ORDER["WP6e compares alternative<br/>orders and ambiguity methods"]
 
     subgraph DUT["DUT boundary: ADC samples to detection list"]
@@ -161,8 +165,10 @@ flowchart LR
         RD
         BF
         CAND
+        UNFOLD
         CFAR
-        ASSOC
+        FUSE
+        CLUST
         DL
     end
 ```
@@ -188,8 +194,8 @@ complete only after those decisions are recorded and verified.
 The generator abstracts the exact ADR 0015 RF waveform and analog conversion;
 it emits
 sampled 50 MHz IF directly with coherent delay, Doppler, and array phase. The
-five-PRF set and 128-return count are simulation targets that remain
-subject to G2 verification; 128 usable pulses per PRF per azimuth look is a
+five-PRF set is retained; the historical 128-return count is not frozen and
+usable pulses per PRF per azimuth look is a
 scheduling target, not verified performance. The diagram does not freeze the
 sampled DDC implementation, DSP interfaces, or the full transition schedule.
 The 50 MHz IF is distinct from the 50 MS/s complex intermediate; a real-only /3
@@ -204,9 +210,8 @@ open unless stated above as an agreed decision.
 
 ## G2 and downstream items still open
 
-- Can the G1 50 MHz IF, 150 MS/s ADC rate, PRF set, pulse count, and
-  processing schedule produce 128 usable returns per PRF with the specified
-  blanking, guard, priming, and transitions?
+- What usable-pulse allocation per PRF satisfies the azimuth dwell, blanking,
+  guard, priming, and transition constraints, and how will it be verified?
 - What look spacing follows from the ideal 3 dB beamwidth, and what noisy
   angle, elevation-sector, Doppler-error, and velocity tolerances apply?
 - What clutter cutoff and detection-statistic definition make results
