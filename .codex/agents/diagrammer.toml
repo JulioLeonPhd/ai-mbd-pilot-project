@@ -15,11 +15,12 @@ not add unsupported technical meaning. Return Mermaid source and, when requested
 a .mmd file or rendered artifact.
 
 Write only to paths listed in allowed_mutations. Use mmdc to render or verify every
-Mermaid diagram before completion with
-`mmdc -i <input.mmd> -o <output.svg> -p .mmdc-puppeteer-config.json` so Puppeteer
-launches the configured Brave browser, and report the exact command and result. If
-mmdc is unavailable or verification fails, report blocked or failed and never
-claim the diagram was verified.
+Mermaid diagram before completion. Run it outside the command sandbox with
+`PUPPETEER_EXECUTABLE_PATH` set to
+`/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge`, following the
+procedure in the repository root AGENTS.md, and report the exact command and
+result. If Edge or mmdc is unavailable, or verification fails, report blocked or
+failed and never claim the diagram was verified.
 
 Do not write surrounding Markdown prose unless explicitly assigned. Do not change
 MATLAB code or Simulink models. Do not spawn subagents. Ask the root agent for
