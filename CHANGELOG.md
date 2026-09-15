@@ -8,6 +8,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.4.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.4.0) - 2026-09-15
+
+<small>[Compare with v0.3.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.3.0...v0.4.0)</small>
+
+### Added
+
+- Added: document rendering procedure for Mermaid diagrams using Microsoft Edge ([e3c5584](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/e3c558435288f50bc46d2020e79fcb7ac1170f1d) by Julio Leon).
+- Added: define draft radar V1 WP3 data contracts ([5bb66fc](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/5bb66fc116113e9d4babbfdbad234d7fa930eecb) by Julio Leon). SemVer impact: none
+
+### Changed
+
+- Changed: retain five-PRF processing baseline ([95924e1](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/95924e1ddbd8496b9a1f6e3a3e7004070e85278d) by Julio Leon). SemVer impact: none
+- Changed: adopt exact radar baseline and refine WP3 contracts ([01ffebf](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/01ffebf0084aa44fd708f1cb1f92d6e665143270) by Julio Leon). SemVer impact: none
+- Changed: Refined fast-time and slow-time processing descriptions in architecture document ([cda17bb](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/cda17bbffee4034b48fe58870342995b42ce0ac0) by Julio Leon).
+
+### Fixed
+
+- Fixed:  commit worker guidelines and clarify operation handling for new and amend actions ([f006252](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/f0062522e4a8de680cec086d2c3dcd0e9014847f) by Julio Leon).
+
 ## [v0.3.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.3.0) - 2026-09-14
 
 <small>[Compare with v0.2.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.2.0...v0.3.0)</small>
