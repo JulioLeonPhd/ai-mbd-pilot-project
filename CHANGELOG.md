@@ -8,6 +8,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.5.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.5.0) - 2026-09-20
+
+<small>[Compare with v0.4.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.4.0...v0.5.0)</small>
+
+### Added
+
+- Added: add manifest-driven WP3 conformance coverage ([84c6234](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/84c623491508f08f5f4ea553153b2eee80d19e2e) by Julio Leon). SemVer impact: none
+- Added: adopt commanded-look receive processing and provisional G2 schedule ([c45f09a](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c45f09a981998580f054d53bb7b79a8c0cb6c750) by Julio Leon).
+- Added: add Pyright project validation ([f141605](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/f141605e1670e976f01a93dc5f6b9d4321ee8fc8) by Julio Leon). SemVer impact: none
+- Added: configure repository engineering skill context ([4b1ca5d](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/4b1ca5dbeac908f409c5f4df7f9521d7a0322e3c) by Julio Leon). SemVer impact: none
+
+### Changed
+
+- Changed: record WP3 acceptance and WP4 handoff ([e9bf4e0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/e9bf4e0a03b0a0529b7e9a1db9aeb2e5c77c65b7) by Julio Leon). SemVer impact: none
+- Changed: tune Simulink implementer model configuration ([fac2f5a](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/fac2f5adb2e4ee0906a2fa476676941e62f72c79) by Julio Leon). SemVer impact: none
+- Changed: add repository front page and standardize Mermaid rendering ([63f0b0e](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/63f0b0e18d6aa93667b0f80a6adc0f5dcd8d81a9) by Julio Leon). SemVer impact: none
+
+### Misc
+
+- Updated: Handoff skill ([186957a](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/186957ac5c8cbeb221172245143504f74c3e3bfc) by Julio Leon).
+
 ## [v0.4.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.4.0) - 2026-09-15
 
 <small>[Compare with v0.3.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.3.0...v0.4.0)</small>
