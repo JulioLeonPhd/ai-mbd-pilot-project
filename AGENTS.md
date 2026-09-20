@@ -285,20 +285,16 @@ push the commit and tag when the user requests publication.
 
 ### Issue tracker
 
-Read [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md) before creating,
-reading, listing, commenting on, labeling, or closing a GitHub issue, or whenever
-a skill says to publish or fetch tracker content. The repository tracker is
-GitHub Issues for `JulioLeonPhd/ai-mbd-pilot-project`; use `gh` from this clone.
+GitHub Issues for `JulioLeonPhd/ai-mbd-pilot-project`, using the `gh` CLI.
+See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
-Read [docs/agents/triage-labels.md](docs/agents/triage-labels.md) before applying
-or interpreting tracker labels, including a skill's named triage role. Use its
-canonical role-to-label mapping.
+The five default canonical labels: `needs-triage`, `needs-info`,
+`ready-for-agent`, `ready-for-human`, and `wontfix`.
+See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-Read [docs/agents/domain.md](docs/agents/domain.md), [CONTEXT.md](CONTEXT.md),
-and the relevant [docs/adr](docs/adr/) entries before exploring a domain topic,
-drafting requirements or tests, or proposing a design change. Use the glossary
-terms and surface any conflict with an ADR.
+Single-context layout: root `CONTEXT.md` and system-wide decisions in
+`docs/adr/`. See `docs/agents/domain.md`.
