@@ -1,0 +1,11 @@
+{
+  "include": [
+    "contracts",
+    "scripts"
+  ],
+  "exclude": [
+    "**/.venv",
+    "**/node_modules"
+  ],
+  "typeCheckingMode": "basic"
+}

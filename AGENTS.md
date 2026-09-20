@@ -266,6 +266,15 @@ or editing a `.py` file, run `uv run --frozen ruff check <path>` and
 Ruff fixes with `uv run --frozen ruff check --fix <path>` and
 `uv run --frozen ruff format <path>` when appropriate, then review the diff.
 
+Pylance/Pyright provides supplementary static type checking for Python code in
+`contracts` and `scripts`. The repository-level `pyrightconfig.json` keeps this
+check at `basic` mode because Python is used for project tooling and contract
+validation rather than as the primary project language. Preserve that scope
+and mode unless the project explicitly adopts stricter Python typing. When the
+dependency environment is available, run `uv run --frozen pyright contracts
+scripts` for the corresponding command-line check; report any remaining
+diagnostics rather than treating the check as passed.
+
 ## Repository context
 
 ```text
