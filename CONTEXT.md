@@ -26,6 +26,15 @@ detection-list generation.
 **Detection list**:
 The structured set of detected target outputs produced by the DUT.
 
+**Commanded azimuth look**:
+The selected receive azimuth used to form a directional receive look. V1
+associates detections with this commanded look rather than claiming sub-beam
+azimuth estimation.
+
+**V1 reported azimuth**:
+The commanded azimuth look associated with a detection. V1 does not claim
+sub-beam azimuth estimation; multi-beam or monopulse refinement is future work.
+
 **Test vector**:
 A saved MAT-file containing generated stimulus and associated data for a test,
 including the exact radar-configuration and target-scenario versions used.

@@ -61,8 +61,8 @@ The five-PRF and CPI decision is recorded in [ADR 0016](../adr/0016-retain-five-
   with shared nonzero radial velocity, separated by 50 m in range, and emits two
   detection-list reports. Additional velocity-separated and
   unfolded-velocity cases are required.
-- Azimuth and elevation receive beamforming are simultaneous; elevation does
-  not scan. Boresight angle accuracy is the first acceptance case.
+- Commanded-look azimuth summation precedes range/Doppler processing; elevation
+  processing follows selected range-Doppler candidates and does not scan.
 - A 90° azimuth sector (±45°) and one-second sector update are provisional
   timing/coverage goals, not established ±45° performance requirements, until
   illumination and steering are established.
@@ -119,7 +119,10 @@ The planned data flow is:
    configuration and scenario versions.
 2. ADC inputs provide digitized samples for each channel.
 3. The DUT applies DDC and decimation.
-4. Fast-time processing produces per-pulse range data. Before coherent
+4. For each commanded azimuth look, receive beamforming coherently sums the 16
+   azimuth elements independently for each of the four elevation rows, reducing
+   64 DDC channels to four complex elevation streams. Fast-time processing then
+   produces per-pulse range data. Before coherent
    slow-time processing, those results receive migration-aware alignment or
    handling for the moving-target hypotheses under consideration. Slow-time
    processing then forms Doppler data from the usable pulse ensemble for each
@@ -144,11 +147,12 @@ flowchart LR
     GEN["MVP target generator<br/>direct 64-channel ADC vectors<br/>2.99792458 GHz RF phase model"] --> ADC["DUT input: 64 real 16-bit ADC channels<br/>150 MS/s/channel; 50 MHz IF"]
     ADC --> DDC["Multistage DDC<br/>complex mix/filter + /3 to 50 MS/s<br/>filter + /4 to 12.5 MS/s"]
     DDC --> BB["Complex baseband candidate<br/>12.5 MS/s/channel; Nyquist +/-6.25 MHz"]
-    BB --> FT["Fast-time/range processing<br/>10 MHz waveform; nominal ~15 m resolution"]
-    FT --> ST["Migration-aware alignment/handling<br/>then slow-time/Doppler processing<br/>usable fast-time pulse results for each azimuth look;<br/>five approximate PRFs: 1700, 1900, 2150, 2450, 2700 Hz<br/>usable pulses per PRF selected at WP4/WP6e"]
+    BB --> ABF["Commanded-look azimuth beamforming<br/>16 elements summed per row<br/>64 channels -> 4 elevation streams"]
+    ABF --> FT["Fast-time/range processing<br/>10 MHz waveform; nominal ~15 m resolution"]
+    FT --> ST["Migration-aware alignment/handling<br/>then slow-time/Doppler processing<br/>usable fast-time pulse results for each azimuth look;<br/>five approximate PRFs: 1700, 1900, 2150, 2450, 2700 Hz<br/>usable pulses selected and verified by WP4 at G2"]
     ST --> RD["Range-Doppler feature formation<br/>aligned pulse ensemble to Doppler map"]
-    RD --> BF["Azimuth/elevation receive beamforming"]
-    BF --> CAND["Per-PRF candidate seam<br/>folded range/velocity + PRF identity"]
+    RD --> EL["Elevation processing at selected range-Doppler candidates"]
+    EL --> CAND["Per-PRF candidate seam<br/>folded range/velocity + PRF identity<br/>azimuth = commanded look"]
     CAND --> UNFOLD["Ambiguity projection/unfolding<br/>five PRF layers retained"]
     UNFOLD --> CFAR["Per-PRF CFAR decisions"]
     CFAR --> FUSE["Non-coherent binary fusion<br/>3-of-5 baseline; masks and source cells"]
@@ -160,10 +164,11 @@ flowchart LR
         ADC
         DDC
         BB
+        ABF
         FT
         ST
         RD
-        BF
+        EL
         CAND
         UNFOLD
         CFAR
@@ -184,12 +189,13 @@ azimuth 16:  ch 61 ch 62 ch 63 ch 64
              el1   el2   el3   el4
 ```
 
-The solid path is one candidate arrangement for discussion; it is not a frozen
-runtime order. The dotted link is a design-time decision boundary: WP6e will
-compare alternatives and select the arrangement before implementation freezes
-stage order, cross-PRF support, or confidence tie-breaking. Exact clustering
-adjacency, tolerances, and edge handling remain WP4/G2 decisions; RAD-V1-020 is
-complete only after those decisions are recorded and verified.
+The solid path records the V1 receive shape: `[sample,64]` through DDC, then
+`[sample,4]` after commanded-look azimuth summation, followed by range and
+Doppler processing on the four elevation streams. V1 reports the commanded look
+as azimuth; it does not estimate a sub-beam azimuth. The dotted link remains a
+design-time decision boundary for WP6e ambiguity order and method. Exact
+clustering adjacency is the WP4/G2 one-cell within-look rule: no edge wrapping,
+invalid bridging, or cross-look deduplication.
 
 The generator abstracts the exact ADR 0015 RF waveform and analog conversion;
 it emits
@@ -210,10 +216,13 @@ open unless stated above as an agreed decision.
 
 ## G2 and downstream items still open
 
-- What usable-pulse allocation per PRF satisfies the azimuth dwell, blanking,
-  guard, priming, and transition constraints, and how will it be verified?
+- Does the provisional `[22,25,28,32,35]` usable-pulse allocation fit the
+  70.653 ms cell-time cap with required blanking, guard, priming, and
+  transition constraints? Its current arithmetic is 65.147760 ms usable dwell
+    plus 2.358240 ms priming plus 2.849847 ms transitions = 70.355847 ms,
+    leaving 0.297153 ms. Downstream WP6e may reject it and reopen G2.
 - What look spacing follows from the ideal 3 dB beamwidth, and what noisy
-  angle, elevation-sector, Doppler-error, and velocity tolerances apply?
+  angle and elevation-sector measurements should be reported?
 - What clutter cutoff and detection-statistic definition make results
   reproducible, including Monte Carlo trial and confidence methods?
 

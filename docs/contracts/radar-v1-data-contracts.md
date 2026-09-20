@@ -19,7 +19,7 @@ not as accepted implementation defaults. A value marked **G2-pending** is an
 interface placeholder and is not a pass criterion. WP4/G2 must resolve filter
 delay and alias rejection, receive
 window priming and transitions, the usable-return schedule, migration handling,
-angle and Doppler tolerances, near-zero-Doppler cutoff and suppression
+angle measurements and Doppler tolerances, near-zero-Doppler cutoff and suppression
 tolerance, and the exact detection statistic. WP6e must select the ambiguity
 method and compare candidate processing orders; this contract defines the
 per-PRF candidate seam and a provisional MVP clustering behavior without
@@ -177,7 +177,7 @@ and stage-specific calibration or index origin. Every fixture declares
 fixtures also carry generator revision, version, seed, and parameters; hashes
 are not required when code permits semantic replay.
 
-The supported stage seams are `ddc`, `range`, `doppler`, `angle`,
+The supported stage seams are `ddc`, `azimuth-beamformed`, `range`, `doppler`, `angle`,
 `candidate-list`, `ambiguity-projection`, `cfar`, `fusion`, and `cluster`.
 Projection preserves five separate PRF layers; CFAR emits one decision per
 layer, including explicit invalid/fail states, and fusion votes across those
@@ -187,15 +187,26 @@ five distinct decisions. Their minimum data contracts are:
 | Stage | `data` shape and meaning | Required units |
 | --- | --- | --- |
 | `ddc` | `[sample, channel]` complex baseband | V or normalized ADC units; producer must state one |
-| `range` | `[rangeBin, pulse, channel]` complex | range-bin index plus `rangeBinCentersM` |
-| `doppler` | `[rangeBin, dopplerBin, azimuthLook, elevationLook]` complex or real statistic | `rangeBinCentersM`, `dopplerBinCentersMps` |
+| `azimuth-beamformed` | `[sample, elevation]` complex after commanded-look coherent summation of 16 azimuth elements per row | four elevation streams; commanded `azimuthLookIndex` and steering metadata |
+| `range` | `[rangeBin, pulse, elevation]` complex after azimuth beamforming | range-bin index plus `rangeBinCentersM` |
+| `doppler` | `[rangeBin, dopplerBin, elevation]` complex after azimuth beamforming; any real statistic is a separate named field or seam | `rangeBinCentersM`, `dopplerBinCentersMps`; commanded `azimuthLookIndex` |
 | `angle` | typed struct array shape `[N,1]` with fields `rangeM`, `radialVelocityMps`, `azimuthDeg`, `elevationDeg`, `statistic` | one-based row indices; scalar numeric fields and statistic units are declared |
 | `candidate-list` | typed struct array shape `[N,1]` with unique one-based `candidateId`, one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeM`, `foldedVelocityMps`, `statistic`, `sourceId` | PRF and angle-look indices are one-based and preserved into cross-PRF association and any final report; no resolver method implied |
 | `ambiguity-projection` | typed struct array preserving five PRF layers, with common hypothesis coordinates, per-PRF `validityMask`, and `sourceCellId` identities | each hypothesis retains its five-layer eligibility and source-cell provenance before per-PRF CFAR; invalid layers are explicit |
 | `cfar` | typed struct array shape `[N,1]` with one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeBin`, `dopplerBin`, `sourceCellId`, `statistic`, `threshold`, logical `pass`, and `decisionState` | `decisionState` is one of `pass`, `fail`, or `invalid`; invalidity is recorded in the CFAR record and mirrored in the fusion masks |
 | `fusion` | typed struct array shape `[N,1]` with `validityMask`, `supportMask`, `voteCount`, `voteThreshold`, `residual`, `ambiguityStatus`, `sourceCellIds`, and fused `rangeM`/`radialVelocityMps` | masks distinguish eligible, pass, fail, and invalid PRF decisions; source identities preserve contributing PRFs/cells; `voteThreshold` is 3 for the full-domain 3-of-5 baseline; residual and status are declared for unresolved hypotheses |
-| `cluster` | typed struct arrays of fused hypotheses and cluster records, each shape `[N,1]`; records carry fused coordinates, `supportMask`, `validityMask`, and contributing `sourceCellIds` | clusters consume fused hypotheses; no single-`prfIndex` invariant applies; connected-neighbor adjacency, tolerances, and edge handling are WP4-pending |
+| `cluster` | typed struct arrays of fused hypotheses with shape `[H,1]` and cluster records with shape `[C,1]`; records carry fused coordinates, `supportMask`, `validityMask`, and contributing `sourceCellIds` | clusters consume fused hypotheses; no single-`prfIndex` invariant applies; V1 provisional adjacency is one-cell Chebyshev within one look, with no edge wrap, invalid bridging, or cross-look deduplication |
 <!-- markdownlint-enable MD013 -->
+
+For the `cluster` stage, `H` is the number of fused hypotheses and `C` is the
+number of cluster records; `H` and `C` are independent cardinalities. For the
+cluster stage, the top-level `shape` must equal
+`metadata.clusterShape: [C,1]`. `hypothesisShape: [H,1]` independently
+describes the fused hypotheses; both shapes validate their corresponding
+arrays independently.
+Many-to-one clustering, including `H != C`, is valid. Every entry in each
+cluster record's `hypothesisIds` must reference a
+hypothesis in the same cluster-stage envelope.
 
 The baseline stage order is ambiguity projection/unfolding, per-PRF CFAR,
 M-of-5 binary fusion, then clustering. Migration alignment and CFAR
@@ -212,7 +223,8 @@ Implementations must preserve these seams and record the selected method in
 `metadata`; they must not infer an order from an example.
 Candidate PRF and angle-look provenance must remain available through
 association and be preserved in any final report that exposes PRF evidence.
-ADR 0016 records the five-PRF decision and reopened CPI pulse-count trade.
+ADR 0016 records the five-PRF decision and reopened CPI pulse-count trade;
+ADR 0017 records the provisional schedule and commanded-look receive seam.
 
 ## Detection-list envelope
 
