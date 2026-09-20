@@ -1,0 +1,12 @@
+{
+  "schemaName": "radar.compatibility",
+  "schemaVersion": "1.0.0-draft.1",
+  "documentVersion": "0.2.0",
+  "id": "compatibility-example-1",
+  "createdUtc": "2026-09-14T00:00:00Z",
+  "producer": "wp3-example/0.1.0",
+  "consumerSchemaVersion": "1.0.0-draft.1",
+  "producerSchemaVersion": "1.0.0-draft.1",
+  "migration": "none",
+  "acceptedMajor": 1
+}
