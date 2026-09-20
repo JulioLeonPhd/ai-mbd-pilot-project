@@ -2,6 +2,16 @@
 
 ## Last verified result
 
+On 2026-09-19, WP3 was independently accepted. The current checker passes 18
+Python tests and 30 executable manifest rows. Ruff check/format, Markdown lint,
+and `git diff --check` pass. Independent deep validation passed 24 semantic
+probes plus malformed-input probes, with no implementation errors. The
+normative cluster contract also passed independent semantic review.
+
+The MATLAB checks recorded below are historical evidence from earlier work; they
+were not rerun in this repair cycle. See the WP3 checker and manifest under
+`contracts/wp3/`.
+
 On 2026-09-14, WP2 completed and revised G1 passed for the bounded analytic and
 ideal simulation candidate in [ADR 0014][adr0014].
 WP0/G0 and WP1 were previously reviewed. MATLAB MCP ran the tracked coverage,
@@ -17,10 +27,18 @@ replay provenance, and ignored/LFS vector storage rules: [data contracts](docs/c
 [architecture](docs/architecture/architecture.md), and [WP3 examples](contracts/wp3/examples/).
 [The five-PRF decision and reopened CPI pulse-count rationale](docs/adr/0016-retain-five-prfs-and-reopen-cpi-pulse-count.md)
 are recorded in ADR 0016. The provisional clustering and cross-PRF approach
-remains subject to WP4/G2
-exact timing and clustering rules; WP6e selects the ambiguity order and method.
-WP3/G2 remains open pending complete valid, invalid, zero-result, version-
-mismatch, and dimension-mismatch conformance coverage.
+remains subject to WP4 verification at G2; downstream WP6e may reject it and
+reopen G2. The provisional schedule is
+`[22,25,28,32,35]` usable pulses for the five PRFs under the 70.653 ms cell-time
+cap, subject to WP6e rejection and G2 reopening. Its current arithmetic is
+65.147760 ms usable dwell + 2.358240 ms priming + 2.849847 ms transitions =
+70.355847 ms, leaving 0.297153 ms. Clustering is provisionally
+one-cell Chebyshev adjacency within a look only, with no edge wrap, invalid
+bridging, or cross-look deduplication; WP6e selects the ambiguity order and
+method.
+WP3 is independently accepted. WP4/G2 remains open pending verification of the
+provisional schedule and clustering rules, including complete valid, invalid,
+zero-result, version-mismatch, and dimension-mismatch coverage.
 
 The JSON subset, MAT example, MATLAB Code Analyzer, Ruff, Markdown lint, and
 Mermaid render checks passed. Independent documentation and code reviews found
@@ -29,9 +47,10 @@ coverage.
 
 ## Active gate
 
-Revised G1 passed for the bounded analytic and ideal candidate. WP3 data
-contracts and WP4 DSP/timing architecture may proceed; G2 is their shared
-technical gate.
+Revised G1 passed for the bounded analytic and ideal candidate. WP3 is
+independently accepted. Active next work is WP4/G2 verification; G2 is the
+shared technical gate for the WP3 data contracts and WP4 DSP/timing
+architecture.
 
 ## Blockers and retained risks
 
@@ -41,23 +60,41 @@ been published; issue publication does not block technical work.
 
 Revised G1 adopted an analytic and ideal simulation baseline, not verified DUT,
 hardware, or real-time
-performance. WP4/WP6e must select usable pulses per PRF and prove timing,
-receive-window priming, PRF transitions, and post-CFAR 3-of-5 fusion; 128
-pulses is reopened by ADR 0016. The revised 10 MHz waveform
+performance. WP4 must verify usable pulses per PRF and prove timing,
+receive-window priming, PRF transitions, and post-CFAR 3-of-5 fusion;
+downstream WP6e evaluates performance and may reject the schedule, reopening
+G2. The 128-pulse setting remains reopened by ADR 0016. The revised 10 MHz waveform
 and DDC rate claims passed only their bounded G1 analytic checks. The noisy multi-target
 ambiguity method remains WP6e study work. Sampled end-to-end 50 m separation,
-noisy angle accuracy, and detection performance remain downstream gates.
-The ±45° sector and one-second update are provisional. The current 50 MHz IF
-and 150 MS/s ADC are candidates; the MVP generator emits direct ADC-rate
+noisy angle accuracy and detection performance remain downstream measurements,
+not V1 gates.
+The ±45° sector and one-second update are provisional. The V1 ideal input is a
+band-limited 45–55 MHz ADC input centered at 50 MHz with a 150 MS/s ADC; ENOB
+and jitter are downstream sensitivity studies. The MVP generator emits direct ADC-rate
 vectors without sampling RF or modeling analog downconversion; coherent phase
 uses the exact ADR 0015 carrier invariant.
 
 ## Next ready packages
 
-- Complete WP3 conformance fixtures and checks, then resolve WP4 timing and
-  clustering rules at G2.
+- Verify the provisional WP4 schedule and clustering rules at G2, including
+  complete valid, invalid, zero-result, version-mismatch, and dimension-
+  mismatch coverage.
 - Keep the ambiguity-resolution candidate open for WP6e; do not freeze its
   order or method at G2.
+
+## Session handoff
+
+The detailed continuation note is [WP3/WP4 handoff](docs/handoffs/wp3-wp4-handoff-2026-09-19.md).
+
+The accepted receive-processing decision is recorded in [ADR 0017](docs/adr/0017-adopt-v1-commanded-look-receive-processing-and-g2-schedule.md):
+64 channels remain through DDC, commanded-azimuth beamforming sums 16 elements
+per elevation row to four streams, and range/Doppler operate on those four
+streams. The documentation bundle has passed independent semantic review.
+
+Do not redo the completed documentation or WP3 repairs. The latest independent
+WP3 result is the authoritative continuation point: WP3 is accepted with no
+unresolved implementation errors. Proceed with WP4/G2 verification; G2 is not
+passed.
 
 ## Evidence
 
