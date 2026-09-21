@@ -1,8 +1,15 @@
 # Radar Demonstrator Architecture
 
+<!-- markdownlint-disable MD033 -->
+
 WP4/G2 Phase 0 is frozen by [ADR 0018](../adr/0018-freeze-wp4-g2-phase0-contract.md).
 The executable checker and timing/DSP evidence remain pending, so this freeze
 does not constitute G2 acceptance.
+
+<a id="architecture-wp4-topology"></a>
+This document summarizes topology only. ADR 0018 owns WP4/G2 decisions, the
+data contract owns fields and invariants, and the requirements document owns
+observable obligations.
 
 This document records the current direction for a public AI-assisted
 model-based design reference project. The architecture is deliberately
@@ -116,6 +123,8 @@ are analytic model outputs, not coverage or detection acceptance criteria; the
 evaluation.
 
 ## Processing boundary
+
+<a id="architecture-processing-boundary"></a>
 
 The planned data flow is:
 

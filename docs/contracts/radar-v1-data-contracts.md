@@ -17,24 +17,23 @@ sensitive and additional keys are invalid unless explicitly marked `extensions`.
 
 ## Decision status
 
+<a id="wp4-contract-authority"></a>
+
 The accepted WP4/G2 Phase 0 values are defined in
 [ADR 0018](../adr/0018-freeze-wp4-g2-phase0-contract.md). Executable
 verification remains pending.
 
 The field names, dimensions, units, signs, and provenance rules in this
-document are the WP3 contract. Candidate values are recorded for traceability,
-not as accepted implementation defaults. A value marked **G2-pending** is an
-interface placeholder and is not a pass criterion. WP4/G2 must resolve filter
-delay and alias rejection, receive
-window priming and transitions, the usable-return schedule, migration handling,
-angle measurements and Doppler tolerances, near-zero-Doppler cutoff and suppression
-tolerance, and the exact detection statistic. WP6e must select the ambiguity
-method and compare candidate processing orders; this contract defines the
-per-PRF candidate seam and a provisional MVP clustering behavior without
-selecting the final DSP method.
+document are the WP3 contract. The Phase 0 alias budget, receive schedule,
+dimensions, fusion, and clustering seams are frozen decisions awaiting
+executable verification; they are not G2 acceptance evidence. Remaining
+unresolved choices include filter delay, ambiguity method/order, angle and
+Doppler tolerances, near-zero-Doppler cutoff, and downstream method parameters.
+WP6e must select the ambiguity method and compare candidate processing orders.
 
 ## Common rules
 
+<a id="common.version"></a>
 Each JSON envelope has `schemaName`, `schemaVersion`, `documentVersion`, and
 `id`. The MAT envelope carries the same provenance fields as MAT variables.
 `schemaVersion` identifies the field schema; `documentVersion` identifies the
@@ -100,6 +99,7 @@ hypotheses repeat the eligibility/look/cell fields. Aggregate clusters require
 `validityMask`, `supportMask`, `passMask`, and sorted unique `sourceCellIds`;
 they have no single `clusterCell`.
 
+<a id="clustering.order"></a>
 Clustering is input-order independent. The canonical member key is
 `(sorted(sourceCellIds), hypothesisId)`; members are emitted in ascending key
 order. Means use IEEE-754 double arithmetic in that order. Masks are exact
@@ -124,9 +124,13 @@ plural `sourceCellIds`. Duplicate cells remain distinct hypotheses but are
 connected when adjacent. Cluster records sort by first-member canonical key and
 receive sequential IDs from one.
 
-Fusion masks (`validityMask`, `supportMask`, `passMask`) all have length five;
+<a id="fusion.mask-length"></a>
+Fusion masks (`validityMask`, `supportMask`, and `passMask`) all have length five;
+<a id="fusion.mask-subset"></a>
 support is a subset of validity, `voteCount=sum(passMask)`, and threshold is
-three. Outcome is `pass` for at least three valid passing layers, `fail` for at
+<a id="fusion.threshold"></a>
+three. <a id="fusion.outcome"></a>Outcome is `pass` for at least three valid
+passing layers, `fail` for at
 least three valid layers but fewer than three passes, and `invalid` for fewer
 than three valid layers. The diagnostic for a wrong mask length is
 `DIMENSION_MISMATCH` at the mask path.
@@ -218,6 +222,8 @@ generator truth is under `truth`, with `targetId`, `rangeM`,
 the DUT. Missing or mismatched configuration/scenario versions or snapshots
 are invalid.
 
+<a id="schedule.recurrence"></a>
+<a id="wp4-schedule-recurrence"></a>
 The complete schedule grammar is five groups of `(one priming, usableCount
 usable)` records, with usableCount `[22,25,28,32,35]`, and four transitions only
 between adjacent groups: exactly 151 records. Every interval is half-open;
@@ -230,6 +236,9 @@ by the group's PRI count. Each transition has `sampleCount=106872`,
 is `10553388`; midpoint offset is `5276694` ticks. Any deviation is
 `TICK_DISCONTINUITY`.
 
+<a id="DDC.passband-ripple"></a>
+<a id="DDC.alias-rejection"></a>
+<a id="wp4-ddc-metrics"></a>
 DDC acceptance uses unity input-tone normalization and amplitude
 `20*log10(abs(H))`. The frequency grid is uniform and includes endpoints.
 Passband is `[-5,+5] MHz`; stage-2 stopband is `|f| >= 6.25 MHz` in the 50 MHz
@@ -266,6 +275,20 @@ The supported stage seams are `ddc`, `azimuth-beamformed`, `range`, `doppler`, `
 Projection preserves five separate PRF layers; CFAR emits one decision per
 layer, including explicit invalid/fail states, and fusion votes across those
 five distinct decisions. Their minimum data contracts are:
+
+<a id="beamforming.shape"></a>
+The authoritative beamforming shape invariant is `[sample,64]` at DDC input
+and `[sample,4]` after commanded-look summation, as shown by the
+`azimuth-beamformed` stage below.
+
+<a id="clustering.components"></a>
+<a id="clustering.no-wrap"></a>
+<a id="clustering.no-bridge"></a>
+<a id="clustering.same-look"></a>
+The authoritative clustering invariant is connected components over eligible
+hypotheses using same-look one-cell Chebyshev adjacency with ordinary integer
+differences, without edge wrapping or ineligible bridging; different looks are
+never deduplicated.
 
 <!-- markdownlint-disable MD013 -->
 | Stage | `data` shape and meaning | Required units |
@@ -342,7 +365,9 @@ range domain are invalid.
 Schema or type errors, missing provenance, invalid dimensions, non-finite
 numbers, non-monotonic ticks, unknown channel mapping, inconsistent rates, and
 version major mismatch must fail before processing with a structured error
-containing `code`, `path`, and `message`. A valid zero-result input returns an
+containing `code`, `path`, and `message`.
+<a id="processing.zero-result"></a>
+A valid zero-result input returns an
 empty detection list. Out-of-domain range, stationary/near-zero-speed cases,
 or provisional sector values are valid only when the fixture declares the
 applicable scope; they are not silently clipped, relabeled, or accepted as V1

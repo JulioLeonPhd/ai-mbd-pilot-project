@@ -15,12 +15,16 @@ not pass G2 or select the WP6e ambiguity-resolution method or order.
 
 ## Decision
 
-<!-- Stable clause anchors used by the WP4 fixture manifest: ADR0018.schedule,
-ADR0018.ddc-metrics, ADR0018.beamforming, fusion.outcome,
-clustering.components, clustering.no-wrap, clustering.no-bridge,
-clustering.same-look, clustering.order, processing.zero-result. -->
+ADR 0018 is authoritative for WP4/G2 decisions and rationale. The data
+contract owns field-level envelopes and invariants; architecture and
+requirements summarize this decision and must not introduce competing values.
+
+<!-- Decision anchors are retained for schedule, DDC, beamforming, fusion, and
+clustering rationale. Executable field/invariant selectors belong to the data
+contract. -->
 
 <a id="wp4-schedule-recurrence"></a>
+<a id="ADR0018.schedule"></a>
 Use 150 MHz ADC ticks and half-open intervals. The configured PRFs remain
 `[1700,1900,2150,2450,2700]` Hz with PRI counts
 `[88236,78948,69768,61224,55560]`. The usable pulse counts are
@@ -43,6 +47,7 @@ priming start. The final end tick is `10553388`; midpoint is offset
 `5276694` from scan start. This grammar is the source of the totals above.
 
 <a id="wp4-ddc-metrics"></a>
+<a id="ADR0018.ddc-metrics"></a>
 The DDC contract is a 50 MHz complex intermediate followed by 12.5 MHz complex
 output (`/3`, then `/4`). The accepted finite-filter budget is passband
 `[-5,+5] MHz`, ripple `<=0.1 dB`, digital decimation-alias rejection `>=60 dB`,
@@ -60,6 +65,7 @@ to dB. The 95–105 MHz analog alias
 condition remains a front-end assumption, not a digital-filter claim.
 
 <a id="wp4-beamforming-shape"></a>
+<a id="ADR0018.beamforming"></a>
 DDC preserves shape `[N,64]`. For commanded look angle `theta`, with positive
 radar-left azimuth, row `r` and azimuth element `a` use manifold
 `v_a(theta)=exp(-1i*2*pi*(a-1)*0.5*sin(theta))`; the beam output is the
@@ -72,18 +78,19 @@ Doppler consume those four streams. Candidate, CFAR, fusion, and cluster
 records carry `clusterEligible`, one-based `azimuthLookIndex`,
 `elevationLookIndex`, and `clusterCell=[rangeCell,dopplerCell]` where applicable.
 
-Clustering is connected components over eligible hypotheses with the same look
-indices and one-cell Chebyshev adjacency in ordinary integer cell differences.
-There is no wrap, ineligible records cannot bridge components, and hypotheses
-from different looks are never deduplicated. Components and members are ordered
-deterministically by `(azimuthLookIndex,elevationLookIndex,rangeCell,
-dopplerCell,sourceCellId)`, with stable first occurrence as the final tie-break.
+The clustering decision is connected components over eligible hypotheses with
+the same look and one-cell adjacency; the executable ordering and edge-case
+invariants are defined once in the data contract.
+
+See the data contract for the single testable definition of no-wrap, no-bridge,
+same-look, and deterministic ordering invariants.
 Post-CFAR fusion remains 3-of-5. `validityMask`, `supportMask`, and `passMask`
 are logical vectors of length five; `supportMask` is a subset of validity,
 `voteCount=sum(passMask)`, and `voteThreshold=3`. A valid fused outcome is
 `pass` when at least three valid layers pass, `fail` when at least three valid
-layers exist but fewer than three pass, and `invalid` when fewer than three
-valid layers exist. Five PRF layers and source identities are preserved.
+layers exist but fewer than three pass, and
+<a id="wp4-clustering-components"></a>`invalid` when fewer than three valid
+layers exist. Five PRF layers and source identities are preserved.
 
 For a fused hypothesis, `clusterEligible`, look indices, and `clusterCell` are
 fields on the hypothesis. A cluster-stage hypothesis repeats those fields.
