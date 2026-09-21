@@ -6,6 +6,15 @@ exercise the workflow; it is not the project's primary mission system.
 
 ## Project terms
 
+**Independent numerical oracle**:
+A separately implemented computation of expected numerical results from raw
+inputs and authoritative coefficients, used to check generated evidence without
+trusting the generator's stored summaries.
+
+**Legal zero-result**:
+A valid input case whose defined outcome contains no result, distinguished from
+an invalid input or an implementation failure.
+
 **Exact RF baseline**:
 The project uses exact free-space wavelength $\lambda=0.1$ m with
 $f_c=2997924580$ Hz derived from exact $c=299792458$ m/s. Half-wave element

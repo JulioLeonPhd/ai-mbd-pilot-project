@@ -2,6 +2,11 @@
 
 ## Last verified result
 
+WP4/G2 Phase 1 documentation consolidation was independently validated and
+committed in `da1e301`. Phase 2 numerical-fixture architecture is complete and
+root-approved; the durable ledger is [the WP4/G2 recovery plan](docs/plans/wp4-g2-recovery-plan-2026-09-21.md).
+No executable WP4 evidence exists yet, and G2 remains open.
+
 On 2026-09-19, WP3 was independently accepted. The current checker passes 18
 Python tests and 30 executable manifest rows. Ruff check/format, Markdown lint,
 and `git diff --check` pass. Independent deep validation passed 24 semantic
@@ -52,7 +57,8 @@ coverage.
 ## Active gate
 
 Revised G1 passed for the bounded analytic and ideal candidate. WP3 is
-independently accepted. Active next work is WP4/G2 verification; G2 is the
+independently accepted. Active next work is Phase 3 WP4/G2 executable evidence
+generation; G2 is the
 shared technical gate for the WP3 data contracts and WP4 DSP/timing
 architecture.
 
@@ -80,15 +86,17 @@ uses the exact ADR 0015 carrier invariant.
 
 ## Next ready packages
 
-- Execute WP4/G2 verification of the frozen schedule and clustering rules, including
-  complete valid, invalid, zero-result, version-mismatch, and dimension-
-  mismatch coverage.
+- Implement the approved Phase 2 MATLAB-only architecture under `contracts/wp4/`.
+- Generate and test temporarily first, then stop for root authorization of the
+  immutable generator-source commit before regenerating tracked fixtures.
+- Run the exact 54 acceptance tests, MATLAB Code Analyzer, and preserve the
+  no-Python and no-WP6e-method constraints.
 - Keep the ambiguity-resolution candidate open for WP6e; do not freeze its
   order or method at G2.
 
 ## Session handoff
 
-The detailed continuation note is [WP3/WP4 handoff](docs/handoffs/wp3-wp4-handoff-2026-09-19.md).
+The detailed continuation note is [the WP4/G2 recovery plan](docs/plans/wp4-g2-recovery-plan-2026-09-21.md).
 
 The accepted receive-processing decision is recorded in [ADR 0017](docs/adr/0017-adopt-v1-commanded-look-receive-processing-and-g2-schedule.md):
 64 channels remain through DDC, commanded-azimuth beamforming sums 16 elements
@@ -119,5 +127,6 @@ passed.
   [result](evidence/radar_v1_angle_feasibility_results.json)
 - [WP3 data contracts](docs/contracts/radar-v1-data-contracts.md) and
   [examples/checker directory](contracts/wp3/examples/)
+- [WP4/G2 recovery plan](docs/plans/wp4-g2-recovery-plan-2026-09-21.md)
 
 [adr0014]: docs/adr/0014-adopt-revised-v1-analytic-simulation-baseline.md
