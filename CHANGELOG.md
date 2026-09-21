@@ -8,6 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.6.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.6.0) - 2026-09-21
+
+<small>[Compare with v0.5.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.5.0...v0.6.0)</small>
+
+### Added
+
+- Added: automate agent handoff checks ([796318e](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/796318eba595918cfce79c57456e518e64409c92) by Julio Leon). SemVer impact: none
+
+### Changed
+
+- Changed: flatten diagram orchestration ([e541219](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/e541219b96e0a0879060c2f7a3c0e551e3b12a2b) by Julio Leon). SemVer impact: none
+- Changed: optimise phase-one agent handoffs ([67bf106](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/67bf10658f9f2029b4911a5f0410d6ed939f1e62) by Julio Leon). SemVer impact: none
+- Changed: document outside-sandbox GitHub CLI execution ([00d7ef8](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/00d7ef894c050152a5d4c7bcb7600e3dfb46121f) by Julio Leon). SemVer impact: none
+
 ## [v0.5.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.5.0) - 2026-09-20
 
 <small>[Compare with v0.4.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.4.0...v0.5.0)</small>
