@@ -1,5 +1,5 @@
 function report = generateWp4Fixtures(outputDirectory, options)
-%GENERATEWP4FIXTURES Generate deterministic temporary WP4/G2 fixtures.
+%GENERATEWP4FIXTURES Generate deterministic WP4/G2 fixture evidence.
 %   REPORT = GENERATEWP4FIXTURES(OUTPUTDIRECTORY) writes executable WP4/G2
 %   evidence to OUTPUTDIRECTORY. The checker recomputes values independently.
 
@@ -14,9 +14,19 @@ end
 
 defaults = struct("Seed", 401002, "GeneratorVersion", "wp4gen-1.0.0", ...
     "GeneratorRevision", "working-tree", "CreatedUtc", "", "WriteManifest", true, ...
+    "FixtureScope", "temporary-unit-evidence", ...
     "Seeds", struct("master", 401002, "schedule", 401011, "ddc", 401021, ...
     "beam", 401031, "fusion", 401041, "clustering", 401051, "migration", 401061));
 options = mergeOptions(defaults, options);
+options.FixtureScope = string(options.FixtureScope);
+if ~ismember(options.FixtureScope, ["temporary-unit-evidence", "acceptance-evidence"])
+    error("wp4:FixtureScope", "FixtureScope must be temporary-unit-evidence or acceptance-evidence.");
+end
+if options.FixtureScope == "acceptance-evidence" && ...
+        isempty(regexp(char(string(options.GeneratorRevision)), "^[0-9A-Fa-f]{40}$", "once"))
+    error("wp4:ImmutableRevision", ...
+        "Acceptance evidence requires a 40-hex immutable generator revision.");
+end
 
 if strlength(options.CreatedUtc) == 0
     options.CreatedUtc = "1970-01-01T00:00:00Z";
@@ -76,7 +86,7 @@ report.generatorRevision = char(options.GeneratorRevision);
 report.seed = options.Seed;
 report.seeds = options.Seeds;
 report.fixtureCount = numel(manifest.fixtures);
-report.scope = "temporary-unit-evidence";
+report.scope = char(options.FixtureScope);
 end
 
 function merged = mergeOptions(defaults, supplied)

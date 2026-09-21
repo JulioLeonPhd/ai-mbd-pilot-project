@@ -40,6 +40,7 @@ document.schemaVersion = "1.0.0-draft.2";
 document.hypotheses = hypotheses;
 document.clusters = radardemo.clustering.clusterHypotheses(hypotheses);
 document.seed = options.Seeds.clustering;
+document = wp4gen.addProvenance(document, options, options.Seeds.clustering, "clustering");
 end
 
 function hypothesis = makeHypothesis(identifier, azimuth, elevation, rangeCell, ...

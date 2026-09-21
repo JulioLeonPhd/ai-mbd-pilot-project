@@ -67,6 +67,15 @@ if options.StrictTraceability
             results(index).message = "Traceability clause is not a path#anchor selector.";
         end
     end
+    provenanceValid = checkProvenance(manifest, root, rows);
+    if ~provenanceValid
+        for index = 1:numel(results)
+            results(index).passed = false;
+            results(index).message = "Fixture provenance does not match the manifest.";
+        end
+    end
+else
+    provenanceValid = true;
 end
 report = struct();
 report.manifestPath = char(manifestPath);
@@ -75,6 +84,7 @@ report.caseCount = numel(results);
 report.passedCount = sum([results.passed]);
 report.failedCount = report.caseCount - report.passedCount;
 report.passed = report.failedCount == 0;
+report.provenanceValid = provenanceValid;
 report.tolerances = struct("ddcDb", 1e-9, "firSymmetry", 1e-13, ...
     "coefficientRegeneration", 5e-15, "streaming", 5e-11, "beam", 1e-12, ...
     "cluster", 1e-12, ...
@@ -148,11 +158,20 @@ if identifier == "META-001"
         all(contains(string({rows.clause}), "#")) && ...
         all(strlength(string({rows.productionEntryPoint})) > 0) && ...
         all(isfield(rows, "provenanceSeed")) && ...
+        isfield(manifest, "fixtureScope") && isfield(manifest, "generatorVersion") && ...
+        isfield(manifest, "generatorRevision") && isfield(manifest, "createdUtc") && ...
+        isfield(manifest, "generatorSeed") && manifest.generatorSeed == 401002 && ...
+        isfield(manifest, "generationParameters") && ...
+        string(manifest.generationParameters.fixtureScope) == string(manifest.fixtureScope) && ...
+        ((string(manifest.fixtureScope) == "temporary-unit-evidence" && ...
+        string(manifest.status) == "temporary-generator-evidence") || ...
+        (string(manifest.fixtureScope) == "acceptance-evidence" && ...
+        string(manifest.status) == "acceptance-evidence")) && ...
         isequal([manifest.seeds.master, manifest.seeds.schedule, manifest.seeds.ddc, ...
         manifest.seeds.beam, manifest.seeds.fusion, manifest.seeds.clustering, ...
         manifest.seeds.migration], [401002, 401011, 401021, 401031, 401041, 401051, 401061]) && ...
         all(arrayfun(@(row) isempty(row.artifact) || isfile(fullfile(root, string(row.artifact))), rows)) && ...
-        clausesResolve && methodsResolve;
+        clausesResolve && methodsResolve && checkProvenance(manifest, root, rows);
     if valid
         diagnostic = struct("accepted", true, "code", "", "path", "", ...
             "message", "Manifest traceability is complete.", "output", struct());
@@ -178,12 +197,62 @@ else
     diagnostic = struct("accepted", valid, "code", "", "path", "", ...
         "message", "Generator and oracle dependency directions inspected.", "output", struct());
 end
+end
+
+function valid = checkProvenance(manifest, root, rows)
+valid = isfield(manifest, "fixtureScope") && isfield(manifest, "generatorVersion") && ...
+    isfield(manifest, "generatorRevision") && isfield(manifest, "createdUtc");
+if ~valid
+    return
+end
+scope = string(manifest.fixtureScope);
+revision = string(manifest.generatorRevision);
+if ~ismember(scope, ["temporary-unit-evidence", "acceptance-evidence"]) || ...
+        strlength(revision) == 0
+    valid = false;
+    return
+end
+if scope == "acceptance-evidence" && ...
+        isempty(regexp(char(revision), "^[0-9A-Fa-f]{40}$", "once"))
+    valid = false;
+    return
+end
+for index = 1:numel(rows)
+    row = rows(index);
+    if isempty(row.artifact)
+        continue
+    end
+    artifactPath = fullfile(root, string(row.artifact));
+    if ~isfile(artifactPath)
+        valid = false;
+        return
+    end
+    try
+        artifact = loadArtifact(artifactPath);
+    catch
+        valid = false;
+        return
+    end
+    required = ["generatorRevision", "generatorVersion", "generatorSeed", ...
+        "generationParameters", "createdUtc"];
+    if ~all(isfield(artifact, required)) || ...
+            string(artifact.generatorRevision) ~= revision || ...
+            string(artifact.generatorVersion) ~= string(manifest.generatorVersion) || ...
+            artifact.generatorSeed ~= row.provenanceSeed || ...
+            ~isfield(artifact.generationParameters, "fixtureScope") || ...
+            string(artifact.generationParameters.fixtureScope) ~= scope || ...
+            strlength(string(artifact.createdUtc)) == 0 || ...
+            string(artifact.createdUtc) ~= string(manifest.createdUtc)
+        valid = false;
+        return
+    end
+end
+end
 
 function text = readFiles(files)
 text = strings(numel(files), 1);
 for index = 1:numel(files)
     text(index) = lower(string(fileread(fullfile(files(index).folder, files(index).name))));
-end
 end
 end
 

@@ -38,4 +38,5 @@ fixture.input = input;
 fixture.expectedOutput = expectedOutput;
 fixture.tolerance = 1e-12;
 fixture.seed = options.Seeds.beam;
+fixture = wp4gen.addProvenance(fixture, options, options.Seeds.beam, "beam");
 end

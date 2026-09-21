@@ -248,12 +248,55 @@ methods (Test)
     end
 
     function testManifestTraceability(testCase)
-        manifest = jsondecode(fileread(TestWp4Fixtures.getManifestPath()));
+        temporaryManifestPath = TestWp4Fixtures.getManifestPath();
+        manifest = jsondecode(fileread(temporaryManifestPath));
         testCase.verifyEqual(numel(manifest.fixtures), 54);
         testCase.verifyEqual(numel(unique(string({manifest.fixtures.id}))), 54);
         testCase.verifyEqual(numel(unique(string({manifest.fixtures.testMethod}))), 54);
         testCase.verifyTrue(all(contains(string({manifest.fixtures.clause}), "#")));
         testCase.verifyTrue(all(strlength(string({manifest.fixtures.productionEntryPoint})) > 0));
+        temporaryReport = checkWp4Fixtures(temporaryManifestPath, ...
+            struct("StrictTraceability", true));
+        testCase.verifyTrue(temporaryReport.passed);
+
+        invalidRoot = tempname;
+        mkdir(invalidRoot);
+        testCase.verifyError(@() generateWp4Fixtures(invalidRoot, struct( ...
+            "FixtureScope", "acceptance-evidence", "GeneratorRevision", "working-tree")), ...
+            "wp4:ImmutableRevision");
+
+        acceptanceRoot = tempname;
+        mkdir(acceptanceRoot);
+        testRevision = "0123456789abcdef0123456789abcdef01234567";
+        acceptanceReport = generateWp4Fixtures(acceptanceRoot, struct( ...
+            "FixtureScope", "acceptance-evidence", "GeneratorRevision", testRevision, ...
+            "GeneratorVersion", "wp4gen-test", "CreatedUtc", "2026-09-21T00:00:00Z"));
+        acceptanceManifest = jsondecode(fileread(acceptanceReport.manifestPath));
+        testCase.verifyEqual(string(acceptanceManifest.status), "acceptance-evidence");
+        testCase.verifyEqual(string(acceptanceManifest.fixtureScope), "acceptance-evidence");
+        testCase.verifyEqual(string(acceptanceManifest.generatorRevision), testRevision);
+        acceptanceChecked = checkWp4Fixtures(acceptanceReport.manifestPath, ...
+            struct("StrictTraceability", true));
+        testCase.verifyTrue(acceptanceChecked.passed);
+        for artifactIndex = 1:numel(acceptanceReport.artifacts)
+            artifactName = string(acceptanceReport.artifacts{artifactIndex});
+            artifactPath = fullfile(acceptanceRoot, artifactName);
+            if endsWith(artifactName, ".json")
+                artifact = jsondecode(fileread(artifactPath));
+            else
+                loaded = load(artifactPath, "-mat");
+                variableNames = fieldnames(loaded);
+                artifact = loaded.(variableNames{1});
+            end
+            testCase.verifyEqual(string(artifact.generatorRevision), testRevision);
+            testCase.verifyEqual(string(artifact.generatorVersion), "wp4gen-test");
+            testCase.verifyEqual(string(artifact.generationParameters.fixtureScope), ...
+                "acceptance-evidence");
+            matchingRows = acceptanceManifest.fixtures( ...
+                string({acceptanceManifest.fixtures.artifact}) == artifactName);
+            testCase.verifyNotEmpty(matchingRows);
+            testCase.verifyEqual(artifact.generatorSeed, matchingRows(1).provenanceSeed);
+        end
     end
 
     function testGeneratorOracleSeparation(testCase)

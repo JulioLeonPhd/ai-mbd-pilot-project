@@ -8,8 +8,17 @@ end
 manifest = struct();
 manifest.manifestVersion = "1.0.0";
 manifest.contractVersion = "1.0.0-draft.2";
-manifest.status = "temporary-generator-evidence";
+manifest.fixtureScope = char(options.FixtureScope);
+if options.FixtureScope == "acceptance-evidence"
+    manifest.status = "acceptance-evidence";
+else
+    manifest.status = "temporary-generator-evidence";
+end
+manifest.generatorVersion = char(options.GeneratorVersion);
 manifest.generatorRevision = char(options.GeneratorRevision);
+manifest.generatorSeed = options.Seeds.master;
+manifest.createdUtc = char(options.CreatedUtc);
+manifest.generationParameters = struct("fixtureScope", char(options.FixtureScope));
 manifest.seeds = options.Seeds;
 manifest.fixtures = [
     makeRow("SCH-001", "schedule.json", "schedule", "testScheduleValid", "accept", "", "", "schedule.recurrence"), ...
@@ -83,7 +92,7 @@ end
 
 function seed = seedForDomain(domain)
 switch domain
-    case "schedule"
+    case {"schedule", "timing"}
         seed = 401011;
     case {"ddc", "ddc-streaming", "ddc-zero"}
         seed = 401021;

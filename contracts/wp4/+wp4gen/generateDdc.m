@@ -23,6 +23,7 @@ design.stage2AliasRejectionDb = metrics.stage2AliasRejectionDb;
 design.digitalAliasRejectionDb = metrics.digitalAliasRejectionDb;
 design.gridResolutionHz = metrics.gridResolutionHz;
 design.seed = options.Seeds.ddc;
+design = wp4gen.addProvenance(design, options, options.Seeds.ddc, "ddc");
 
 sampleCount = 2400;
 sampleIndex = (0:sampleCount - 1).';
@@ -49,6 +50,7 @@ streaming.expectedOutput = expectedOutput;
 streaming.expectedLength = numel(expectedOutput);
 streaming.tolerance = 5e-11;
 streaming.seed = options.Seeds.ddc;
+streaming = wp4gen.addProvenance(streaming, options, options.Seeds.ddc, "ddc-streaming");
 
 zero = struct();
 zero.schemaName = "radar.wp4.ddc-zero";
@@ -63,5 +65,6 @@ zero.expectedInputShape = [240, 64];
 zero.expectedOutputShape = [20, 64];
 zero.finalState = zeroState;
 zero.seed = options.Seeds.ddc;
+zero = wp4gen.addProvenance(zero, options, options.Seeds.ddc, "ddc-zero");
 ddc = struct("design", design, "streaming", streaming, "zero", zero);
 end
