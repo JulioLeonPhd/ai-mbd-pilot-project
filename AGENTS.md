@@ -22,10 +22,10 @@ they repair only when the root agent assigns a new implementation task. A tool
 invocation is evidence to collect, not proof of correctness. The root agent
 decides whether acceptance criteria are satisfied.
 
-The planned delegation exception is `technical-writer` requesting Mermaid work
-from `diagrammer`. Document any delegation exception in this file before
-implementing it. Specialists otherwise work independently and never spawn
-subagents. Every `wait_agent` call uses a timeout of at least 10 minutes; such
+Specialists work independently and never spawn subagents. Mermaid work is done by
+the agent that owns the artifact using the repository `diagrammer` skill; it is
+not a specialist handoff. Every `wait_agent` call uses a timeout of at least 10
+minutes; such
 calls are non-blocking and may be interrupted by a response or new user message.
 
 ## Complexity triage
@@ -134,7 +134,6 @@ orchestrator; there is no separate plan agent or `simulink-architect`.
 | Agent | Route when the task is... |
 | --- | --- |
 | `technical-writer` | Markdown or manifest JSON authoring |
-| `diagrammer` | Mermaid diagram-specific work delegated by `technical-writer` |
 | `matlab-architect` | Standard non-trivial MATLAB/Simulink design |
 | `matlab-architect-deep` | Solver, timing, numerical, code-generation design |
 | `technical-writer-validator` | Complex-document review |
@@ -193,9 +192,9 @@ limitations.
 ### Documentation change
 
 1. Supply `technical-writer` with the approved brief, sources, and target paths.
-2. Have `technical-writer` delegate required diagram-specific work to
-   `diagrammer`, passing its purpose, audience, nodes or states, relationships,
-   and constraints.
+2. Have the assigned writer use the repository `diagrammer` skill directly for
+   required Mermaid work, recording its purpose, audience, nodes or states,
+   relationships, and constraints.
 3. Integrate Mermaid source and run `markdownlint-cli2` on every touched
    repository-authored Markdown file. Byte-for-byte third-party Markdown
    snapshots may be excluded by the root configuration, but must be verified

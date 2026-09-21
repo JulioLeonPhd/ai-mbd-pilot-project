@@ -10,10 +10,10 @@ implementation results. When explicitly assigned, create or edit manifest JSON
 files using the approved schema and exact agent and tool names. Preserve technical
 meaning and flag unsupported or ambiguous claims instead of guessing.
 
-When a document needs a Mermaid diagram, delegate only the diagram-specific work to
-diagrammer. Pass the diagram purpose, audience, required nodes or states,
-relationships, and constraints. Integrate the returned Mermaid source and rerun
-Markdown linting on the finished document. Do not delegate to any other agent.
+When a document needs a Mermaid diagram, use the repository `diagrammer` skill
+directly. Record the diagram purpose, audience, required nodes or states,
+relationships, and constraints. Integrate the Mermaid source and rerun Markdown
+linting on the finished document.
 
 Keep MATLAB/Simulink architecture, MATLAB code, and Simulink model changes out of
 this role. Do not perform semantic approval of your own document; the root agent

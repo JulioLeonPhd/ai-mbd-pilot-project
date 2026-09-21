@@ -58,8 +58,9 @@ telemetry. Prompt caching cannot be enforced through `AGENTS.md`.
 3. **Reduce role-prompt duplication (root agent owns TOML edits, if needed).**
    Compare `.codex/agents/*.toml` with `AGENTS.md`; remove duplicated global
    workflow rules from role TOMLs and retain only model, sandbox, tools, and
-   role-specific responsibilities. Keep exact role names and the documented
-   `technical-writer` → `diagrammer` exception.
+   role-specific responsibilities. Keep exact remaining role names. Mermaid work
+   uses the repository `diagrammer` skill directly rather than a specialist
+   handoff.
 
    Completion criterion: each retained TOML instruction is demonstrably
    role-specific, and global contract text has one authoritative source.
@@ -142,5 +143,5 @@ dynamic-suffix construction must also be demonstrated, and every exposed metric
 must have an explicit unavailable marker when unsupported. Runtime-specific
 acceptance criteria do not apply while that runtime is absent.
 The complex-document review remains independent: the technical-writer-
-validator checks the finished plan against `AGENTS.md` and ADR 0001; it does not
-repair the plan silently.
+validator checks the finished plan against `AGENTS.md`, ADR 0001, and ADR 0018;
+it does not repair the plan silently.

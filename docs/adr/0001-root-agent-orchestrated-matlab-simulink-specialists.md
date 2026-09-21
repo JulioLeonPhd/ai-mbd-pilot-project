@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded by ADR-0018
 ---
 
 # Root-agent orchestration for MATLAB/Simulink specialists
