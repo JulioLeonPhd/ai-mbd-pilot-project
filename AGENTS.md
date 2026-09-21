@@ -101,6 +101,28 @@ Use `failed` when the assignment could not be completed, `blocked` when
 external state or missing authority is required, and `complete` when the work is
 done with any warnings disclosed.
 
+### Handoff economy
+
+Use the existing packet fields as a compact interface. Keep `task.id` stable
+for the task lifecycle and make `task.objective` concise and outcome-focused.
+Keep `task.context` bounded; inherit the full conversation only when that string
+records `inherit-full-conversation: reason=<specific missing context>`.
+
+Keep `task.inputs` as string entries. Prefer immutable revision-pinned references
+in this form: `ref: repo-relative/path @ revision-or-hash [#selector]`. A bare
+path or mutable label such as `@ working-tree` remains compatible with the current
+contract, but the result reports an explicit `integrity-unverified` warning. Put
+only assignment-specific requirements in
+`constraints`, `acceptance_criteria`, `allowed_mutations`, and
+`requested_checks`.
+
+In a result, use the existing `status`, `summary`, `artifacts`, `changes`,
+`checks`, `findings`, `assumptions`, and `handoff` fields: identify changed
+artifacts, record evidence in `checks`, disclose findings and assumptions, and
+state the next handoff. Keep source material referenced rather than repeated;
+results contain no reasoning traces. Preserve every field name, type, and
+status meaning in the packet contract above.
+
 ## Specialist registry and conditional routing
 
 The TOML file is authoritative for each specialist's description and execution
