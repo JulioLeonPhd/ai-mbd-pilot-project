@@ -295,7 +295,11 @@ push the commit and tag when the user requests publication.
 ### Issue tracker
 
 GitHub Issues for `JulioLeonPhd/ai-mbd-pilot-project`, using the `gh` CLI.
-See `docs/agents/issue-tracker.md`.
+Because GitHub API access can fail inside the command sandbox, always run
+`gh` CLI commands outside the sandbox using the execution environment's
+escalation mechanism. This outside-sandbox execution is authorized for all
+GitHub issue-tracker operations in this repository. See
+`docs/agents/issue-tracker.md` for command conventions.
 
 ### Triage labels
 
