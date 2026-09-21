@@ -249,6 +249,11 @@ and complex
 MATLAB/Simulink changes require independent validation with no unresolved error
 findings. The final response names changed artifacts and collected evidence.
 
+Run `uv run --frozen python scripts/check_agent_handoffs.py` after changing
+`AGENTS.md`, `.codex/agents/*.toml`, the `diagrammer` skill, or agent orchestration
+architecture documents. Completion requires every reported check to pass; an
+unavailable required checker is a disclosed limitation, not a pass.
+
 ## MATLAB coding standards
 
 Codex automatically loads this `AGENTS.md`; it does not discover MATLAB rules

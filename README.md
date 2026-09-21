@@ -61,6 +61,12 @@ documentation checks. The repository uses `uv` for the small set of development
 tools described in [pyproject.toml](pyproject.toml). Portable MATLAB and Simulink
 setup instructions will be added as those artifacts are built.
 
+Validate the agent handoff contract and flat specialist registry with:
+
+```sh
+uv run --frozen python scripts/check_agent_handoffs.py
+```
+
 ## License
 
 Copyright © Julio León. Released under the [Apache License 2.0](LICENSE).
