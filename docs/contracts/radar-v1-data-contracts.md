@@ -1,8 +1,10 @@
 # Radar V1 data contracts
 
-**Status:** WP3 draft for G2 review
+<!-- markdownlint-disable MD033 -->
+
+**Status:** WP3 accepted; WP4/G2 Phase 0 frozen, executable verification pending
 **Contract family:** `radar-v1`
-**Contract version:** `1.0.0-draft.1`
+**Contract version:** `1.0.0-draft.2`
 
 This document defines the interchange contracts for the floating-point MATLAB
 reference. The five versioned envelopes are configuration, target scenario,
@@ -11,7 +13,13 @@ finite IEEE-754
 double values unless a field says otherwise. JSON object keys are case
 sensitive and additional keys are invalid unless explicitly marked `extensions`.
 
+<a id="wp4-decision-status"></a>
+
 ## Decision status
+
+The accepted WP4/G2 Phase 0 values are defined in
+[ADR 0018](../adr/0018-freeze-wp4-g2-phase0-contract.md). Executable
+verification remains pending.
 
 The field names, dimensions, units, signs, and provenance rules in this
 document are the WP3 contract. Candidate values are recorded for traceability,
@@ -49,6 +57,8 @@ is authoritative until an ADR changes it. A target's radial velocity is the
 projection of its velocity onto the line of sight from the radar to its
 position at the scenario reference epoch; a zero-range position is invalid.
 
+<a id="wp4-configuration-envelope"></a>
+
 ## Configuration envelope
 
 The radar configuration is authoritative for generator, DUT, and fixture
@@ -58,7 +68,7 @@ parameters. Required top-level fields are:
 | Field | Type/shape | Units and rule |
 | --- | --- | --- |
 | `schemaName` | string | `radar.configuration` |
-| `schemaVersion` | string | `1.x`; this draft is `1.0.0-draft.1` |
+| `schemaVersion` | string | `1.x`; this contract is `1.0.0-draft.2` |
 | `id` | string | stable configuration identifier |
 | `createdUtc`, `producer` | string | ISO-8601 timestamp; producer name/version |
 | `rfCarrierHz` | number | Hz; exact current baseline `2997924580` (derive $\lambda=0.1$ m and $d=0.05$ m from ADR 0015) |
@@ -68,14 +78,58 @@ parameters. Required top-level fields are:
 | `channelCount` | integer | `64` |
 | `array` | object | `azimuthElements: 16`, `elevationElements: 4`, `elementSpacingWavelengths: 0.5` |
 | `waveform` | object | `pulseWidthSec: 40e-6`, `chirpBandwidthHz: 10e6`, `chirpStartHz: -5e6`, `chirpStopHz: 5e6` |
-| `ddc` | object | `complexIntermediateRateHz: 50e6`, `outputRateHz: 12.5e6`, `decimationFactors: [3,4]` |
+| `ddc` | object | `complexIntermediateRateHz: 50e6`, `outputRateHz: 12.5e6`, `decimationFactors: [3,4]`; passband `[-5e6,5e6]`, ripple `<=0.1 dB`, digital alias rejection `>=60 dB`, stage-2 stopband starts no later than `6.25e6` |
 | `prfsHz` | array[5] | nominal candidate `[1700,1900,2150,2450,2700]`; G2 verifies tick schedule |
-| `priSampleCounts` | integer array[5] | candidate `[88236,78948,69768,61224,55560]`; `12*round(adcSampleRateHz/(12*prfsHz(i)))`; one-based; G2 pending |
+| `priSampleCounts` | integer array[5] | accepted `[88236,78948,69768,61224,55560]`; one-based 150 MHz ADC ticks |
 | `processing` | object | `maxInstrumentedRangeM: 100000`, `rangeDomainM: [6800,100000]`, and stage settings |
 | `scan` | object | `azimuthSectorDeg: [-45,45]`, `updatePeriodSec: 1`; both provisional |
 | `blanking` | object | candidate `transmitBlankingSec: 40e-6` and `guardSec: 5e-6`; G2 pending |
 | `random` | object | integer `seed`; all stochastic fixtures use it |
 <!-- markdownlint-enable MD013 -->
+
+Record requirements are exact: candidate records require `candidateId`,
+`prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeM`,
+`foldedVelocityMps`, `statistic`, `sourceId`, `clusterEligible`, and
+`clusterCell`; CFAR records require those look fields plus `rangeBin`,
+`dopplerBin`, `sourceCellId`, `threshold`, `pass`, and `decisionState`; fused
+hypotheses require length-five `validityMask`, `supportMask`, and `passMask`,
+`voteCount`, `voteThreshold`, named `outcome`, `rangeM`,
+`radialVelocityMps`, `statistic`, and plural `sourceCellIds`. Cluster-stage
+hypotheses repeat the eligibility/look/cell fields. Aggregate clusters require
+`clusterId`, `hypothesisIds`, `rangeM`, `radialVelocityMps`, `statistic`,
+`validityMask`, `supportMask`, `passMask`, and sorted unique `sourceCellIds`;
+they have no single `clusterCell`.
+
+Clustering is input-order independent. The canonical member key is
+`(sorted(sourceCellIds), hypothesisId)`; members are emitted in ascending key
+order. Means use IEEE-754 double arithmetic in that order. Masks are exact
+elementwise ORs. The aggregate statistic is the maximum member statistic,
+breaking ties by lowest hypothesis ID. The canonical cluster key is its first
+member key, and cluster IDs are assigned sequentially after sorting.
+
+Draft.1 records are legacy regression inputs. A draft.1 record is accepted only
+through an explicit adapter: derive `durationTicks` from the configured PRI,
+derive `role` from legacy transition state (one priming record per group is
+required), set missing `clusterEligible` to true only for eligible candidate
+and fused hypotheses, derive look indices from commanded-look metadata, and
+reject records when any value cannot be derived. WP3 examples and checker stay
+legacy inputs; the WP4 checker owns adapter and migration tests.
+
+`clusterEligible`, look indices, and `clusterCell` are required on candidate
+records, CFAR records, fused hypotheses, and cluster-stage hypotheses. An
+aggregate cluster has no single `clusterCell`; it carries `hypothesisIds`,
+ordered arithmetic-mean range and velocity, statistic equal to the maximum
+member statistic with lowest-ID tie break, OR-combined masks, and sorted unique
+plural `sourceCellIds`. Duplicate cells remain distinct hypotheses but are
+connected when adjacent. Cluster records sort by first-member canonical key and
+receive sequential IDs from one.
+
+Fusion masks (`validityMask`, `supportMask`, `passMask`) all have length five;
+support is a subset of validity, `voteCount=sum(passMask)`, and threshold is
+three. Outcome is `pass` for at least three valid passing layers, `fail` for at
+least three valid layers but fewer than three passes, and `invalid` for fewer
+than three valid layers. The diagnostic for a wrong mask length is
+`DIMENSION_MISMATCH` at the mask path.
 
 `processing` must also carry `nearZeroDoppler.enabled` and a numeric
 `nearZeroDoppler.cutoffMps` once WP4 decides it. Until then, a fixture may set
@@ -136,13 +190,20 @@ Routine generated vectors belong under `data/testVectors/` and are ignored by
 Git. Deliberately retained large reference vectors belong under
 `data/retainedTestVectors/` and may use Git LFS. The tiny canonical shape
 example remains tracked until WP5 supplies a generation check.
-`pulseRecords` contains records with `adcSamples` (`int16`, shape
+`pulseRecords` contains records with `role` (`priming|usable|transition`),
+`adcSamples` (`int16`, shape
 `[samplesInPulse,64]`), `adcTick` (`uint64`, shape `[samplesInPulse,1]`),
-`pulseStartTick`, `pulseSampleCount`, `prfIndex`, and `prfNominalHz`.
-Full-scan records also require logical scalar `isTransition`: false for an
-ordinary pulse and true for a transition. A transition retains `prfIndex` and
-`prfNominalHz` for its destination PRF; its duration rule remains WP4/G2
-pending. The unit-only shape example may omit `isTransition`.
+`pulseStartTick`, `pulseSampleCount`, `durationTicks`, `prfIndex`, and
+`prfNominalHz`. `pulseSampleCount` describes retained ADC samples and may be
+smaller than the schedule duration; `adcTick` maps retained sample `j` to
+`pulseStartTick+j` (or the declared `sampleTickOffset+j` when capture is
+windowed). Schedule arithmetic uses `durationTicks`, never capture count.
+Full-scan records also require logical scalar `isTransition`, which is true
+exactly when `role=transition` and false otherwise. Each PRF has one priming
+record and the accepted usable counts are `[22,25,28,32,35]`. A transition
+retains `prfIndex` and `prfNominalHz` for its destination PRF and uses the
+accepted `transitionGapTicks: 106872`. The unit-only shape example may omit
+these schedule fields.
 `prfIndex` is one-based and indexes the configured `prfsHz` array.
 `adcTick` is the global ADC tick epoch and records may be consumed incrementally.
 For each record after the first, `pulseStartTick` is the actual integer ADC tick
@@ -151,12 +212,35 @@ record's start tick. For non-transition, same-PRF records, this difference must
 equal `priSampleCounts(prfIndex)`. The derived actual PRF is
 `adcSampleRateHz/priSampleCounts(prfIndex)`; the fifth candidate is therefore
 `2699.784...` Hz by design. Transition records declare
-`isTransition: true`; their timing rule is deferred to WP4/G2. No inferred
-quantization is permitted. Optional
+`isTransition: true`; no inferred quantization is permitted. Optional
 generator truth is under `truth`, with `targetId`, `rangeM`,
 `radialVelocityMps`, `azimuthDeg`, and `elevationDeg`; truth is never read by
 the DUT. Missing or mismatched configuration/scenario versions or snapshots
 are invalid.
+
+The complete schedule grammar is five groups of `(one priming, usableCount
+usable)` records, with usableCount `[22,25,28,32,35]`, and four transitions only
+between adjacent groups: exactly 151 records. Every interval is half-open;
+`endTick = startTick + durationTicks`. Priming and usable records have
+`durationTicks` equal to their PRF PRI; transitions have
+`sampleCount=106872` and `durationTicks=106872`. Within a group, successive
+starts differ
+by the group's PRI count. Each transition has `sampleCount=106872`,
+`durationTicks=106872`, and ends at the next priming start. The final end tick
+is `10553388`; midpoint offset is `5276694` ticks. Any deviation is
+`TICK_DISCONTINUITY`.
+
+DDC acceptance uses unity input-tone normalization and amplitude
+`20*log10(abs(H))`. The frequency grid is uniform and includes endpoints.
+Passband is `[-5,+5] MHz`; stage-2 stopband is `|f| >= 6.25 MHz` in the 50 MHz
+pre-decimation input domain through 25 MHz. Stage-1 folding is into
+`[-25,25] MHz` after `/3`; stage 2 folds that 50 MHz input before `/4`.
+The cascade reference includes mixer, both filters, and both decimators.
+Evaluate a deterministic 1 kHz grid including endpoints. Cascade digital alias
+rejection is the minimum stopband attenuation relative to maximum passband
+amplitude. Compare each metric with absolute tolerance `1e-9 dB`.
+
+<a id="wp4-processing-intermediate"></a>
 
 ## Processing-intermediate envelope
 
@@ -191,11 +275,11 @@ five distinct decisions. Their minimum data contracts are:
 | `range` | `[rangeBin, pulse, elevation]` complex after azimuth beamforming | range-bin index plus `rangeBinCentersM` |
 | `doppler` | `[rangeBin, dopplerBin, elevation]` complex after azimuth beamforming; any real statistic is a separate named field or seam | `rangeBinCentersM`, `dopplerBinCentersMps`; commanded `azimuthLookIndex` |
 | `angle` | typed struct array shape `[N,1]` with fields `rangeM`, `radialVelocityMps`, `azimuthDeg`, `elevationDeg`, `statistic` | one-based row indices; scalar numeric fields and statistic units are declared |
-| `candidate-list` | typed struct array shape `[N,1]` with unique one-based `candidateId`, one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeM`, `foldedVelocityMps`, `statistic`, `sourceId` | PRF and angle-look indices are one-based and preserved into cross-PRF association and any final report; no resolver method implied |
+| `candidate-list` | typed struct array shape `[N,1]` with unique one-based `candidateId`, one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeM`, `foldedVelocityMps`, `statistic`, `sourceId`, `clusterEligible`, `clusterCell=[rangeCell,dopplerCell]` | PRF and angle-look indices are one-based and preserved; no resolver method implied |
 | `ambiguity-projection` | typed struct array preserving five PRF layers, with common hypothesis coordinates, per-PRF `validityMask`, and `sourceCellId` identities | each hypothesis retains its five-layer eligibility and source-cell provenance before per-PRF CFAR; invalid layers are explicit |
 | `cfar` | typed struct array shape `[N,1]` with one-based `prfIndex`, `azimuthLookIndex`, `elevationLookIndex`, `rangeBin`, `dopplerBin`, `sourceCellId`, `statistic`, `threshold`, logical `pass`, and `decisionState` | `decisionState` is one of `pass`, `fail`, or `invalid`; invalidity is recorded in the CFAR record and mirrored in the fusion masks |
 | `fusion` | typed struct array shape `[N,1]` with `validityMask`, `supportMask`, `voteCount`, `voteThreshold`, `residual`, `ambiguityStatus`, `sourceCellIds`, and fused `rangeM`/`radialVelocityMps` | masks distinguish eligible, pass, fail, and invalid PRF decisions; source identities preserve contributing PRFs/cells; `voteThreshold` is 3 for the full-domain 3-of-5 baseline; residual and status are declared for unresolved hypotheses |
-| `cluster` | typed struct arrays of fused hypotheses with shape `[H,1]` and cluster records with shape `[C,1]`; records carry fused coordinates, `supportMask`, `validityMask`, and contributing `sourceCellIds` | clusters consume fused hypotheses; no single-`prfIndex` invariant applies; V1 provisional adjacency is one-cell Chebyshev within one look, with no edge wrap, invalid bridging, or cross-look deduplication |
+| `cluster` | typed struct arrays of fused hypotheses with shape `[H,1]` and cluster records with shape `[C,1]`; records carry fused coordinates, `supportMask`, `validityMask`, `clusterEligible`, one-based look indices, `clusterCell=[rangeCell,dopplerCell]`, and contributing `sourceCellIds` | connected components use same-look one-cell Chebyshev adjacency with ordinary integer differences, no edge wrap, no ineligible bridging, and no cross-look deduplication |
 <!-- markdownlint-enable MD013 -->
 
 For the `cluster` stage, `H` is the number of fused hypotheses and `C` is the
@@ -224,7 +308,10 @@ Implementations must preserve these seams and record the selected method in
 Candidate PRF and angle-look provenance must remain available through
 association and be preserved in any final report that exposes PRF evidence.
 ADR 0016 records the five-PRF decision and reopened CPI pulse-count trade;
-ADR 0017 records the provisional schedule and commanded-look receive seam.
+ADR 0017 is historical; its rounded schedule arithmetic is superseded by ADR
+0018, which owns the frozen Phase 0 schedule and receive seam.
+
+<a id="wp4-detection-list"></a>
 
 ## Detection-list envelope
 
@@ -248,6 +335,8 @@ selected method defines them. Empty `detections: []` is valid. Duplicate
 `detectionId` values, non-finite values, and reports outside the configured
 range domain are invalid.
 
+<a id="wp4-invalid-input"></a>
+
 ## Invalid-input behavior
 
 Schema or type errors, missing provenance, invalid dimensions, non-finite
@@ -259,6 +348,8 @@ or provisional sector values are valid only when the fixture declares the
 applicable scope; they are not silently clipped, relabeled, or accepted as V1
 performance evidence. Unsupported pending methods return `code:
 "METHOD_PENDING"`.
+
+<a id="wp4-examples-compatibility"></a>
 
 ## Examples and compatibility
 
@@ -279,6 +370,8 @@ required field or changing type, units, sign, shape, channel map, or stage
 meaning must increment the major version and provide a migration note. A
 consumer must reject a major mismatch and report the expected and received
 versions.
+
+<a id="wp4-conformance-matrix"></a>
 
 ## Conformance checklist and matrix
 

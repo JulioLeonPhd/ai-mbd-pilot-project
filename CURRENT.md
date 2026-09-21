@@ -28,17 +28,21 @@ replay provenance, and ignored/LFS vector storage rules: [data contracts](docs/c
 [The five-PRF decision and reopened CPI pulse-count rationale](docs/adr/0016-retain-five-prfs-and-reopen-cpi-pulse-count.md)
 are recorded in ADR 0016. The provisional clustering and cross-PRF approach
 remains subject to WP4 verification at G2; downstream WP6e may reject it and
-reopen G2. The provisional schedule is
-`[22,25,28,32,35]` usable pulses for the five PRFs under the 70.653 ms cell-time
-cap, subject to WP6e rejection and G2 reopening. Its current arithmetic is
-65.147760 ms usable dwell + 2.358240 ms priming + 2.849847 ms transitions =
-70.355847 ms, leaving 0.297153 ms. Clustering is provisionally
+reopen G2. The frozen schedule is `[22,25,28,32,35]` usable pulses with 151
+records, 150 MHz integer ticks, transition gap `106872`, total `10553388`
+ticks, cap `10597950`, margin `44562`, midpoint offset `5276694`, 2.849920 ms
+transitions, 70.355920 ms total, and 0.297080 ms margin.
+Clustering is frozen as
 one-cell Chebyshev adjacency within a look only, with no edge wrap, invalid
 bridging, or cross-look deduplication; WP6e selects the ambiguity order and
 method.
-WP3 is independently accepted. WP4/G2 remains open pending verification of the
-provisional schedule and clustering rules, including complete valid, invalid,
-zero-result, version-mismatch, and dimension-mismatch coverage.
+WP3 is independently accepted. WP4/G2 Phase 0 is frozen by
+[ADR 0018](docs/adr/0018-freeze-wp4-g2-phase0-contract.md): integer-tick
+schedule, DDC budget, receive dimensions, fusion, and clustering seams are
+accepted as contracts.
+Executable WP4 verification remains pending, including complete valid, invalid,
+zero-result, version-mismatch, and dimension-mismatch coverage; G2 is not
+passed.
 
 The JSON subset, MAT example, MATLAB Code Analyzer, Ruff, Markdown lint, and
 Mermaid render checks passed. Independent documentation and code reviews found
@@ -76,7 +80,7 @@ uses the exact ADR 0015 carrier invariant.
 
 ## Next ready packages
 
-- Verify the provisional WP4 schedule and clustering rules at G2, including
+- Execute WP4/G2 verification of the frozen schedule and clustering rules, including
   complete valid, invalid, zero-result, version-mismatch, and dimension-
   mismatch coverage.
 - Keep the ambiguity-resolution candidate open for WP6e; do not freeze its

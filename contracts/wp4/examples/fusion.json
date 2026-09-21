@@ -1,0 +1,1 @@
+{"schemaName":"radar.wp4.fusion","schemaVersion":"1.0.0-draft.2","validityMask":[true,true,true,true,true],"supportMask":[true,true,true,false,false],"passMask":[true,true,true,false,false],"voteCount":3,"voteThreshold":3,"outcome":"pass","sourceCellIds":["p1:c1","p2:c1","p3:c1"]}

@@ -1,5 +1,9 @@
 # Radar Demonstrator Architecture
 
+WP4/G2 Phase 0 is frozen by [ADR 0018](../adr/0018-freeze-wp4-g2-phase0-contract.md).
+The executable checker and timing/DSP evidence remain pending, so this freeze
+does not constitute G2 acceptance.
+
 This document records the current direction for a public AI-assisted
 model-based design reference project. The architecture is deliberately
 provisional: unresolved radar requirements must be settled before an
@@ -216,11 +220,10 @@ open unless stated above as an agreed decision.
 
 ## G2 and downstream items still open
 
-- Does the provisional `[22,25,28,32,35]` usable-pulse allocation fit the
-  70.653 ms cell-time cap with required blanking, guard, priming, and
-  transition constraints? Its current arithmetic is 65.147760 ms usable dwell
-    plus 2.358240 ms priming plus 2.849847 ms transitions = 70.355847 ms,
-    leaving 0.297153 ms. Downstream WP6e may reject it and reopen G2.
+- Does executable verification pass the frozen `[22,25,28,32,35]` allocation,
+  151-record grammar, and integer-tick cap? The frozen arithmetic is 2.849920
+  ms transitions plus 70.355920 ms total, leaving 0.297080 ms under the
+  70.653 ms cap. Downstream WP6e may reject it and reopen G2.
 - What look spacing follows from the ideal 3 dB beamwidth, and what noisy
   angle and elevation-sector measurements should be reported?
 - What clutter cutoff and detection-statistic definition make results

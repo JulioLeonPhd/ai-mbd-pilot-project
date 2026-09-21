@@ -1,0 +1,1 @@
+{"schemaName":"radar.wp4.ddc","schemaVersion":"1.0.0-draft.2","sampleRateHz":150000000,"passbandHz":[-5000000,5000000],"passbandRippleDb":0.1,"digitalAliasRejectionDb":60,"stage2StopbandStartHz":6250000,"gridResolutionHz":1000,"metricToleranceDb":1e-9}

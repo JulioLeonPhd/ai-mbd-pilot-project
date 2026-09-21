@@ -1,0 +1,1 @@
+{"schemaName":"radar.wp4.clustering","schemaVersion":"1.0.0-draft.2","hypotheses":[{"hypothesisId":"h1","clusterEligible":true,"azimuthLookIndex":1,"elevationLookIndex":1,"clusterCell":[10,20],"rangeM":1000,"radialVelocityMps":2,"statistic":4,"sourceCellIds":["p1:c1"]}],"clusters":[]}
