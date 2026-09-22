@@ -1,0 +1,15 @@
+{
+  "schemaName": "radar.wp4.fusion",
+  "schemaVersion": "1.0.0-draft.2",
+  "hypotheses": [],
+  "results": [],
+  "seed": 401041,
+  "generatorRevision": "cb95b925d2e91e4d8de4d7cff89d590dd172fc2e",
+  "generatorVersion": "wp4gen-1.0.0",
+  "generatorSeed": 401041,
+  "generationParameters": {
+    "fixtureScope": "acceptance-evidence",
+    "domain": "fusion-zero"
+  },
+  "createdUtc": "2026-09-21T20:44:03Z"
+}

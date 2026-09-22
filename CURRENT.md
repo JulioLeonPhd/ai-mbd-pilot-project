@@ -4,8 +4,9 @@
 
 WP4/G2 Phase 1 documentation consolidation was independently validated and
 committed in `da1e301`. Phase 2 numerical-fixture architecture is complete and
-root-approved; the durable ledger is [the WP4/G2 recovery plan](docs/plans/wp4-g2-recovery-plan-2026-09-21.md).
-No executable WP4 evidence exists yet, and G2 remains open.
+root-approved. Phase 3 implementation and precommit validation are complete;
+the durable ledger is [the WP4/G2 recovery plan](docs/plans/wp4-g2-recovery-plan-2026-09-21.md).
+Canonical replay independently completed and passed; G2 remains open.
 
 On 2026-09-19, WP3 was independently accepted. The current checker passes 18
 Python tests and 30 executable manifest rows. Ruff check/format, Markdown lint,
@@ -45,9 +46,12 @@ WP3 is independently accepted. WP4/G2 Phase 0 is frozen by
 [ADR 0018](docs/adr/0018-freeze-wp4-g2-phase0-contract.md): integer-tick
 schedule, DDC budget, receive dimensions, fusion, and clustering seams are
 accepted as contracts.
-Executable WP4 verification remains pending, including complete valid, invalid,
-zero-result, version-mismatch, and dimension-mismatch coverage; G2 is not
-passed.
+WP4 Phase 3 now has 23 physical fixture artifacts, 54/54 strict acceptance
+rows, exactly 54 passing `matlab.unittest` methods, clean Code Analyzer results
+for 32 `.m` files, and an independent source review with no unresolved errors.
+The production-like floating-point reference is split between `src/+radardemo/`
+domain modules and `contracts/wp4/` generator, oracle, and adapter code; the
+test class is `tests/wp4/TestWp4Fixtures.m`. G2 is not passed.
 
 The JSON subset, MAT example, MATLAB Code Analyzer, Ruff, Markdown lint, and
 Mermaid render checks passed. Independent documentation and code reviews found
@@ -57,8 +61,8 @@ coverage.
 ## Active gate
 
 Revised G1 passed for the bounded analytic and ideal candidate. WP3 is
-independently accepted. Active next work is Phase 3 WP4/G2 executable evidence
-generation; G2 is the
+independently accepted. Active next work is the formal Phase 4 review and the
+later Phase 5–6 gates; G2 is the
 shared technical gate for the WP3 data contracts and WP4 DSP/timing
 architecture.
 
@@ -86,11 +90,11 @@ uses the exact ADR 0015 carrier invariant.
 
 ## Next ready packages
 
-- Implement the approved Phase 2 MATLAB-only architecture under `contracts/wp4/`.
-- Generate and test temporarily first, then stop for root authorization of the
-  immutable generator-source commit before regenerating tracked fixtures.
-- Run the exact 54 acceptance tests, MATLAB Code Analyzer, and preserve the
-  no-Python and no-WP6e-method constraints.
+- Formalize the completed canonical replay in the Phase 4 review against
+  immutable generator revision `cb95b925d2e91e4d8de4d7cff89d590dd172fc2e`.
+- Reconcile the manifest and documentation in Phase 5; the data contract still
+  calls filter delay unresolved although the Phase 2 design fixes 372 ticks /
+  31 samples.
 - Keep the ambiguity-resolution candidate open for WP6e; do not freeze its
   order or method at G2.
 
@@ -105,8 +109,35 @@ streams. The documentation bundle has passed independent semantic review.
 
 Do not redo the completed documentation or WP3 repairs. The latest independent
 WP3 result is the authoritative continuation point: WP3 is accepted with no
-unresolved implementation errors. Proceed with WP4/G2 verification; G2 is not
-passed.
+unresolved implementation errors. Proceed with formal Phase 4 review; G2 is
+not passed.
+
+### WP4 Phase 3 reproduction
+
+From the repository root, in MATLAB:
+
+```matlab
+repoRoot = pwd;
+addpath(fullfile(repoRoot, "src"));
+addpath(fullfile(repoRoot, "contracts", "wp4"));
+R = "cb95b925d2e91e4d8de4d7cff89d590dd172fc2e";
+createdUtc = "2026-09-21T20:44:03Z";
+tmp = string(tempname);
+generateWp4Fixtures(tmp, struct("FixtureScope", "acceptance-evidence", ...
+    "GeneratorRevision", R, "GeneratorVersion", "wp4gen-1.0.0", ...
+    "CreatedUtc", createdUtc));
+opts = struct("FixtureRoot", fullfile(repoRoot, "contracts", "wp4", ...
+    "fixtures"), ...
+    "StrictTraceability", true);
+checkWp4Fixtures(fullfile(repoRoot, "contracts", "wp4", ...
+    "fixture-manifest.json"), opts);
+runtests(fullfile(repoRoot, "tests", "wp4", "TestWp4Fixtures.m"));
+```
+
+The timestamp is the source-commit timestamp selected for deterministic replay,
+not the wall-clock generation time. Measured reference metrics are DDC ripple
+`0.00067200911666936 dB`, stage-2 rejection `87.7676669047022 dB`, and full
+cascade rejection `85.2548307898255 dB`.
 
 ## Evidence
 

@@ -1,0 +1,1554 @@
+{
+  "schemaName": "radar.wp4.schedule",
+  "schemaVersion": "1.0.0-draft.2",
+  "recordCount": 151,
+  "prfsHz": [
+    1700,
+    1900,
+    2150,
+    2450,
+    2700
+  ],
+  "priSampleCounts": [
+    88236,
+    78948,
+    69768,
+    61224,
+    55560
+  ],
+  "usableCounts": [
+    22,
+    25,
+    28,
+    32,
+    35
+  ],
+  "transitionGapTicks": 106872,
+  "totalTicks": 10553388,
+  "capTicks": 10597950,
+  "midpointOffsetTicks": 5276694,
+  "records": [
+    {
+      "role": "priming",
+      "prfIndex": 1,
+      "startTick": 0,
+      "endTick": 88236,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 88236,
+      "endTick": 176472,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 176472,
+      "endTick": 264708,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 264708,
+      "endTick": 352944,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 352944,
+      "endTick": 441180,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 441180,
+      "endTick": 529416,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 529416,
+      "endTick": 617652,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 617652,
+      "endTick": 705888,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 705888,
+      "endTick": 794124,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 794124,
+      "endTick": 882360,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 882360,
+      "endTick": 970596,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 970596,
+      "endTick": 1058832,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1058832,
+      "endTick": 1147068,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1147068,
+      "endTick": 1235304,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1235304,
+      "endTick": 1323540,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1323540,
+      "endTick": 1411776,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1411776,
+      "endTick": 1500012,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1500012,
+      "endTick": 1588248,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1588248,
+      "endTick": 1676484,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1676484,
+      "endTick": 1764720,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1764720,
+      "endTick": 1852956,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1852956,
+      "endTick": 1941192,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 1,
+      "startTick": 1941192,
+      "endTick": 2029428,
+      "durationTicks": 88236,
+      "sampleCount": 88236,
+      "pulseSampleCount": 88236,
+      "isTransition": false
+    },
+    {
+      "role": "transition",
+      "prfIndex": 2,
+      "startTick": 2029428,
+      "endTick": 2136300,
+      "durationTicks": 106872,
+      "sampleCount": 106872,
+      "pulseSampleCount": 106872,
+      "isTransition": true
+    },
+    {
+      "role": "priming",
+      "prfIndex": 2,
+      "startTick": 2136300,
+      "endTick": 2215248,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 2215248,
+      "endTick": 2294196,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 2294196,
+      "endTick": 2373144,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 2373144,
+      "endTick": 2452092,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 2452092,
+      "endTick": 2531040,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 2531040,
+      "endTick": 2609988,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 2609988,
+      "endTick": 2688936,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 2688936,
+      "endTick": 2767884,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 2767884,
+      "endTick": 2846832,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 2846832,
+      "endTick": 2925780,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 2925780,
+      "endTick": 3004728,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3004728,
+      "endTick": 3083676,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3083676,
+      "endTick": 3162624,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3162624,
+      "endTick": 3241572,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3241572,
+      "endTick": 3320520,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3320520,
+      "endTick": 3399468,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3399468,
+      "endTick": 3478416,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3478416,
+      "endTick": 3557364,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3557364,
+      "endTick": 3636312,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3636312,
+      "endTick": 3715260,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3715260,
+      "endTick": 3794208,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3794208,
+      "endTick": 3873156,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3873156,
+      "endTick": 3952104,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 3952104,
+      "endTick": 4031052,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 4031052,
+      "endTick": 4110000,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 2,
+      "startTick": 4110000,
+      "endTick": 4188948,
+      "durationTicks": 78948,
+      "sampleCount": 78948,
+      "pulseSampleCount": 78948,
+      "isTransition": false
+    },
+    {
+      "role": "transition",
+      "prfIndex": 3,
+      "startTick": 4188948,
+      "endTick": 4295820,
+      "durationTicks": 106872,
+      "sampleCount": 106872,
+      "pulseSampleCount": 106872,
+      "isTransition": true
+    },
+    {
+      "role": "priming",
+      "prfIndex": 3,
+      "startTick": 4295820,
+      "endTick": 4365588,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 4365588,
+      "endTick": 4435356,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 4435356,
+      "endTick": 4505124,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 4505124,
+      "endTick": 4574892,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 4574892,
+      "endTick": 4644660,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 4644660,
+      "endTick": 4714428,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 4714428,
+      "endTick": 4784196,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 4784196,
+      "endTick": 4853964,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 4853964,
+      "endTick": 4923732,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 4923732,
+      "endTick": 4993500,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 4993500,
+      "endTick": 5063268,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5063268,
+      "endTick": 5133036,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5133036,
+      "endTick": 5202804,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5202804,
+      "endTick": 5272572,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5272572,
+      "endTick": 5342340,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5342340,
+      "endTick": 5412108,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5412108,
+      "endTick": 5481876,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5481876,
+      "endTick": 5551644,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5551644,
+      "endTick": 5621412,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5621412,
+      "endTick": 5691180,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5691180,
+      "endTick": 5760948,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5760948,
+      "endTick": 5830716,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5830716,
+      "endTick": 5900484,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5900484,
+      "endTick": 5970252,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 5970252,
+      "endTick": 6040020,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 6040020,
+      "endTick": 6109788,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 6109788,
+      "endTick": 6179556,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 6179556,
+      "endTick": 6249324,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 3,
+      "startTick": 6249324,
+      "endTick": 6319092,
+      "durationTicks": 69768,
+      "sampleCount": 69768,
+      "pulseSampleCount": 69768,
+      "isTransition": false
+    },
+    {
+      "role": "transition",
+      "prfIndex": 4,
+      "startTick": 6319092,
+      "endTick": 6425964,
+      "durationTicks": 106872,
+      "sampleCount": 106872,
+      "pulseSampleCount": 106872,
+      "isTransition": true
+    },
+    {
+      "role": "priming",
+      "prfIndex": 4,
+      "startTick": 6425964,
+      "endTick": 6487188,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 6487188,
+      "endTick": 6548412,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 6548412,
+      "endTick": 6609636,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 6609636,
+      "endTick": 6670860,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 6670860,
+      "endTick": 6732084,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 6732084,
+      "endTick": 6793308,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 6793308,
+      "endTick": 6854532,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 6854532,
+      "endTick": 6915756,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 6915756,
+      "endTick": 6976980,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 6976980,
+      "endTick": 7038204,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7038204,
+      "endTick": 7099428,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7099428,
+      "endTick": 7160652,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7160652,
+      "endTick": 7221876,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7221876,
+      "endTick": 7283100,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7283100,
+      "endTick": 7344324,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7344324,
+      "endTick": 7405548,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7405548,
+      "endTick": 7466772,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7466772,
+      "endTick": 7527996,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7527996,
+      "endTick": 7589220,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7589220,
+      "endTick": 7650444,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7650444,
+      "endTick": 7711668,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7711668,
+      "endTick": 7772892,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7772892,
+      "endTick": 7834116,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7834116,
+      "endTick": 7895340,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7895340,
+      "endTick": 7956564,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 7956564,
+      "endTick": 8017788,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 8017788,
+      "endTick": 8079012,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 8079012,
+      "endTick": 8140236,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 8140236,
+      "endTick": 8201460,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 8201460,
+      "endTick": 8262684,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 8262684,
+      "endTick": 8323908,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 8323908,
+      "endTick": 8385132,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 4,
+      "startTick": 8385132,
+      "endTick": 8446356,
+      "durationTicks": 61224,
+      "sampleCount": 61224,
+      "pulseSampleCount": 61224,
+      "isTransition": false
+    },
+    {
+      "role": "transition",
+      "prfIndex": 5,
+      "startTick": 8446356,
+      "endTick": 8553228,
+      "durationTicks": 106872,
+      "sampleCount": 106872,
+      "pulseSampleCount": 106872,
+      "isTransition": true
+    },
+    {
+      "role": "priming",
+      "prfIndex": 5,
+      "startTick": 8553228,
+      "endTick": 8608788,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 8608788,
+      "endTick": 8664348,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 8664348,
+      "endTick": 8719908,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 8719908,
+      "endTick": 8775468,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 8775468,
+      "endTick": 8831028,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 8831028,
+      "endTick": 8886588,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 8886588,
+      "endTick": 8942148,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 8942148,
+      "endTick": 8997708,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 8997708,
+      "endTick": 9053268,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9053268,
+      "endTick": 9108828,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9108828,
+      "endTick": 9164388,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9164388,
+      "endTick": 9219948,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9219948,
+      "endTick": 9275508,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9275508,
+      "endTick": 9331068,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9331068,
+      "endTick": 9386628,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9386628,
+      "endTick": 9442188,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9442188,
+      "endTick": 9497748,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9497748,
+      "endTick": 9553308,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9553308,
+      "endTick": 9608868,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9608868,
+      "endTick": 9664428,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9664428,
+      "endTick": 9719988,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9719988,
+      "endTick": 9775548,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9775548,
+      "endTick": 9831108,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9831108,
+      "endTick": 9886668,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9886668,
+      "endTick": 9942228,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9942228,
+      "endTick": 9997788,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 9997788,
+      "endTick": 10053348,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 10053348,
+      "endTick": 10108908,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 10108908,
+      "endTick": 10164468,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 10164468,
+      "endTick": 10220028,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 10220028,
+      "endTick": 10275588,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 10275588,
+      "endTick": 10331148,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 10331148,
+      "endTick": 10386708,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 10386708,
+      "endTick": 10442268,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 10442268,
+      "endTick": 10497828,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    },
+    {
+      "role": "usable",
+      "prfIndex": 5,
+      "startTick": 10497828,
+      "endTick": 10553388,
+      "durationTicks": 55560,
+      "sampleCount": 55560,
+      "pulseSampleCount": 55560,
+      "isTransition": false
+    }
+  ],
+  "documentVersion": "phase0-frozen",
+  "id": "wp4-g2-schedule",
+  "createdUtc": "2026-09-21T20:44:03Z",
+  "producer": "wp4gen-1.0.0",
+  "seed": 401011,
+  "generatorRevision": "cb95b925d2e91e4d8de4d7cff89d590dd172fc2e",
+  "generatorVersion": "wp4gen-1.0.0",
+  "generatorSeed": 401011,
+  "generationParameters": {
+    "fixtureScope": "acceptance-evidence",
+    "domain": "schedule"
+  }
+}

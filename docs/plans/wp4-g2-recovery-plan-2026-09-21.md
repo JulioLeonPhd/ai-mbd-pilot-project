@@ -31,14 +31,16 @@ artifacts; the writer consumes real artifacts and records traceability.
 
 ## Phase progress
 
+<!-- markdownlint-disable MD013 -->
 | Phase | Status | Evidence / gate |
 | --- | --- | --- |
 | 1. Documentation contract | Complete; `da1e301` | Validated |
 | 2. Numerical fixture architecture | Complete; root-approved | Recorded below |
-| 3. Executable evidence | Next; not started | MATLAB handoff below |
-| 4. Independent validation | Pending | Requires Phase 3 artifacts |
+| 3. Executable evidence | Complete; commits `cfd2bc1`, `cb95b92` | 23 artifacts; 54/54 rows; 54 tests |
+| 4. Independent validation | Replay complete; formal gate pending | Strict 54/54; 23-artifact regeneration identical |
 | 5. Manifest and traceability | Pending | Requires validated artifacts |
 | 6. Root completion gate | Pending | G2 remains open |
+<!-- markdownlint-enable MD013 -->
 
 This plan is the detailed phase ledger and approved Phase 2 architecture record.
 `CURRENT.md` is the concise current-state pointer. Phase completion does not
@@ -94,7 +96,8 @@ The public interfaces are `report=generateWp4Fixtures(outputDirectory,options)`,
 are `contracts/wp4/generateWp4Fixtures.m`, `contracts/wp4/+wp4gen/`,
 `contracts/wp4/checkWp4Fixtures.m`, `contracts/wp4/+wp4oracle/`,
 `contracts/wp4/adaptWp4Draft1.m`,
-`contracts/wp4/tests/TestWp4Fixtures.m`,
+and the historical test location `contracts/wp4/tests/TestWp4Fixtures.m`
+(superseded by `tests/wp4/TestWp4Fixtures.m`),
 `contracts/wp4/fixture-manifest.json`, and `contracts/wp4/fixtures/`.
 
 The exact DDC design is mixer → 25-tap even-order-24 Kaiser beta 8.6 at
@@ -196,9 +199,46 @@ including invalid, zero-result, version/dimension mismatch, migration, and
 combined diagnostic precedence. Run the MATLAB Code Analyzer, resolving all
 reported errors and warnings.
 
-The implementation result must identify exact artifact paths, test names,
-tolerances, and reproducible generation commands. A stored summary value alone
-does not satisfy the DDC gate.
+Completed in source commit `cfd2bc1897d5985fb192a2bc33f62a7715a8be40` and
+immutable generator revision `cb95b925d2e91e4d8de4d7cff89d590dd172fc2e`.
+The user-directed revised layout puts production-like floating-point domain
+modules in `src/+radardemo/`; `contracts/wp4/+wp4gen/` contains fixture
+generation, `+wp4oracle/` independent checks, and adapters, while
+`tests/wp4/TestWp4Fixtures.m` contains the 54 acceptance methods. Precommit
+validation recorded 23 physical artifacts, 54/54 strict rows, exactly 54
+passing tests, clean Code Analyzer results for 32 `.m` files, and an independent
+source review with no unresolved errors. Measured DDC ripple is
+`0.00067200911666936 dB`; stage-2 rejection is `87.7676669047022 dB`; full
+cascade rejection is `85.2548307898255 dB`.
+
+Reproduction from the repository root in MATLAB:
+
+```matlab
+repoRoot = pwd;
+addpath(fullfile(repoRoot, "src"));
+addpath(fullfile(repoRoot, "contracts", "wp4"));
+R = "cb95b925d2e91e4d8de4d7cff89d590dd172fc2e";
+createdUtc = "2026-09-21T20:44:03Z";
+tmp = string(tempname);
+generateWp4Fixtures(tmp, struct("FixtureScope", "acceptance-evidence", ...
+    "GeneratorRevision", R, "GeneratorVersion", "wp4gen-1.0.0", ...
+    "CreatedUtc", createdUtc));
+opts = struct("FixtureRoot", fullfile(repoRoot, "contracts", "wp4", ...
+    "fixtures"), ...
+    "StrictTraceability", true);
+checkWp4Fixtures(fullfile(repoRoot, "contracts", "wp4", ...
+    "fixture-manifest.json"), opts);
+runtests(fullfile(repoRoot, "tests", "wp4", "TestWp4Fixtures.m"));
+```
+
+The `CreatedUtc` value is the source-commit timestamp selected for deterministic
+replay, not actual wall-clock generation time. Independent canonical replay
+passed: strict checker 54/54 with provenance true; fresh regeneration from R
+was semantically identical across 23 artifacts and the manifest was
+byte-identical. Formal Phase 4 acceptance remains pending; Phase 5
+manifest/document reconciliation and Phase 6 closure remain pending. The data
+contract still calls filter delay
+unresolved although the Phase 2 design fixes 372 ticks / 31 samples.
 
 ### Phase 4 — Independently validate MATLAB evidence
 
@@ -235,11 +275,13 @@ recorded, and no validator has unresolved errors. Only then may the root close
 G2 and update `CURRENT.md`. If a required checker is unavailable, disclose it;
 do not treat unavailability as a pass.
 
-## Phase 3 implementation handoff
+## Historical Phase 3 implementation handoff (superseded)
 
-Start Phase 3 with this bounded packet. Generate and test temporary fixtures
-first; stop for root authorization of the immutable generator-source commit,
-then regenerate tracked fixtures from that exact revision.
+The following packet records the original Phase 3 dispatch and is retained for
+history only; it is not a current instruction. Phase 3 is complete. The current
+scope is `src/+radardemo/**`, `contracts/wp4/` generator/oracle/adapters, and
+`tests/wp4/**`; the old contracts-only mutation scope and revision placeholder
+are superseded.
 
 ```yaml
 task:
@@ -253,11 +295,11 @@ task:
     - "ref: docs/plans/wp4-g2-recovery-plan-2026-09-21.md @ <commit-containing-this-plan>"
     - "ref: docs/adr/0018-freeze-wp4-g2-phase0-contract.md @ da1e301"
     - "ref: docs/contracts/radar-v1-data-contracts.md @ da1e301"
-    - "ref: contracts/wp4/ @ da1e301"
+    - "ref: contracts/wp4/ @ da1e301 (historical source layout)"
   constraints:
     - "Route to matlab-implementer; use MATLAB only and no Python orchestrator."
-    - "Mutations are limited to contracts/wp4/."
-    - "Replace the plan revision placeholder with its immutable commit before dispatch."
+    - "Historical constraint: mutations were limited to contracts/wp4/."
+    - "Historical requirement: replace the plan revision placeholder before dispatch."
     - >
       Preserve no-WP6e-method constraints and stop before tracked regeneration
       for root authorization.
@@ -269,7 +311,8 @@ task:
     - "Run MATLAB Code Analyzer with no unresolved errors or warnings."
     - "Pin the generator source revision before tracked fixture regeneration."
   allowed_mutations:
-    - "contracts/wp4/"
+    - "contracts/wp4/ (historical; current scope also includes src/+radardemo/"
+    - "and tests/wp4/)"
   requested_checks:
     - "MATLAB Code Analyzer on every created or edited .m file"
     - "All 54 matlab.unittest methods"

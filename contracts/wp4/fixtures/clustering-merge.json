@@ -1,0 +1,124 @@
+{
+  "schemaName": "radar.wp4.clustering",
+  "schemaVersion": "1.0.0-draft.2",
+  "hypotheses": [
+    {
+      "hypothesisId": "h1",
+      "clusterEligible": true,
+      "azimuthLookIndex": 1,
+      "elevationLookIndex": 1,
+      "clusterCell": [
+        1,
+        1
+      ],
+      "rangeM": 1,
+      "radialVelocityMps": 1,
+      "statistic": 1,
+      "validityMask": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "supportMask": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "passMask": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "sourceCellIds": [
+        "p1:c1"
+      ]
+    },
+    {
+      "hypothesisId": "h2",
+      "clusterEligible": true,
+      "azimuthLookIndex": 1,
+      "elevationLookIndex": 1,
+      "clusterCell": [
+        2,
+        1
+      ],
+      "rangeM": 3,
+      "radialVelocityMps": 3,
+      "statistic": 2,
+      "validityMask": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "supportMask": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "passMask": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "sourceCellIds": [
+        "p2:c1"
+      ]
+    }
+  ],
+  "clusters": {
+    "clusterId": 1,
+    "hypothesisIds": [
+      "h1",
+      "h2"
+    ],
+    "rangeM": 2,
+    "radialVelocityMps": 2,
+    "statistic": 2,
+    "validityMask": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "supportMask": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "passMask": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "sourceCellIds": [
+      "p1:c1",
+      "p2:c1"
+    ]
+  },
+  "seed": 401051,
+  "generatorRevision": "cb95b925d2e91e4d8de4d7cff89d590dd172fc2e",
+  "generatorVersion": "wp4gen-1.0.0",
+  "generatorSeed": 401051,
+  "generationParameters": {
+    "fixtureScope": "acceptance-evidence",
+    "domain": "clustering"
+  },
+  "createdUtc": "2026-09-21T20:44:03Z"
+}
