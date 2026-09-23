@@ -1,6 +1,6 @@
 name = "matlab-validator-deep"
 description = "Independently validate high-risk control, solver, numerical, safety, or code-generation changes."
-model = "gpt-5.6-sol"
+model = "gpt-6-sol"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 
