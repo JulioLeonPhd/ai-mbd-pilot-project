@@ -114,18 +114,48 @@ methods (Test)
     end
     function testFusionPass(testCase)
         testCase.verifyTrue(testCase.runCase("Fusion-Pass"));
+        fusionCase = testCase.getFusionCase("pass");
+        testCase.verifyEqual(logical(fusionCase.validityMask(:).'), true(1, 5));
+        testCase.verifyEqual(logical(fusionCase.supportMask(:).'), [true, true, true, false, false]);
+        testCase.verifyEqual(logical(fusionCase.passMask(:).'), [true, true, true, false, false]);
+        testCase.verifyEqual(fusionCase.voteCount, 3);
+        testCase.verifyEqual(string(fusionCase.outcome), "pass");
     end
     function testFusionFail(testCase)
         testCase.verifyTrue(testCase.runCase("Fusion-Fail"));
+        fusionCase = testCase.getFusionCase("fail");
+        testCase.verifyEqual(logical(fusionCase.validityMask(:).'), true(1, 5));
+        testCase.verifyEqual(logical(fusionCase.supportMask(:).'), true(1, 5));
+        testCase.verifyEqual(logical(fusionCase.passMask(:).'), [true, false, false, false, false]);
+        testCase.verifyEqual(fusionCase.voteCount, 1);
+        testCase.verifyEqual(string(fusionCase.outcome), "fail");
     end
     function testFusionInvalidOutcome(testCase)
         testCase.verifyTrue(testCase.runCase("Fusion-Invalid-Outcome"));
+        fusionCase = testCase.getFusionCase("invalid");
+        expectedMask = [true, false, false, false, false];
+        testCase.verifyEqual(logical(fusionCase.validityMask(:).'), expectedMask);
+        testCase.verifyEqual(logical(fusionCase.supportMask(:).'), expectedMask);
+        testCase.verifyEqual(logical(fusionCase.passMask(:).'), expectedMask);
+        testCase.verifyEqual(fusionCase.voteCount, 1);
+        testCase.verifyEqual(string(fusionCase.outcome), "invalid");
     end
     function testFusionZeroHypotheses(testCase)
         testCase.verifyTrue(testCase.runCase("Fusion-Zero-Hypotheses"));
     end
     function testFusionSupportSubset(testCase)
-        testCase.verifyTrue(testCase.runCase("Fusion-Support-Subset"));
+        manifestPath = TestWp4Fixtures.getManifestPath();
+        manifest = jsondecode(fileread(manifestPath));
+        row = manifest.fixtures(string({manifest.fixtures.id}) == "FUS-005");
+        testCase.verifyEqual(numel(row.mutation), 2);
+        testCase.verifyEqual(string({row.mutation.path}), ["validityMask", "supportMask"]);
+        testCase.verifyEqual(logical(row.mutation(1).value(:).'), [true, true, true, true, false]);
+        testCase.verifyEqual(logical(row.mutation(2).value(:).'), true(1, 5));
+        report = checkWp4Fixtures(manifestPath, struct("CaseId", "FUS-005"));
+        testCase.verifyTrue(report.passed);
+        testCase.verifyFalse(report.cases.accepted);
+        testCase.verifyEqual(string(report.cases.actualCode), "VALUE_OUT_OF_RANGE");
+        testCase.verifyEqual(string(report.cases.actualPath), "supportMask");
     end
     function testFusionMaskDimension(testCase)
         testCase.verifyTrue(testCase.runCase("Fusion-Mask-Dimension"));
@@ -334,6 +364,13 @@ methods (Access=private)
         row = manifest.fixtures(find(match, 1));
         report = checkWp4Fixtures(TestWp4Fixtures.getManifestPath(), struct("CaseId", row.id));
         passed = report.caseCount == 1 && report.passed;
+    end
+
+    function fusionCase = getFusionCase(~, caseId)
+        fusionPath = fullfile(fileparts(TestWp4Fixtures.getManifestPath()), "fusion-cases.json");
+        artifact = jsondecode(fileread(fusionPath));
+        matches = string({artifact.cases.caseId}) == string(caseId);
+        fusionCase = artifact.cases(find(matches, 1));
     end
 end
 methods (Static, Access=private)
