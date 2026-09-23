@@ -53,6 +53,60 @@ methods (Test)
     end
     function testTimingDelayAndNearRange(testCase)
         testCase.verifyTrue(testCase.runCase("Timing-Delay-And-Near-Range"));
+        fixtureRoot = fileparts(TestWp4Fixtures.getManifestPath());
+        loaded = load(fullfile(fixtureRoot, "timing-gate.mat"), "-mat");
+        timing = loaded.timingGate;
+        testCase.verifyEqual(timing.delayTicks, uint64(372));
+        testCase.verifyEqual(timing.historySpanTicks, uint64(744));
+        testCase.verifyEqual(timing.nominalRawMarginTicks, int64(54));
+        testCase.verifyEqual(timing.motionBoundRawMarginTicks, int64(46));
+        testCase.verifyEqual(timing.motionBoundAlignedMarginTicks, int64(40));
+        testCase.verifyTrue(timing.primingVerified);
+        testCase.verifyEqual(numel(timing.primingRecordIndices), 5);
+        testCase.verifyEqual(numel(timing.usableRecordEvidence), 142);
+        diagnostic = wp4oracle.checkTiming(timing);
+        testCase.verifyTrue(diagnostic.accepted);
+        badTiming = timing;
+        badTiming.motionBoundAlignedMarginTicks = int64(41);
+        diagnostic = wp4oracle.checkTiming(badTiming);
+        testCase.verifyFalse(diagnostic.accepted);
+        badTiming = timing;
+        badTiming.delayTicks = uint64(373);
+        diagnostic = wp4oracle.checkTiming(badTiming);
+        testCase.verifyFalse(diagnostic.accepted);
+        badTiming = timing;
+        badTiming.primingVerified = false;
+        diagnostic = wp4oracle.checkTiming(badTiming);
+        testCase.verifyFalse(diagnostic.accepted);
+        badTiming = timing;
+        badTiming.usableRecordEvidence(1).rawGateTick = ...
+            badTiming.usableRecordEvidence(1).rawGateTick + uint64(12);
+        diagnostic = wp4oracle.checkTiming(badTiming);
+        testCase.verifyFalse(diagnostic.accepted);
+        badSchedule = timing.schedule;
+        badSchedule.records(1).role = "usable";
+        badTiming = timing;
+        badTiming.schedule = badSchedule;
+        diagnostic = wp4oracle.checkTiming(badTiming);
+        testCase.verifyFalse(diagnostic.accepted);
+        evaluated = radardemo.timing.evaluateReceiveTiming( ...
+            badSchedule, timing.timingDesign, timing.timingSpec);
+        testCase.verifyFalse(evaluated.accepted);
+        testCase.verifyError(@() radardemo.timing.evaluateReceiveTiming( ...
+            timing.schedule, timing.timingDesign, struct("nearRangeMarginTicks", 54)), ...
+            "radardemo:timing:ExpectedMarginUnsupported");
+        targetMargins = [-1, 0, 1];
+        for index = 1:numel(targetMargins)
+            marginSpec = timing.timingSpec;
+            marginSpec.radialSpeedBoundMps = 0;
+            marginSpec.nominalRangeM = (6756 + targetMargins(index) + 0.5) * ...
+                marginSpec.speedOfLightMps / (2 * marginSpec.adcRateHz);
+            boundaryTiming = radardemo.timing.evaluateReceiveTiming( ...
+                timing.schedule, timing.timingDesign, marginSpec);
+            testCase.verifyEqual(boundaryTiming.motionBoundAlignedMarginTicks, ...
+                int64(targetMargins(index)));
+            testCase.verifyEqual(boundaryTiming.accepted, targetMargins(index) > 0);
+        end
     end
     function testDdcResponse(testCase)
         testCase.verifyTrue(testCase.runCase("Ddc-Response"));
@@ -65,6 +119,42 @@ methods (Test)
     end
     function testDdcStreamingState(testCase)
         testCase.verifyTrue(testCase.runCase("Ddc-Streaming-State"));
+        fixtureRoot = fileparts(TestWp4Fixtures.getManifestPath());
+        loaded = load(fullfile(fixtureRoot, "ddc-streaming.mat"), "-mat");
+        streaming = loaded.ddcStreaming;
+        evidence = streaming.boundaryEvidence;
+        testCase.verifyEqual(numel(evidence.boundaryTicks), 150);
+        testCase.verifyLessThanOrEqual(max(evidence.chunkLengths), 8192);
+        importantTicks = [88236, 2029428, 2136300, 2215248, 8553228, 8608788];
+        cumulativeInputs = cumsum(double(evidence.chunkLengths(:)));
+        for index = 1:numel(importantTicks)
+            row = find(cumulativeInputs == importantTicks(index), 1);
+            testCase.verifyNotEmpty(row);
+            checkpoint = evidence.checkpoints(row, :);
+            testCase.verifyEqual(checkpoint(2), mod(importantTicks(index), 3));
+            testCase.verifyEqual(checkpoint(3), mod(ceil(importantTicks(index) / 3), 4));
+            testCase.verifyEqual(checkpoint(4), ceil(importantTicks(index) / 12));
+        end
+        firstPriBoundary = double(evidence.boundaryTicks(1));
+        fault = testCase.resetBoundaryStream(streaming, firstPriBoundary, "stage1");
+        diagnostic = wp4oracle.checkDdcStreaming(fault);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NUMERICAL_MISMATCH");
+        transitionIndex = find(string({evidence.schedule.records.role}) == "transition", 1);
+        transitionEntry = double(evidence.schedule.records(transitionIndex).startTick);
+        transitionExit = double(evidence.schedule.records(transitionIndex).endTick);
+        fault = testCase.resetBoundaryStream(streaming, transitionEntry, "stage2");
+        diagnostic = wp4oracle.checkDdcStreaming(fault);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NUMERICAL_MISMATCH");
+        fault = testCase.resetBoundaryStream(streaming, transitionExit, "stage2");
+        diagnostic = wp4oracle.checkDdcStreaming(fault);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NUMERICAL_MISMATCH");
+        fault = testCase.resetBoundaryStream(streaming, firstPriBoundary + 7, "mixerCount");
+        diagnostic = wp4oracle.checkDdcStreaming(fault);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NUMERICAL_MISMATCH");
     end
     function testDdcZeroInput(testCase)
         testCase.verifyTrue(testCase.runCase("Ddc-Zero-Input"));
@@ -371,6 +461,52 @@ methods (Access=private)
         artifact = jsondecode(fileread(fusionPath));
         matches = string({artifact.cases.caseId}) == string(caseId);
         fusionCase = artifact.cases(find(matches, 1));
+    end
+    function mutated = resetBoundaryStream(testCase, streaming, resetTick, resetKind)
+        evidence = streaming.boundaryEvidence;
+        design = radardemo.ddc.createDesign(struct());
+        state = radardemo.ddc.initializeState(design, 1);
+        offset = 0;
+        while offset < resetTick
+            chunkSize = min(8192, resetTick - offset);
+            indices = offset + (0:chunkSize - 1).';
+            input = testCase.makeBoundaryStimulus(indices, evidence.stimulus);
+            [~, state] = radardemo.ddc.processChunk(input, state, design);
+            offset = offset + chunkSize;
+        end
+        faultState = state;
+        switch string(resetKind)
+            case "stage1"
+                faultState.stage1Delay = zeros(size(faultState.stage1Delay));
+            case "stage2"
+                faultState.stage2Delay = zeros(size(faultState.stage2Delay));
+            case "mixerCount"
+                faultState.inputSampleCount = uint64(0);
+            otherwise
+                error("TestWp4Fixtures:UnknownReset", "Unknown DDC reset mutation.");
+        end
+        indices = resetTick + (0:899).';
+        input = testCase.makeBoundaryStimulus(indices, evidence.stimulus);
+        [faultOutput, ~] = radardemo.ddc.processChunk(input, faultState, design);
+        firstOrdinal = ceil(resetTick / 12);
+        outputTicks = 12 * (firstOrdinal + (0:numel(faultOutput) - 1).');
+        [found, locations] = ismember(outputTicks, double(evidence.outputTicks(:)));
+        if ~any(found)
+            error("TestWp4Fixtures:ResetWindowMissing", ...
+                "The reset segment does not overlap a recorded output window.");
+        end
+        mutated = streaming;
+        selected = find(found);
+        mutated.boundaryEvidence.outputSamples(locations(selected)) = faultOutput(selected);
+    end
+
+    function samples = makeBoundaryStimulus(~, sampleIndices, stimulus)
+        samples = zeros(numel(sampleIndices), 1);
+        for toneIndex = 1:numel(stimulus.frequenciesHz)
+            samples = samples + stimulus.amplitudes(toneIndex) .* ...
+                cos(2 * pi * stimulus.frequenciesHz(toneIndex) / ...
+                stimulus.sampleRateHz .* sampleIndices + stimulus.phasesRad(toneIndex));
+        end
     end
 end
 methods (Static, Access=private)

@@ -115,7 +115,9 @@ switch domain
         entryPoint = "radardemo.schedule.createReceiveSchedule";
     case "timing"
         entryPoint = "radardemo.timing.evaluateReceiveTiming";
-    case {"ddc", "ddc-streaming", "ddc-zero"}
+    case "ddc-streaming"
+        entryPoint = "radardemo.ddc.processChunk";
+    case {"ddc", "ddc-zero"}
         entryPoint = "radardemo.ddc.createDesign";
     case "beam"
         entryPoint = "radardemo.beamforming.formCommandedLook";

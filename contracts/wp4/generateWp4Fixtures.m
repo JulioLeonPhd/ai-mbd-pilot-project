@@ -33,8 +33,8 @@ if strlength(options.CreatedUtc) == 0
 end
 
 schedule = wp4gen.generateSchedule(options);
-ddc = wp4gen.generateDdc(options);
-timing = wp4gen.generateTimingGate(schedule, options);
+ddc = wp4gen.generateDdc(schedule, options);
+timing = wp4gen.generateTimingGate(schedule, ddc.design, options);
 beam = wp4gen.generateBeamFixtures(options);
 fusion = wp4gen.generateFusionFixtures(options);
 clustering = wp4gen.generateClusteringFixtures(options);

@@ -1,10 +1,9 @@
-function ddc = generateDdc(options)
-%GENERATEDDC Record production DDC design, stream, and zero fixtures.
-
+function ddc = generateDdc(schedule, options)
+%GENERATEDDC Record DDC response, short-stream, schedule-boundary, and zero evidence.
 arguments
+    schedule struct
     options struct
 end
-
 design = radardemo.ddc.createDesign(struct());
 metrics = radardemo.ddc.measureResponse(design, struct());
 design.frequencyHz = metrics.frequencyHz;
@@ -29,27 +28,25 @@ sampleCount = 2400;
 sampleIndex = (0:sampleCount - 1).';
 inputSignal = cos(2 * pi * 50e6 / 150e6 * sampleIndex) + ...
     0.1 * cos(2 * pi * 2e6 / 150e6 * sampleIndex);
-inputSignal = repmat(inputSignal, 1, 1);
 chunkLengths = [317, 911, 503, sampleCount - 317 - 911 - 503];
 state = radardemo.ddc.initializeState(design, 1);
 outputChunks = cell(numel(chunkLengths), 1);
 offset = 0;
 for index = 1:numel(chunkLengths)
     chunk = inputSignal(offset + (1:chunkLengths(index)), :);
-    [chunkOutput, state] = radardemo.ddc.processChunk(chunk, state, design);
-    outputChunks{index} = chunkOutput;
+    [outputChunks{index}, state] = radardemo.ddc.processChunk(chunk, state, design);
     offset = offset + chunkLengths(index);
 end
-expectedOutput = vertcat(outputChunks{:});
 streaming = struct();
 streaming.schemaName = "radar.wp4.ddc-streaming";
 streaming.schemaVersion = "1.0.0-draft.2";
 streaming.input = inputSignal;
 streaming.chunkLengths = chunkLengths;
-streaming.expectedOutput = expectedOutput;
-streaming.expectedLength = numel(expectedOutput);
+streaming.expectedOutput = vertcat(outputChunks{:});
+streaming.expectedLength = numel(streaming.expectedOutput);
 streaming.tolerance = 5e-11;
 streaming.seed = options.Seeds.ddc;
+streaming.boundaryEvidence = generateBoundaryEvidence(schedule, design);
 streaming = wp4gen.addProvenance(streaming, options, options.Seeds.ddc, "ddc-streaming");
 
 zero = struct();
@@ -67,4 +64,76 @@ zero.finalState = zeroState;
 zero.seed = options.Seeds.ddc;
 zero = wp4gen.addProvenance(zero, options, options.Seeds.ddc, "ddc-zero");
 ddc = struct("design", design, "streaming", streaming, "zero", zero);
+end
+
+function evidence = generateBoundaryEvidence(schedule, design)
+totalTicks = double(schedule.totalTicks);
+boundaryTicks = double([schedule.records(1:end - 1).endTick]).';
+stimulus = struct("frequenciesHz", [49e6, 49.6e6, 50.4e6, 51e6], ...
+    "amplitudes", [0.41, 0.32, 0.23, 0.17], ...
+    "phasesRad", [0.17, 0.73, 1.19, 2.07], "sampleRateHz", 150e6, ...
+    "mixerFrequencyHz", 50e6);
+regularCuts = 0:8192:totalTicks;
+offsets = [-17, -5, 0, 7, 17, 23];
+boundaryCuts = reshape(boundaryTicks + offsets, [], 1);
+boundaryCuts = boundaryCuts(boundaryCuts > 0 & boundaryCuts < totalTicks);
+cuts = unique([regularCuts(:); boundaryCuts; totalTicks]);
+chunkLengths = diff(cuts);
+if any(chunkLengths <= 0) || any(chunkLengths > 8192) || sum(chunkLengths) ~= totalTicks
+    error("wp4gen:DdcChunkPlan", "Boundary stream chunks must cover the scan in bounded pieces.");
+end
+lastOutputTick = 12 * (ceil(totalTicks / 12) - 1);
+boundaryWindows = reshape(boundaryTicks + (-768:12:768), [], 1);
+startupWindow = 0:12:min(lastOutputTick, 768);
+endWindow = (lastOutputTick - 768):12:lastOutputTick;
+outputTicks = unique([startupWindow(:); endWindow(:); boundaryWindows]);
+outputTicks = outputTicks(outputTicks >= 0 & outputTicks <= lastOutputTick & ...
+    mod(outputTicks, 12) == 0);
+outputSamples = complex(zeros(numel(outputTicks), 1));
+outputOrdinals = outputTicks / 12;
+checkpoints = zeros(numel(chunkLengths), 4);
+state = radardemo.ddc.initializeState(design, 1);
+offset = 0;
+outputCount = 0;
+for chunkIndex = 1:numel(chunkLengths)
+    chunkSize = chunkLengths(chunkIndex);
+    indices = offset + (0:chunkSize - 1).';
+    input = makeStimulus(indices, stimulus);
+    [chunkOutput, state] = radardemo.ddc.processChunk(input, state, design);
+    if ~isempty(chunkOutput)
+        firstOrdinal = ceil(offset / 12);
+        ordinals = firstOrdinal + (0:numel(chunkOutput) - 1).';
+        selected = find(outputOrdinals >= firstOrdinal & outputOrdinals <= ordinals(end));
+        if ~isempty(selected)
+            localIndices = outputOrdinals(selected) - firstOrdinal + 1;
+            outputSamples(selected) = chunkOutput(localIndices);
+        end
+    end
+    outputCount = outputCount + numel(chunkOutput);
+    offset = offset + chunkSize;
+    checkpoints(chunkIndex, :) = [double(state.inputSampleCount), ...
+        double(state.stage1Phase), double(state.stage2Phase), outputCount];
+end
+expectedOutputCount = ceil(totalTicks / 12);
+if offset ~= totalTicks || outputCount ~= expectedOutputCount || ...
+        any(~isfinite(outputSamples))
+    error("wp4gen:DdcBoundaryStream", ...
+        "The continuous DDC stream did not produce the expected bounded observations.");
+end
+evidence = struct("schedule", schedule, "stimulus", stimulus, ...
+    "inputSampleCount", uint64(totalTicks), "channelCount", 1, ...
+    "maxChunkSamples", 8192, "chunkLengths", chunkLengths, ...
+    "checkpoints", checkpoints, "boundaryTicks", uint64(boundaryTicks), ...
+    "windowRadiusTicks", 768, "outputTicks", uint64(outputTicks), ...
+    "outputSamples", outputSamples, "expectedOutputCount", uint64(expectedOutputCount), ...
+    "tolerance", 5e-11);
+end
+
+function samples = makeStimulus(sampleIndices, stimulus)
+samples = zeros(numel(sampleIndices), 1);
+for toneIndex = 1:numel(stimulus.frequenciesHz)
+    samples = samples + stimulus.amplitudes(toneIndex) .* ...
+        cos(2 * pi * stimulus.frequenciesHz(toneIndex) / stimulus.sampleRateHz .* ...
+        sampleIndices + stimulus.phasesRad(toneIndex));
+end
 end
