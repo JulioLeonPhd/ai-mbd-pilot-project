@@ -4,12 +4,12 @@
   "hypotheses": [],
   "results": [],
   "seed": 401041,
-  "generatorRevision": "8f54fa54d229edf00d06634ea25c3249aff0c8ed",
+  "generatorRevision": "0fe89d45fa20a9f0f68ae6908855dbc61835b083",
   "generatorVersion": "wp4gen-1.0.0",
   "generatorSeed": 401041,
   "generationParameters": {
     "fixtureScope": "acceptance-evidence",
     "domain": "fusion-zero"
   },
-  "createdUtc": "2026-09-23T08:12:56Z"
+  "createdUtc": "2026-09-24T13:56:08Z"
 }
