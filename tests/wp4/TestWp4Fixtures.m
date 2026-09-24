@@ -95,6 +95,56 @@ methods (Test)
         testCase.verifyError(@() radardemo.timing.evaluateReceiveTiming( ...
             timing.schedule, timing.timingDesign, struct("nearRangeMarginTicks", 54)), ...
             "radardemo:timing:ExpectedMarginUnsupported");
+        profileNames = ["nominalRangeM", "nominalRangeM", "adcRateHz", ...
+            "speedOfLightMps", "radialSpeedBoundMps", ...
+            "transmitBlankingTicks", "guardTicks"];
+        profileValues = [7000, 6800.1, 150e6 + 1, 299792459, 0, 6001, 751];
+        expectedPaths = ["timingSpec.nominalRangeM", "timingSpec.nominalRangeM", ...
+            "timingDesign.adcRateHz", "timingSpec.speedOfLightMps", ...
+            "timingSpec.radialSpeedBoundMps", "timingSpec.transmitBlankingTicks", ...
+            "timingSpec.guardTicks"];
+        for index = 1:numel(profileNames)
+            profileSpec = timing.timingSpec;
+            profileDesign = timing.timingDesign;
+            if profileNames(index) == "adcRateHz"
+                profileSpec.adcRateHz = profileValues(index);
+                profileDesign.adcRateHz = profileValues(index);
+            else
+                profileSpec.(char(profileNames(index))) = profileValues(index);
+            end
+            coherent = testCase.makeCoherentTiming(timing, profileSpec, profileDesign);
+            testCase.verifyTrue(coherent.accepted);
+            if index == 1
+                testCase.verifyEqual([coherent.nominalRawMarginTicks, ...
+                    coherent.motionBoundRawMarginTicks, ...
+                    coherent.motionBoundAlignedMarginTicks], int64([254, 247, 241]));
+            elseif index == 2
+                testCase.verifyEqual([coherent.nominalRawMarginTicks, ...
+                    coherent.motionBoundRawMarginTicks, ...
+                    coherent.motionBoundAlignedMarginTicks], int64([54, 46, 40]));
+            end
+            diagnostic = wp4oracle.checkTiming(coherent);
+            testCase.verifyFalse(diagnostic.accepted);
+            testCase.verifyEqual(string(diagnostic.code), "VALUE_OUT_OF_RANGE");
+            testCase.verifyEqual(string(diagnostic.path), expectedPaths(index));
+        end
+        marginFields = ["nominalRawMarginTicks", "motionBoundRawMarginTicks", ...
+            "motionBoundAlignedMarginTicks", "nearRangeMarginTicks"];
+        for index = 1:numel(marginFields)
+            fractionalTiming = timing;
+            fieldName = char(marginFields(index));
+            fractionalTiming.(fieldName) = double(fractionalTiming.(fieldName)) + 0.5;
+            diagnostic = wp4oracle.checkTiming(fractionalTiming);
+            testCase.verifyFalse(diagnostic.accepted);
+            testCase.verifyEqual(string(diagnostic.code), "VALUE_OUT_OF_RANGE");
+            testCase.verifyEqual(string(diagnostic.path), marginFields(index));
+        end
+        nonfiniteTiming = timing;
+        nonfiniteTiming.timingSpec.nominalRangeM = NaN;
+        diagnostic = wp4oracle.checkTiming(nonfiniteTiming);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NONFINITE");
+        testCase.verifyEqual(string(diagnostic.path), "timingSpec.nominalRangeM");
         targetMargins = [-1, 0, 1];
         for index = 1:numel(targetMargins)
             marginSpec = timing.timingSpec;
@@ -454,6 +504,18 @@ methods (Access=private)
         row = manifest.fixtures(find(match, 1));
         report = checkWp4Fixtures(TestWp4Fixtures.getManifestPath(), struct("CaseId", row.id));
         passed = report.caseCount == 1 && report.passed;
+    end
+
+    function coherent = makeCoherentTiming(~, source, spec, design)
+        proof = radardemo.timing.evaluateReceiveTiming(source.schedule, design, spec);
+        coherent = source;
+        proofFields = fieldnames(proof);
+        for fieldIndex = 1:numel(proofFields)
+            fieldName = proofFields{fieldIndex};
+            coherent.(fieldName) = proof.(fieldName);
+        end
+        coherent.timingSpec = spec;
+        coherent.timingDesign = design;
     end
 
     function fusionCase = getFusionCase(~, caseId)

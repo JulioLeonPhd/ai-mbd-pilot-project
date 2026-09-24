@@ -1,5 +1,5 @@
 function diagnostic = checkTiming(data)
-%CHECKTIMING Independently reconstruct delay, priming, and gated pulse timing.
+%CHECKTIMING Independently enforce the frozen timing profile and proof.
 diagnostic = checkVersion(data);
 if ~diagnostic.accepted
     return
@@ -10,14 +10,9 @@ required = ["decimationFactors", "delayTicks", "delayOutputSamples", ...
     "nominalRawMarginTicks", "motionBoundRawMarginTicks", ...
     "motionBoundAlignedMarginTicks", "nearRangeMarginTicks", ...
     "finalPhaseModuloTicks", "scheduleRecordCount", "scanMidpointOffsetTicks", ...
-    "schedule", "timingDesign", "timingSpec"];
+    "accepted", "schedule", "timingDesign", "timingSpec"];
 diagnostic = requireFields(data, required);
 if ~diagnostic.accepted
-    return
-end
-scheduleDiagnostic = wp4oracle.checkSchedule(data.schedule);
-if ~scheduleDiagnostic.accepted
-    diagnostic = scheduleDiagnostic;
     return
 end
 design = data.timingDesign;
@@ -27,19 +22,9 @@ if ~isstruct(design) || any(~isfield(design, designRequired))
         "Timing design coefficients, factors, and sample rate are required.");
     return
 end
-factors = double(design.decimationFactors(:).');
-stage1 = double(design.stage1Numerator(:));
-stage2 = double(design.stage2Numerator(:));
-if ~isequal(factors, [3, 4]) || numel(stage1) ~= 25 || numel(stage2) ~= 241
-    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "timingDesign.stage2Numerator", ...
-        "Timing oracle requires 25- and 241-tap stages with factors [3 4].");
-    return
-end
-if any(~isfinite(stage1)) || any(~isfinite(stage2)) || ...
-        max(abs(stage1 - flipud(stage1))) > 1e-13 || ...
-        max(abs(stage2 - flipud(stage2))) > 1e-13
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "timingDesign.stage1Numerator", ...
-        "Timing coefficients must be finite and symmetric.");
+diagnostic = validateFrozenScalar(design, "adcRateHz", 150e6, ...
+    "timingDesign.adcRateHz");
+if ~diagnostic.accepted
     return
 end
 spec = data.timingSpec;
@@ -50,19 +35,41 @@ if ~isstruct(spec) || any(~isfield(spec, specRequired))
         "Frozen physical timing inputs are required.");
     return
 end
-rate = double(spec.adcRateHz);
-c = double(spec.speedOfLightMps);
-rangeM = double(spec.nominalRangeM);
-speed = double(spec.radialSpeedBoundMps);
-blanking = double(spec.transmitBlankingTicks);
-guard = double(spec.guardTicks);
-if any(~isfinite([rate, c, rangeM, speed, blanking, guard])) || ...
-        rate ~= double(design.adcRateHz) || rate <= 0 || c <= 0 || ...
-        rangeM <= 0 || speed < 0 || blanking < 0 || guard < 0
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "timingSpec", ...
-        "Timing physical inputs are outside their valid range.");
+frozenValues = [150e6, 299792458, 6800, 800 / 3.6, 6000, 750];
+for index = 1:numel(specRequired)
+    fieldName = specRequired(index);
+    diagnostic = validateFrozenScalar(spec, fieldName, frozenValues(index), ...
+        "timingSpec." + fieldName);
+    if ~diagnostic.accepted
+        return
+    end
+end
+scheduleDiagnostic = wp4oracle.checkSchedule(data.schedule);
+if ~scheduleDiagnostic.accepted
+    diagnostic = scheduleDiagnostic;
     return
 end
+factors = double(design.decimationFactors(:).');
+stage1 = double(design.stage1Numerator(:));
+stage2 = double(design.stage2Numerator(:));
+if ~isequal(factors, [3, 4]) || numel(stage1) ~= 25 || numel(stage2) ~= 241
+    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "timingDesign.stage2Numerator", ...
+        "Timing oracle requires 25- and 241-tap stages with factors [3 4].");
+    return
+end
+if ~isreal(stage1) || ~isreal(stage2) || any(~isfinite(stage1)) || ...
+        any(~isfinite(stage2)) || max(abs(stage1 - flipud(stage1))) > 1e-13 || ...
+        max(abs(stage2 - flipud(stage2))) > 1e-13
+    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "timingDesign.stage1Numerator", ...
+        "Timing coefficients must be finite, real, and symmetric.");
+    return
+end
+rate = 150e6;
+speedOfLight = 299792458;
+nominalRange = 6800;
+radialSpeedBound = 800 / 3.6;
+blanking = 6000;
+guard = 750;
 stage1GroupDelay = (length(stage1) - 1) / 2;
 stage2GroupDelay = (length(stage2) - 1) / 2;
 derivedDelay = stage1GroupDelay + factors(1) * stage2GroupDelay;
@@ -71,11 +78,11 @@ lattice = prod(factors);
 schedule = data.schedule;
 scanLength = double(schedule.totalTicks);
 midpoint = double(schedule.midpointOffsetTicks);
-nominalArrival = 2 * rangeM * rate / c;
+nominalArrival = 2 * nominalRange * rate / speedOfLight;
 nominalMargin = floor(nominalArrival) - blanking - guard;
 worstElapsed = max(midpoint, scanLength - midpoint) / rate;
-worstRange = rangeM - speed * worstElapsed;
-motionArrival = 2 * worstRange * rate / c;
+worstRange = nominalRange - radialSpeedBound * worstElapsed;
+motionArrival = 2 * worstRange * rate / speedOfLight;
 motionMargin = floor(motionArrival) - blanking - guard;
 records = schedule.records;
 primerIndices = find(string({records.role}) == "priming");
@@ -126,17 +133,60 @@ if ~isequaln(data.usableRecordEvidence, recordEvidence)
         "A pulse gate, guard, lattice minimum, or compensated tick is incorrect.");
     return
 end
-if int64(data.nominalRawMarginTicks) ~= int64(nominalMargin) || ...
-        int64(data.motionBoundRawMarginTicks) ~= int64(motionMargin) || ...
-        int64(data.motionBoundAlignedMarginTicks) ~= int64(alignedMargin) || ...
-        int64(data.nearRangeMarginTicks) ~= int64(nominalMargin) || ...
-        data.finalPhaseModuloTicks ~= mod(derivedDelay, lattice) || ...
+marginNames = ["nominalRawMarginTicks", "motionBoundRawMarginTicks", ...
+    "motionBoundAlignedMarginTicks", "nearRangeMarginTicks"];
+expectedMargins = [nominalMargin, motionMargin, alignedMargin, nominalMargin];
+for index = 1:numel(marginNames)
+    fieldName = marginNames(index);
+    diagnostic = validateIntegralScalar(data, fieldName, fieldName);
+    if ~diagnostic.accepted
+        return
+    end
+    if double(data.(fieldName)) ~= expectedMargins(index)
+        diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", fieldName, ...
+            "Stored integer margin differs from the frozen-profile derivation.");
+        return
+    end
+end
+if data.finalPhaseModuloTicks ~= mod(derivedDelay, lattice) || ...
         double(data.scheduleRecordCount) ~= double(schedule.recordCount) || ...
         double(data.scanMidpointOffsetTicks) ~= midpoint || ...
         any(~[recordEvidence.minimalGate]) || any(~[recordEvidence.guardSupported]) || ...
         any(alignedMargins <= 0) || ~logical(data.accepted)
     diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "motionBoundAlignedMarginTicks", ...
-        "Derived raw/aligned margins or accepted timing status are inconsistent.");
+        "Derived aligned margins or accepted timing status are inconsistent.");
+else
+    diagnostic = passDiagnostic();
+end
+end
+
+function diagnostic = validateFrozenScalar(data, name, expected, path)
+value = data.(name);
+if ~isnumeric(value) || ~isscalar(value) || ~isreal(value)
+    diagnostic = failDiagnostic("TYPE_MISMATCH", path, ...
+        "Frozen timing profile values must be real numeric scalars.");
+elseif ~isfinite(double(value))
+    diagnostic = failDiagnostic("NONFINITE", path, ...
+        "Frozen timing profile values must be finite.");
+elseif double(value) ~= expected
+    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", path, ...
+        "Timing profile differs from the frozen 6800 m radar contract.");
+else
+    diagnostic = passDiagnostic();
+end
+end
+
+function diagnostic = validateIntegralScalar(data, name, path)
+value = data.(name);
+if ~isnumeric(value) || ~isscalar(value) || ~isreal(value)
+    diagnostic = failDiagnostic("TYPE_MISMATCH", path, ...
+        "Stored timing margins must be real numeric scalars.");
+elseif ~isfinite(double(value))
+    diagnostic = failDiagnostic("NONFINITE", path, ...
+        "Stored timing margins must be finite.");
+elseif double(value) ~= fix(double(value))
+    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", path, ...
+        "Stored timing margins must be integral tick counts.");
 else
     diagnostic = passDiagnostic();
 end
