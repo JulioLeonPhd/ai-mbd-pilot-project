@@ -78,7 +78,10 @@ Every specialist result has this shape:
 
 ```yaml
 agent:
-  id: "agent-id"
+  id: "agent-id (uuid)"
+  name: "agent-name (e.g. technical-writer)"
+  model: "model used"
+  reasoning_effort: "reasoning effort used"
 result:
   status: "complete | needs-input | blocked | failed"
   summary: "Short description of the outcome"
