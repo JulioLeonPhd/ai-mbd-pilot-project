@@ -3,8 +3,9 @@
 <!-- markdownlint-disable MD033 -->
 
 WP4/G2 Phase 0 is frozen by [ADR 0018](../adr/0018-freeze-wp4-g2-phase0-contract.md).
-The executable checker and timing/DSP evidence remain pending, so this freeze
-does not constitute G2 acceptance.
+Independent Phase 4 validation passed. Phase 5 independent document review and
+the Phase 6 root gate passed; G2 is accepted for the frozen WP4 evidence.
+Downstream WP6e may still reject the schedule and reopen G2 by recorded decision.
 
 <a id="architecture-wp4-topology"></a>
 This document summarizes topology only. ADR 0018 owns WP4/G2 decisions, the
@@ -151,8 +152,9 @@ A Doppler map for an azimuth look is formed only after the usable pulses for
 that look are available and migration-aware alignment or handling has been
 applied for the relevant candidate hypotheses. Implementations may stream and
 accumulate per-pulse fast-time results while the look is being collected.
-Whether alignment uses candidate true-velocity hypotheses, iteration, or
-another approved method, along with the exact sequencing, remains WP4 work.
+Whether migration compensation uses candidate true-velocity hypotheses,
+iteration, or another approved method, along with its exact sequencing, is an
+open WP6e choice.
 
 <!-- markdownlint-disable MD013 -->
 ```mermaid
@@ -162,7 +164,7 @@ flowchart LR
     DDC --> BB["Complex baseband candidate<br/>12.5 MS/s/channel; Nyquist +/-6.25 MHz"]
     BB --> ABF["Commanded-look azimuth beamforming<br/>16 elements summed per row<br/>64 channels -> 4 elevation streams"]
     ABF --> FT["Fast-time/range processing<br/>10 MHz waveform; nominal ~15 m resolution"]
-    FT --> ST["Migration-aware alignment/handling<br/>then slow-time/Doppler processing<br/>usable fast-time pulse results for each azimuth look;<br/>five approximate PRFs: 1700, 1900, 2150, 2450, 2700 Hz<br/>usable pulses selected and verified by WP4 at G2"]
+    FT --> ST["Migration-aware alignment/handling<br/>then slow-time/Doppler processing<br/>usable fast-time pulse results for each azimuth look;<br/>five PRFs: 1700, 1900, 2150, 2450, 2700 Hz<br/>Phase 4 verified [22,25,28,32,35] usable-pulse schedule"]
     ST --> RD["Range-Doppler feature formation<br/>aligned pulse ensemble to Doppler map"]
     RD --> EL["Elevation processing at selected range-Doppler candidates"]
     EL --> CAND["Per-PRF candidate seam<br/>folded range/velocity + PRF identity<br/>azimuth = commanded look"]
@@ -218,21 +220,37 @@ usable pulses per PRF per azimuth look is a
 scheduling target, not verified performance. The diagram does not freeze the
 sampled DDC implementation, DSP interfaces, or the full transition schedule.
 The 50 MHz IF is distinct from the 50 MS/s complex intermediate; a real-only /3
-followed by IQ recovery is rejected because it aliases the IF to DC. G2 must also
-verify filter alias rejection, transient and group-delay handling, decimator
-phase across PRIs, and near-range gating: the 6.80 km lower range edge has
-approximately 0.1371 us of post-guard edge under the revised ADR 0014 timing
-interpretation.
+followed by IQ recovery is rejected because it aliases the IF to DC. Phase 4
+independently verified digital filter alias rejection, the 372-tick group
+delay, continuous decimator phase across PRIs and transitions, and near-range
+timing. The timing check used guarded leading-edge output timestamps with delay
+compensation and verified margins `nominalRawMarginTicks=54`,
+`motionBoundRawMarginTicks=46`, and `motionBoundAlignedMarginTicks=40`. The
+detailed schedule evidence covers 151 records, including five priming and 142
+usable records. It does not claim full FIR precursor or waveform retention, or
+detection performance. Phase 5 independent document review and the Phase 6 root
+gate passed; G2 is accepted for this evidence scope.
 
-The exact algorithms, interfaces, rates, units, and numerical settings remain
-open unless stated above as an agreed decision.
+The two-stage DDC group delay is 372 ADC ticks, or 31 output samples. The
+contract requires mixer, FIR, and decimator state to be zero-initialized at
+scan start and retained across PRIs and transitions, including continuous `/3`
+then `/4` decimator phase. Independent full-CPI evidence covers one channel,
+10,553,388 ticks, 150 PRI/transition boundaries, and 2,189 chunks. It compares
+19,480 observed output samples/timestamps selected across startup, end, and
+boundary observation windows; maximum absolute complex output-sample
+discrepancy against independent direct convolution is `1.5e-15`. The
+zero-input fixture separately verifies exact-zero output with the 64-channel
+shape. Other exact
+algorithms, interfaces, rates, units, and numerical settings remain open unless
+stated above as an agreed decision.
 
-## G2 and downstream items still open
+## Downstream items still open
 
-- Does executable verification pass the frozen `[22,25,28,32,35]` allocation,
-  151-record grammar, and integer-tick cap? The frozen arithmetic is 2.849920
-  ms transitions plus 70.355920 ms total, leaving 0.297080 ms under the
-  70.653 ms cap. Downstream WP6e may reject it and reopen G2.
+- Phase 4 independently verified the frozen `[22,25,28,32,35]` allocation,
+  151-record grammar, and integer-tick cap. The arithmetic is 2.849920 ms
+  transitions plus 70.355920 ms total, leaving 0.297080 ms under the 70.653 ms
+  cap. G2 accepted this schedule evidence; downstream WP6e may still reject
+  the schedule and reopen G2 through a recorded decision.
 - What look spacing follows from the ideal 3 dB beamwidth, and what noisy
   angle and elevation-sector measurements should be reported?
 - What clutter cutoff and detection-statistic definition make results
@@ -243,6 +261,7 @@ see [ADR 0014](../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md)
 and the [feasibility report](../research/radar-v1-feasibility.md). [ADR 0011](../adr/0011-adopt-v1-simulation-timing-baseline.md)
 is the historical record for the former baseline. ADR 0014 accepted revised
 G1 for WP3 data contracts and WP4 DSP/timing architecture.
-WP3 and WP4 are therefore the next work packages, with G2 required to prove
-the full return, filter, priming, and transition schedule before those
-contracts are accepted.
+WP3 is accepted. WP4 Phases 4 and 5 passed independent validation, and the
+Phase 6 root gate accepted G2 for the frozen schedule, finite-filter
+response/alias behavior, timing, and priming evidence. Issue #3 remains open
+for future checker provenance hardening; Git verified the current evidence pair.

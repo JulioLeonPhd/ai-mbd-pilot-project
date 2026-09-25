@@ -2,7 +2,9 @@
 
 <!-- markdownlint-disable MD033 -->
 
-**Status:** WP3 accepted; WP4/G2 Phase 0 frozen, executable verification pending
+**Status:** WP3 accepted; WP4/G2 Phase 0 frozen; Phase 4 independently passed;
+Phase 5 independent document review and Phase 6 root gate passed; G2 accepted
+for the frozen WP4 evidence. Issue #3 remains open for checker hardening.
 **Contract family:** `radar-v1`
 **Contract version:** `1.0.0-draft.2`
 
@@ -20,15 +22,19 @@ sensitive and additional keys are invalid unless explicitly marked `extensions`.
 <a id="wp4-contract-authority"></a>
 
 The accepted WP4/G2 Phase 0 values are defined in
-[ADR 0018](../adr/0018-freeze-wp4-g2-phase0-contract.md). Executable
-verification remains pending.
+[ADR 0018](../adr/0018-freeze-wp4-g2-phase0-contract.md). Independent Phase 4
+validation passed 54/54 strict manifest rows with provenance and 54 tests.
+Phase 5 independent document review passed and the Phase 6 root gate accepted
+G2 for this evidence scope.
 
 The field names, dimensions, units, signs, and provenance rules in this
 document are the WP3 contract. The Phase 0 alias budget, receive schedule,
-dimensions, fusion, and clustering seams are frozen decisions awaiting
-executable verification; they are not G2 acceptance evidence. Remaining
-unresolved choices include filter delay, ambiguity method/order, angle and
-Doppler tolerances, near-zero-Doppler cutoff, and downstream method parameters.
+dimensions, fusion, and clustering seams are frozen decisions with Phase 4
+independently passed. Phase 5 independent document review and Phase 6 root
+closure passed. The two-stage DDC group delay is 372 ADC ticks, equal to 31
+output samples. The remaining unresolved choices are
+ambiguity method/order, angle and Doppler tolerances, near-zero-Doppler cutoff,
+and downstream method parameters; their owning packages retain authority.
 WP6e must select the ambiguity method and compare candidate processing orders.
 
 ## Common rules
@@ -78,11 +84,11 @@ parameters. Required top-level fields are:
 | `array` | object | `azimuthElements: 16`, `elevationElements: 4`, `elementSpacingWavelengths: 0.5` |
 | `waveform` | object | `pulseWidthSec: 40e-6`, `chirpBandwidthHz: 10e6`, `chirpStartHz: -5e6`, `chirpStopHz: 5e6` |
 | `ddc` | object | `complexIntermediateRateHz: 50e6`, `outputRateHz: 12.5e6`, `decimationFactors: [3,4]`; passband `[-5e6,5e6]`, ripple `<=0.1 dB`, digital alias rejection `>=60 dB`, stage-2 stopband starts no later than `6.25e6` |
-| `prfsHz` | array[5] | nominal candidate `[1700,1900,2150,2450,2700]`; G2 verifies tick schedule |
-| `priSampleCounts` | integer array[5] | accepted `[88236,78948,69768,61224,55560]`; one-based 150 MHz ADC ticks |
+| `prfsHz` | array[5] | frozen `[1700,1900,2150,2450,2700]`; Phase 4 verified integer-tick schedule |
+| `priSampleCounts` | integer array[5] | accepted `[88236,78948,69768,61224,55560]`; one-based 150 MHz ADC ticks; Phase 4 verified |
 | `processing` | object | `maxInstrumentedRangeM: 100000`, `rangeDomainM: [6800,100000]`, and stage settings |
 | `scan` | object | `azimuthSectorDeg: [-45,45]`, `updatePeriodSec: 1`; both provisional |
-| `blanking` | object | candidate `transmitBlankingSec: 40e-6` and `guardSec: 5e-6`; G2 pending |
+| `blanking` | object | configured `transmitBlankingSec: 40e-6` and `guardSec: 5e-6`; Phase 4 independently verified receive-window priming and guarded leading-edge timing |
 | `random` | object | integer `seed`; all stochastic fixtures use it |
 <!-- markdownlint-enable MD013 -->
 
@@ -236,6 +242,15 @@ by the group's PRI count. Each transition has `sampleCount=106872`,
 is `10553388`; midpoint offset is `5276694` ticks. Any deviation is
 `TICK_DISCONTINUITY`.
 
+<a id="timing.delay-priming"></a>
+Independent TIM-001 validation confirmed guarded leading-edge timing applied to
+delay-compensated output timestamps, with a 372 ADC-tick (31 output-sample)
+group delay. Verified derived metrics are `nominalRawMarginTicks=54`,
+`motionBoundRawMarginTicks=46`, and `motionBoundAlignedMarginTicks=40`. The
+schedule has 151 records: five priming records and 142 usable records. This
+timing evidence does not claim full FIR precursor or waveform retention, or
+detection performance.
+
 <a id="DDC.passband-ripple"></a>
 <a id="DDC.alias-rejection"></a>
 <a id="wp4-ddc-metrics"></a>
@@ -248,6 +263,23 @@ The cascade reference includes mixer, both filters, and both decimators.
 Evaluate a deterministic 1 kHz grid including endpoints. Cascade digital alias
 rejection is the minimum stopband attenuation relative to maximum passband
 amplitude. Compare each metric with absolute tolerance `1e-9 dB`.
+
+<a id="DDC.streaming-state"></a>
+Streaming DDC validation shall process a real mixer input in unequal chunks
+while preserving mixer, FIR, and decimator state continuously from scan start
+across PRIs and transitions; the `/3` then `/4` decimator phases shall remain
+continuous across those boundaries. Independent full-CPI evidence covers one
+channel, 10,553,388 ticks, 150 PRI/transition boundaries, and 2,189 chunks.
+It compares 19,480 observed output samples/timestamps selected across startup,
+end, and boundary observation windows. Maximum absolute complex output-sample
+discrepancy against independent direct convolution is `1.5e-15`. The zero-input
+fixture separately verifies exact-zero output with the 64-channel shape.
+
+<a id="DDC.zero-input"></a>
+For a nonempty input whose samples are exactly zero, the DDC shall return an
+output with the expected nonempty shape and every output sample exactly zero.
+The acceptance fixture confirms this for the 64-channel DDC shape; full-CPI
+streaming evidence is one channel and is not a detection-performance claim.
 
 <a id="wp4-processing-intermediate"></a>
 
@@ -374,6 +406,18 @@ applicable scope; they are not silently clipped, relabeled, or accepted as V1
 performance evidence. Unsupported pending methods return `code:
 "METHOD_PENDING"`.
 
+<a id="fusion.zero-result"></a>
+Fusion accepts an empty hypothesis list and returns an empty hypothesis list
+and empty result set.
+
+<a id="clustering.zero-result"></a>
+Clustering accepts `H=0,C=0` (zero hypotheses and zero clusters). It also
+accepts `H>0,C=0` when all hypotheses are ineligible for clustering.
+
+<a id="clustering.mask-length"></a>
+Each cluster-stage hypothesis carries a logical `validityMask` of length five,
+one entry for each PRF layer.
+
 <a id="wp4-examples-compatibility"></a>
 
 ## Examples and compatibility
@@ -403,7 +447,7 @@ versions.
 <!-- markdownlint-disable MD013 -->
 | Contract | Producer check | Consumer check | Status/evidence owner |
 | --- | --- | --- | --- |
-| Configuration | required fields, finite values, candidate/pending status | schema, units, rates, array/channel count | WP3; G2 for timing/filter values |
+| Configuration | required fields, finite values, candidate/pending status | schema, units, rates, array/channel count | WP3; Phase 4 verified frozen schedule, timing, priming, and finite-filter values |
 | Scenario | unique IDs, positive RCS, 3-vectors, constant-state declaration | frame, types, finite values, signs | WP3/WP5 |
 | MAT vector | exact provenance, `int16 [N,64]`, monotonic global ticks | versions, epoch, shape, channel map | WP3/WP5 |
 | DDC/range/Doppler/angle intermediates | declared shape, rate, units, stage metadata | seam and dimensions; no method inference | WP6a–d |
@@ -412,7 +456,10 @@ versions.
 | Compatibility | semantic version and migration note | major mismatch rejection | WP3 |
 <!-- markdownlint-enable MD013 -->
 
-Before G2 exit, the root conformance checks must prove every row with valid,
-invalid, zero-result, version-mismatch, and dimension-mismatch fixtures. WP4
-must then resolve all G2-pending seams listed above; WP6e and WP7 must record
-their method decisions without changing field meanings silently.
+Phase 4 independently validated the WP4-owned frozen schedule, finite-filter,
+timing, priming, and executable fixture evidence. Phases 5 and 6 passed; G2 is
+accepted for this evidence scope. Open WP6e/WP7 choices, including ambiguity
+processing and downstream method parameters, stay
+with those packages; they may trigger a recorded G2 reopening and must not
+silently change field meanings. Issue #3 remains open; Git independently
+verified the current committed source/evidence pair.

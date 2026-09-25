@@ -2,7 +2,9 @@
 
 Date: 2026-09-21  
 Baseline commit: `1d7295328958c29518c8647fff4c261bfcbe2f45`  
-Status: G2 remains open; this note records the approved recovery workflow, not acceptance.
+Status: G2 accepted by the Phase 6 root gate. Issue #3 remains open for future
+checker provenance hardening; downstream WP6e may reopen G2 through a recorded
+decision.
 
 ## Baseline and source of truth
 
@@ -17,17 +19,22 @@ Keep a strict distinction between frozen design intent and executable evidence:
 the former is approved direction; the latter must be generated, independently
 checked, and traceable before G2 can close.
 
-## Known blockers
+## Baseline blockers (resolved by Phases 3–5)
 
-The current evidence is insufficient because it contains symbolic or
-non-resolvable manifest selectors, no numeric positive and negative
-off-boresight beam fixtures, scalar-only DDC evidence rather than computable
-response/coefficient evidence, incomplete deterministic aggregate cluster
-outputs, and duplicated or stale normative clauses across documents.
+At the initial baseline, evidence was insufficient because it contained
+symbolic or non-resolvable manifest selectors, lacked numeric positive and
+negative off-boresight beam fixtures, had scalar-only DDC evidence rather than
+computable response/coefficient evidence, had incomplete deterministic
+aggregate cluster outputs, and contained duplicated or stale normative
+clauses. Phase 3 added executable fixtures and complete aggregate outputs;
+Phase 4 independently validated the numerical and behavioral evidence; Phase 5
+committed resolved manifest selectors and reconciled the normative clauses.
+These baseline blockers are resolved for the frozen WP4 evidence. Issue #3
+remains a nonblocking checker-hardening item.
 
-Numerical fixture generation must not be assigned to `technical-writer`. The
-MATLAB architecture and implementation roles own numerical definitions and
-artifacts; the writer consumes real artifacts and records traceability.
+Numerical fixture generation was assigned to MATLAB architecture and
+implementation roles; the writer consumed the resulting artifacts and recorded
+traceability. This records the original task boundary, not a current blocker.
 
 ## Phase progress
 
@@ -37,14 +44,15 @@ artifacts; the writer consumes real artifacts and records traceability.
 | 1. Documentation contract | Complete; `da1e301` | Validated |
 | 2. Numerical fixture architecture | Complete; root-approved | Recorded below |
 | 3. Executable evidence | Complete; commits `cfd2bc1`, `cb95b92` | 23 artifacts; 54/54 rows; 54 tests |
-| 4. Independent validation | Replay complete; formal gate pending | Strict 54/54; 23-artifact regeneration identical |
-| 5. Manifest and traceability | Pending | Requires validated artifacts |
-| 6. Root completion gate | Pending | G2 remains open |
+| 4. Independent validation | Complete; passed | 54/54 strict rows with provenance; 54 tests; independent timing and streaming boundary validation; MATLAB Code Analyzer clean; issues #4/#5 closed |
+| 5. Manifest and traceability | Complete; independent deep review passed | 54 rows use 20 distinct anchors; all resolve uniquely. Eight rows/selectors were updated in the committed manifest at source `0fe89d45` and evidence `9675b2f2`; five documents lint clean. |
+| 6. Root completion gate | Complete; G2 accepted | MATLAB, provenance, document review, Markdown lint, Code Analyzer, and Mermaid checks passed. Issue #3 is a disclosed nonblocking checker-hardening task. |
 <!-- markdownlint-enable MD013 -->
 
 This plan is the detailed phase ledger and approved Phase 2 architecture record.
-`CURRENT.md` is the concise current-state pointer. Phase completion does not
-close G2 until executable evidence and independent validation pass.
+`CURRENT.md` is the concise current-state pointer. Phases 5 and 6 passed for
+this evidence set. Issue #3 remains open for future checker hardening; Git
+verified the source/evidence pair used for the gate.
 
 ## Ordered recovery workflow
 
@@ -135,10 +143,10 @@ manifest ID and a unique `matlab.unittest` method.
 | SCH-004 | Schema 2.0.0; `schedule.json` | `VERSION_MISMATCH schemaVersion` | `testScheduleVersionMismatch` |
 | SCH-005 | Four usable counts; `schedule.json` | `DIMENSION_MISMATCH usableCounts` | `testScheduleDimensionMismatch` |
 | SCH-006 | Schema 2.0.0 plus PRI zero; `schedule.json` | `VERSION_MISMATCH schemaVersion` | `testScheduleVersionPrecedence` |
-| TIM-001 | Decimation alignment, 372-tick delay, priming, and 54-tick near-range margin; `timing-gate.mat` | accept | `testTimingDelayAndNearRange` |
+| TIM-001 | Guarded leading-edge output timestamps with 372-tick delay compensation; priming and margins 54 nominal raw / 46 motion-bound raw / 40 motion-bound aligned; `timing-gate.mat` | accept | `testTimingDelayAndNearRange` |
 | DDC-001 | Coefficient-derived 1 kHz response; `ddc-design.mat` | accept | `testDdcResponse` |
-| DDC-002 | Real mixer, unequal chunks, continuous state and /3,/4 phases; `ddc-streaming.mat` | accept | `testDdcStreamingState` |
-| DDC-003 | Nonempty zero input produces shaped exact-zero output; `ddc-zero.mat` | accept | `testDdcZeroInput` |
+| DDC-002 | Full 10,553,388-tick CPI on one channel; 150 PRI/transition boundaries; 2,189 chunks; 19,480 observed output samples/timestamps across startup, end, and boundary windows; maximum absolute complex output-sample discrepancy vs independent direct convolution `1.5e-15` | accept | `testDdcStreamingState` |
+| DDC-003 | Nonempty zero input produces shaped exact-zero output with 64-channel shape; `ddc-zero.mat` | accept | `testDdcZeroInput` |
 | DDC-004 | Beta-2 same-length stage-2 coefficients; `ddc-ripple-invalid.mat` | `DDC_RIPPLE_EXCEEDED stage2Numerator` | `testDdcRippleDiagnostic` |
 | DDC-005 | Beta-5 same-length stage-2 coefficients; `ddc-alias-invalid.mat` | `DDC_ALIAS_REJECTION stage2Numerator` | `testDdcAliasDiagnostic` |
 | DDC-006 | Stopband start 6.251 MHz; `ddc-design.mat` mutation | `DDC_STOPBAND_EDGE stopbandStartHz` | `testDdcStopbandEdgeDiagnostic` |
@@ -211,69 +219,57 @@ source review with no unresolved errors. Measured DDC ripple is
 `0.00067200911666936 dB`; stage-2 rejection is `87.7676669047022 dB`; full
 cascade rejection is `85.2548307898255 dB`.
 
-Reproduction from the repository root in MATLAB:
+Historical Phase 3 generated evidence used source revision
+`cb95b925d2e91e4d8de4d7cff89d590dd172fc2e` and
+`CreatedUtc=2026-09-21T20:44:03Z`. This is retained only as historical
+provenance and is not the current replay procedure.
 
-```matlab
-repoRoot = pwd;
-addpath(fullfile(repoRoot, "src"));
-addpath(fullfile(repoRoot, "contracts", "wp4"));
-R = "cb95b925d2e91e4d8de4d7cff89d590dd172fc2e";
-createdUtc = "2026-09-21T20:44:03Z";
-tmp = string(tempname);
-generateWp4Fixtures(tmp, struct("FixtureScope", "acceptance-evidence", ...
-    "GeneratorRevision", R, "GeneratorVersion", "wp4gen-1.0.0", ...
-    "CreatedUtc", createdUtc));
-opts = struct("FixtureRoot", fullfile(repoRoot, "contracts", "wp4", ...
-    "fixtures"), ...
-    "StrictTraceability", true);
-checkWp4Fixtures(fullfile(repoRoot, "contracts", "wp4", ...
-    "fixture-manifest.json"), opts);
-runtests(fullfile(repoRoot, "tests", "wp4", "TestWp4Fixtures.m"));
-```
-
-The `CreatedUtc` value is the source-commit timestamp selected for deterministic
-replay, not actual wall-clock generation time. Independent canonical replay
-passed: strict checker 54/54 with provenance true; fresh regeneration from R
-was semantically identical across 23 artifacts and the manifest was
-byte-identical. Formal Phase 4 acceptance remains pending; Phase 5
-manifest/document reconciliation and Phase 6 closure remain pending. The data
-contract still calls filter delay
-unresolved although the Phase 2 design fixes 372 ticks / 31 samples.
+The current committed source/evidence pair is source
+`0fe89d45fa20a9f0f68ae6908855dbc61835b083` and evidence
+`9675b2f2de654d6701fc6001552c23318e0db87e`, with
+`CreatedUtc=2026-09-24T13:56:08Z`. Git verified the pair. Use the canonical
+replay and semantic comparison procedure in [CURRENT.md](../../CURRENT.md).
+The manifest checker’s synthetic 40-hex revision limitation remains tracked
+under issue #3.
 
 ### Phase 4 — Independently validate MATLAB evidence
 
-Route the generated artifacts and acceptance matrix to `matlab-validator-deep`.
-The validator inspects and tests; it does not repair files under a validation
-assignment. Require independent checks of integer timing, beam sign and
-off-boresight behavior, DDC ripple and at least 60 dB digital decimation-alias
-rejection, fusion, clustering, and deterministic aggregate outputs. The
-validator must also exercise valid, invalid, legal zero-result,
-version-mismatch, dimension-mismatch, `draft.1` migration-adapter, and combined
-diagnostic-precedence paths. Recompute expected numerical values from raw
-inputs/coefficients under the independent-oracle policy.
+**Status: passed.** Independent validation passed all 54 strict manifest rows
+with provenance, all 54 tests, the timing metrics (54/46/40 ADC ticks), the
+151-record schedule with five priming and 142 usable records, and full-CPI DDC
+streaming over one channel and 150 PRI/transition boundaries. The replay
+covered 2,189 chunks and 19,480 observed output samples/timestamps selected
+across startup, end, and boundary observation windows. Maximum absolute
+complex output-sample discrepancy against independent direct convolution was
+`1.5e-15`; MATLAB Code Analyzer was clean. Issues #4 and #5 are closed. Phase 4
+passed, and Phases 5 and 6 subsequently passed; the root accepted G2 for the
+frozen WP4 evidence. Evidence scope does not establish complete FIR
+precursor/waveform retention or detection performance.
 
-Stop for a bounded design or implementation fix if any error remains. Proceed
-only with a complete result packet and no unresolved error findings.
+The independent validator recomputed timing and DDC evidence, beam sign and
+off-boresight behavior, finite-filter response and alias rejection, fusion,
+clustering, and deterministic aggregate outputs. It exercised valid, invalid,
+legal zero-result, version-mismatch, dimension-mismatch, `draft.1` migration,
+and combined diagnostic-precedence cases, using independent recomputation from
+raw inputs and coefficients. Phase 4 passed with no unresolved errors.
 
 ### Phase 5 — Finalize manifest and traceability documentation
 
-Give the real generated artifact paths, test operations, and stable Phase 1
-anchors to `technical-writer`. The writer finalizes the manifest and updates
-current documentation without fabricating evidence. Route the finished complex
-documentation to `technical-writer-validator-deep`; require resolved anchors,
-correct agent/tool names, and traceability from each acceptance clause to an
-executable artifact or an explicit accepted limitation. Apply the manifest
-gate: use the approved schema, exact target path, and exact checker/tool names;
-run JSON syntax and schema validation; then obtain root semantic review. Keep
-G2 open and do not mark `CURRENT.md` passed in this phase.
+**Status: passed.** The generated artifact paths, test operations, and stable
+anchors are recorded in the committed manifest. All 54 rows resolve to 20
+unique anchors; eight rows/selectors were updated. The five documents passed
+Markdown lint and independent deep semantic review. Issue #3’s synthetic
+40-hex revision limitation is disclosed and remains tracked; Git verified the
+current source/evidence pair.
 
 ### Phase 6 — Root completion gate
 
-The root agent verifies that all requested artifacts exist, the relevant role
-returned `complete`, Markdown lint and diff checks pass, MATLAB checks are
-recorded, and no validator has unresolved errors. Only then may the root close
-G2 and update `CURRENT.md`. If a required checker is unavailable, disclose it;
-do not treat unavailability as a pass.
+**Status: passed.** The root verified the requested artifacts, completed role
+results, passing Markdown and diff checks, recorded MATLAB checks, and no
+unresolved validator errors. G2 is accepted for the frozen WP4 evidence.
+GitHub issue #3 remains a nonblocking hardening task because the source/evidence
+pair was verified against Git and deterministic replay. Downstream WP6e may
+reopen G2 through a recorded decision.
 
 ## Historical Phase 3 implementation handoff (superseded)
 
