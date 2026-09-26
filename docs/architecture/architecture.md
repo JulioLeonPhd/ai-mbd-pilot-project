@@ -123,11 +123,21 @@ are analytic model outputs, not coverage or detection acceptance criteria; the
 90° azimuth sector remains provisional pending performance requirements and
 evaluation.
 
-## Processing boundary
+## Historical processing-boundary proposal
 
 <a id="architecture-processing-boundary"></a>
 
-The planned data flow is:
+> **Historical proposal; superseded for current architecture.** The chain and
+> diagram in this section preserve an earlier end-to-end proposal. Their
+> migration-handling step and full downstream ordering are not current approved
+> decisions. Use [ADR 0021](../adr/0021-adopt-dsp-responsibilities-and-ambiguity-baseline.md)
+> and the [Radar V1 architecture overview](radar-overview.md) for current
+> responsibilities, the uncompensated baseline, and the still-unresolved
+> processing order. The scoped WP3/WP4 contracts and evidence later in this
+> document remain historical evidence for those contracts; this section does
+> not revise them.
+
+The earlier proposed data flow was:
 
 1. MATLAB generates waveform and scenario-driven test vectors, recording exact
    configuration and scenario versions.
@@ -145,7 +155,8 @@ The planned data flow is:
    decisions feed non-coherent 3-of-5 binary integration; clustering consumes
    the fused hypotheses and the DUT emits a detection list.
 
-The proposed signal chain and its current rate boundaries are shown below.
+The earlier proposed signal chain and its rate boundaries are shown below for
+historical context only.
 The RF/stimulus path is external to the DUT; the DUT boundary begins with the
 ADC samples. Fast-time/range processing precedes slow-time/Doppler processing.
 A Doppler map for an azimuth look is formed only after the usable pulses for

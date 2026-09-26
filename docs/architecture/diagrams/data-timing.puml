@@ -1,0 +1,57 @@
+@startuml data-timing
+title Radar V1 batch data shapes, implementation stage, and execution questions
+top to bottom direction
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam backgroundColor white
+skinparam packageStyle rectangle
+
+legend right
+Green: bounded implementation evidence.
+Yellow: confirmed responsibility/contract; full path incomplete.
+Red: method, ordering, or execution remains open.
+endlegend
+
+package "Illustrative batch data organization; DDC behavior evidenced separately" {
+  component "DDC data\n[N,64] complex\n12.5 MS/s/channel candidate" as D #B7E1CD
+  component "Commanded azimuth beamformed\n[N,4] complex elevation streams" as B #B7E1CD
+  component "Range processing\n[rangeBin,pulse,elevation]" as R #FFF2CC
+  component "Pulse accumulation + range-migration\nhandling; prepare slow-time ensemble\ninitially without compensation" as ACC #FFF2CC
+  component "Doppler data\n[rangeBin,dopplerBin,elevation]" as V #FFF2CC
+  D --> B
+  B --> R
+  R --> ACC
+  ACC --> V
+}
+
+package "Future Simulink representations: fixed dimensions per configured model" {
+  component "Behavioral model first\napproved algorithms / interfaces;\nnot required to be cycle-accurate" as BEHAV #FFF2CC
+  component "Later hardware-oriented\nimplementation model" as HW #FFF2CC
+  component "HDL generation\ndeferred" as HDL #F4CCCC
+  BEHAV --> HW : may follow
+  HW ..> HDL : future; no readiness implied
+}
+
+component "Rates, sample/frame execution,\nbuffer owner, corner-turn implementation,\nlatency, and execution granularity" as OPEN #F4CCCC
+V .. OPEN : unresolved Simulink boundary details
+
+note bottom of D
+DDC bounded evidence: 372 ADC-tick group delay (31 output samples);
+state retained across PRI/transition boundaries. MATLAB accepts variable
+frame lengths while preserving continuous state; Simulink dimensions are fixed
+per configured model and do not allow runtime-variable frame sizes.
+end note
+
+note bottom of R
+These tensors show batch data organization only, not settled streaming module
+interfaces. The pulse axis represents per-pulse range results; the separate
+accumulation responsibility prepares the slow-time ensemble.
+end note
+
+note bottom of V
+Accepted timing evidence: five PRFs; usable pulse counts [22,25,28,32,35];
+151 schedule records; 10,553,388 ADC ticks under the 10,597,950-tick cap.
+This schedule evidence does not demonstrate end-to-end detection performance.
+end note
+@enduml

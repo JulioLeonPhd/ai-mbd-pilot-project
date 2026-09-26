@@ -17,4 +17,10 @@ Escalate design conflicts to the root agent. Run requested checks and tests. Rec
 exact files, model elements, parameters, interfaces, diagnostics, commands, MCP
 operations, and any partial state after failed calls. Report unresolved behavior;
 the independent validator owns final validation.
+
+Julio owns architectural choices. Make routine model changes and local
+clarifications autonomously within the approved design; return needs-input to
+the root before changes to system decomposition, interfaces, algorithm choices,
+state or timing behavior, or consequential requirements. The root obtains
+Julio's decision and updates the approved design before implementation resumes.
 """

@@ -80,14 +80,15 @@ def _registry_names(contract: str) -> set[str]:
 
 
 def _packet_fields(contract: str, packet: str) -> set[str]:
-    match = re.search(
-        rf"```yaml\n{packet}:\n(?P<body>.*?)\n```",
-        contract,
-        flags=re.DOTALL,
-    )
-    if match is None:
-        return set()
-    return set(re.findall(r"^  ([a-z_]+):", match.group("body"), re.MULTILINE))
+    for block in re.findall(r"```yaml\n(.*?)\n```", contract, re.DOTALL):
+        match = re.search(
+            rf"^{re.escape(packet)}:\n(?P<body>(?:[ \t].*\n|\n)*)",
+            block + "\n",
+            re.MULTILINE,
+        )
+        if match is not None:
+            return set(re.findall(r"^  ([a-z_]+):", match.group("body"), re.MULTILINE))
+    return set()
 
 
 def _load_agents(root: Path) -> tuple[list[dict[str, object]], list[str]]:

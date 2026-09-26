@@ -6,14 +6,31 @@
 
 ## Purpose and authority
 
+Julio owns architecture decisions: system decomposition, interfaces, algorithm
+choices, state and timing behavior, and consequential requirement changes.
+Agents may investigate and propose alternatives with evidence, then implement
+the choices Julio approves. Independent verification provides evidence; it does
+not constitute human approval. Historical decisions remain the baseline until
+Julio explicitly revises them. Routine implementation within an approved
+decision may proceed autonomously. See the [human-led engineering
+workflow](docs/agents/human-led-workflow.md) for component branches, dependency
+rules, human clarity, ticket framing, and evidence attribution. For a learning
+example, documentation should provide a runnable entry point, explain units,
+signal shapes, and persistent state when relevant, and say what the reader
+should observe. Diagrams should have a defined audience and purpose, expose
+required relationships and implementation status, and make unresolved choices
+visible.
+
 The root agent owns task decomposition, sequencing, authority, conflict
 resolution, and the final response. Specialists perform bounded work through the
 interfaces below. Their project-scoped TOML files define their descriptions,
 models, sandbox policies, and operating instructions; keep those files aligned
 with this contract.
 
-The root agent is the default orchestrator. Every specialist receives a bounded
-task packet containing only the context needed for the assignment; pass the full
+The root agent is the default orchestrator and owns workflow coordination; Julio
+owns architecture decisions and approves changes at the boundary above. Every
+specialist receives a bounded task packet containing only the context needed for
+the assignment; pass the full
 conversation only when the task requires it. Specialists surface missing
 information, permissions, or tools as
 `needs-input` or `blocked`; they do not silently expand scope. Mutation and
@@ -126,7 +143,11 @@ In a result, use the existing `status`, `summary`, `artifacts`, `changes`,
 artifacts, record evidence in `checks`, disclose findings and assumptions, and
 state the next handoff. Keep source material referenced rather than repeated;
 results contain no reasoning traces. Preserve every field name, type, and
-status meaning in the packet contract above.
+status meaning in the packet contract above. If the active contract includes
+additional result metadata such as `agent.id`, `agent.name`, `agent.model`, or
+`agent.reasoning_effort`, preserve and report those fields as supplied. Use an
+unknown value when metadata is unavailable; never invent an identifier or
+execution detail.
 
 ## Specialist registry and conditional routing
 
@@ -178,7 +199,9 @@ review to be recorded.
 
 1. Route the task to `matlab-architect`, or to `matlab-architect-deep` when
    solver, timing, numerical, or code-generation difficulty is observable.
-2. Resolve `needs-input` results and approve the architecture.
+2. Resolve `needs-input` results and obtain Julio's explicit decision on
+   architecture choices that cross his approval boundary. The root coordinates
+   the decision and records it; the root does not substitute its own approval.
 3. Route the approved packet to `matlab-implementer`, or to
    `simulink-implementer` for substantive Simulink topology, interfaces,
    configuration, or multi-step MCP editing.

@@ -17,6 +17,12 @@ exact files, model elements, parameters, interfaces, diagnostics, commands, and
 MCP operations changed or inspected. Surface tool failures and unresolved
 behavior. Implementation checks do not replace independent validation.
 
+Julio owns architectural choices. Make routine implementation and local
+clarifications autonomously within the approved design; return needs-input to
+the root before changes to system decomposition, interfaces, algorithm choices,
+state or timing behavior, or consequential requirements. The root obtains
+Julio's decision and updates the approved design before implementation resumes.
+
 If the task requires substantive model topology, interface, configuration, or
 multi-step MCP editing, return needs-input with the observed scope so the root
 agent can route it to simulink-implementer.

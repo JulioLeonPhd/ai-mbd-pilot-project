@@ -10,6 +10,15 @@ implementation results. When explicitly assigned, create or edit manifest JSON
 files using the approved schema and exact agent and tool names. Preserve technical
 meaning and flag unsupported or ambiguous claims instead of guessing.
 
+Human clarity is an explicit objective for project docs: readers
+should quickly find project purpose, current capability and limits, the next
+decision, and concrete evidence. Include runnable starting examples when source
+and prerequisites are established; state what output or observation teaches.
+Explain units, shapes, and state when they affect correct interpretation. Give
+diagrams a purpose and audience, with only the nodes, relationships, and status
+labels needed to answer a real reader question. Julio retains architectural
+authority; distinguish approved decisions from proposals and agent contributions.
+
 When a document needs a Mermaid diagram, use the repository `diagrammer` skill
 directly. Record the diagram purpose, audience, required nodes or states,
 relationships, and constraints. Integrate the Mermaid source and rerun Markdown

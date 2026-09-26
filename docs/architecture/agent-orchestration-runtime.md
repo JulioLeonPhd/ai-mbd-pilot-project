@@ -15,6 +15,14 @@ Specialists receive bounded task packets and return bounded result packets;
 specialists never spawn specialists. That flat rule remains an invariant of any
 future runtime.
 
+Julio owns architectural decisions: system decomposition, interfaces, algorithm
+choices, state and timing behavior, and consequential requirement changes. The
+root coordinates proposals, records Julio's decisions, and accepts evidence
+against approved criteria; it does not approve architecture on Julio's behalf.
+Agents may investigate and recommend alternatives, then proceed autonomously
+with routine work inside an approved decision. Independent verification informs
+human decisions and does not replace them.
+
 The runtime advances the meta-project objective by making the workflow's
 handoffs reproducible, inspectable, and measurable. It would turn lessons from
 prompt-driven handoffs into an explicit, testable execution boundary without
@@ -73,6 +81,13 @@ interfaces should first be validated with traces and small prototypes.
 
 ## Packet lifecycle
 
+Julio has human clarity as an explicit objective for the project: readers should
+be able to find the purpose, current capability, limitations, and next question,
+and understand concrete examples and diagrams. Architecture diagrams must state
+their purpose and audience, show required nodes and relationships, distinguish
+implemented, accepted-but-unimplemented, and unresolved items where relevant,
+and keep unresolved choices visible.
+
 The root creates a task packet with a stable task ID, concise objective,
 bounded context, inputs, constraints, acceptance criteria, allowed mutations,
 and requested checks. The runtime then:
@@ -85,8 +100,10 @@ and requested checks. The runtime then:
    selects, sequences, or nests specialists on its own;
 5. validates the returned result packet and associates changed artifacts,
    findings, assumptions, and checks with the task;
-6. returns the result to the root, which decides whether to accept, retry,
-   revise, or route the next bounded stage.
+6. returns the result to the root, which decides whether evidence meets the
+   acceptance criteria, whether to retry or revise, or which bounded stage to
+   route next. If a result proposes a choice at Julio's architecture boundary,
+   the root obtains and records Julio's decision before dependent work proceeds.
 
 Persistence is triggered when a packet must survive process termination, be
 replayed across runs, cross a process or machine boundary, support audit or

@@ -1,0 +1,40 @@
+@startuml context
+title Radar V1 system context
+top to bottom direction
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam backgroundColor white
+skinparam packageStyle rectangle
+
+legend right
+Green: bounded implementation evidence.
+Yellow: confirmed responsibility/requirement; full path incomplete.
+Red: method, ordering, or execution remains open.
+endlegend
+
+actor "Julio\narchitecture decision owner" as H
+component "Radar configuration +\ntarget scenario" as CFG #FFF2CC
+component "Planned MATLAB stimulus\ngenerator" as GEN #FFF2CC
+component "Radar DUT\nADC samples → detection list" as DUT #FFF2CC
+component "WP4/G2 evidence\nDDC streaming, selected dimensions,\nschedule, fusion, clustering" as EV #B7E1CD
+component "Test-only truth-assisted\ncomparison / oracle" as ORACLE #FFF2CC
+component "Full detection behavior,\nhardware, real-time performance" as OPEN #F4CCCC
+
+H --> CFG : approves system decisions
+CFG --> GEN : reproducible inputs
+GEN --> DUT : planned direct ADC vectors
+DUT --> EV : bounded verification
+DUT ..> OPEN : not established by current evidence
+
+
+note bottom of ORACLE
+Truth-assisted migration comparison is test/oracle-only;
+scenario truth never enters the production DUT.
+end note
+note bottom of DUT
+Approved boundary: ADC samples through detection list.
+Stimulus generation, test fixtures, and verification
+remain outside the production detection path.
+end note
+@enduml

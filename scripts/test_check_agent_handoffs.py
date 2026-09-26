@@ -50,6 +50,22 @@ task:
         failures = [check for check in checks if check.status == "failed"]
         self.assertEqual(failures, [])
 
+    def test_result_after_agent_metadata_excludes_sibling_fields(self) -> None:
+        contract = """```yaml
+agent:
+  id: "agent"
+  model: "model"
+result:
+  status: "complete"
+  checks:
+    - name: "nested"
+other:
+  unrelated: true
+```"""
+        self.assertEqual(
+            CHECKER._packet_fields(contract, "result"), {"status", "checks"}
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

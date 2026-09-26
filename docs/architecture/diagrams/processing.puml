@@ -1,0 +1,52 @@
+@startuml processing
+title Radar V1 module responsibilities and confirmed ordering
+top to bottom direction
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam backgroundColor white
+skinparam packageStyle rectangle
+
+legend right
+Green: bounded WP4/G2 implementation evidence only.
+Yellow: confirmed responsibility; complete implementation not established.
+Red: method or relative ordering remains open.
+endlegend
+
+component "ADC samples\nDUT input" as ADC #FFF2CC
+component "Digital downconversion\nDDC; continuous stream state" as DDC #B7E1CD
+component "Azimuth beamforming\ncommanded look; V1 reports\ncommanded azimuth" as BF #B7E1CD
+component "Range processing" as RANGE #FFF2CC
+component "Pulse accumulation +\nrange-migration handling\nInitial baseline: accumulate / prepare;\nno compensation" as ACC #FFF2CC
+component "Doppler processing" as DOP #FFF2CC
+
+ADC --> DDC
+DDC --> BF
+BF --> RANGE
+RANGE --> ACC
+ACC --> DOP
+
+package "Additional approved responsibilities; relative ordering open" {
+  component "Range-ambiguity handling\nMethod open; retain 100 km" as RA #F4CCCC
+  component "Doppler unfolding\nSeparate module; method / order open" as UNFOLD #F4CCCC
+  component "CFAR" as CFAR #FFF2CC
+  component "Multi-PRF fusion\n3-of-5 baseline" as FUSE #B7E1CD
+  component "Clustering" as CLUST #B7E1CD
+  component "Elevation estimation\nFour complex elevation inputs from selected\nrange-Doppler candidates; angle +\nquality/validity outputs" as ELEV #FFF2CC
+  component "Detection reporting" as REPORT #FFF2CC
+  RA -[hidden]right- UNFOLD
+  UNFOLD -[hidden]right- ELEV
+  RA -[hidden]down- CFAR
+  DOP -[hidden]right- RA
+}
+
+CFAR --> FUSE : accepted post-CFAR order
+FUSE --> CLUST : accepted post-CFAR order
+CLUST --> REPORT : reporting follows clustering
+
+note bottom of ACC
+Truth-assisted compensation is permitted only as a test/oracle comparison.
+Scenario truth is never a production DUT input. Whether later compensation
+is required, its method, and any feedback dependencies remain open.
+end note
+@enduml
