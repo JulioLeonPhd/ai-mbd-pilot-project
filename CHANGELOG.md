@@ -8,6 +8,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.7.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.7.0) - 2026-09-26
+
+<small>[Compare with v0.6.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.6.0...v0.7.0)</small>
+
+### Added
+
+- Added: plan human-led DSP development ([ce91903](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/ce919032db79f25c044476cf071fc47645abb49e) by Julio Leon). SemVer impact: none
+- Added: organize radar demonstrator with MATLAB Project ([d282c78](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/d282c78168fc4e7296d42cf27a6a7d2514e0bd56) by Julio Leon). SemVer impact: none
+- Added agent ID structure to specialist result format in AGENTS.md ([edcbe62](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/edcbe6263ba78b13f4a1168c3aa7027be842a0b9) by Julio Leon).
+- Added: record reproducible WP4 Phase 3 evidence ([f19dd20](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/f19dd20457c8db7083bfed2b15e5fe25034aa69b) by Julio Leon). SemVer impact: none
+- Added: implement executable WP4 reference modules ([cfd2bc1](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/cfd2bc1897d5985fb192a2bc33f62a7715a8be40) by Julio Leon).
+- Added: WP4 plan. ([d0ad678](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/d0ad67832e7170509f67455e5b2ef7084f3b84d8) by Julio Leon).
+
+### Changed
+
+- Changed: make radar development human-led and reviewable ([530545d](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/530545dac01936822532ca3b0fdc081b43fd5d70) by Julio Leon). SemVer impact: none
+- Changed: record Phase 4–6 evidence and traceability status ([01e2155](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/01e215572633d2455d55ff6acbaff44a5ce98649) by Julio Leon). SemVer impact: none
+- Changed: regenerate WP4 acceptance evidence and align selectors ([9675b2f](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/9675b2f2de654d6701fc6001552c23318e0db87e) by Julio Leon). SemVer impact: none
+- Changed: align WP4 manifest clause selectors ([46a0549](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/46a0549c60dcf06b1076080b344ef277e7e6f543) by Julio Leon). SemVer impact: none
+- Changed: enforce immutable WP4 fixture provenance ([cb95b92](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/cb95b925d2e91e4d8de4d7cff89d590dd172fc2e) by Julio Leon). SemVer impact: minor
+- Changed: record WP4 Phase 2 architecture progress ([f2d7796](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/f2d779641f433a8c527acc16f1f40ac6b8022c2b) by Julio Leon). SemVer impact: none
+- Changed: consolidate WP4 G2 documentation authority ([da1e301](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/da1e3014e742862b7a6857e5a73d713d927ad160) by Julio Leon). SemVer impact: none
+- Changed: record WP4 Phase 0 contract progress ([1d72953](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/1d7295328958c29518c8647fff4c261bfcbe2f45) by Julio Leon).
+
+### Fixed
+
+- Fixed: enforce the frozen WP4 timing acceptance profile ([0fe89d4](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/0fe89d45fa20a9f0f68ae6908855dbc61835b083) by Julio Leon). SemVer impact: none
+- Fixed: repair WP4 timing and DDC boundary evidence ([d68ce07](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/d68ce073e677af8b91ae04278a944d2a09c78d4b) by Julio Leon). SemVer impact: none
+- Fixed: regenerate WP4 acceptance manifest and fixtures ([be92b0b](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/be92b0b6e07b49983e326cafc4919a95f86c4800) by Julio Leon). SemVer impact: none
+- Fixed: correct WP4 fusion fixtures and support subset oracle ([8f54fa5](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/8f54fa54d229edf00d06634ea25c3249aff0c8ed) by Julio Leon). SemVer impact: none
+
+### Misc
+
+- Updated agent result structure to include UUID, name, model, and reasoning effort ([2be7254](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/2be7254512c23a4a90619596c11709affb3cb59e) by Julio Leon).
+- Updated model versions to gpt-6 across multiple MATLAB and Simulink agent configurations. ([2186749](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/2186749d8a28df815072304eb93369d6844cedb4) by Julio Leon).
+
 ## [v0.6.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.6.0) - 2026-09-21
 
 <small>[Compare with v0.5.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.5.0...v0.6.0)</small>
