@@ -46,12 +46,10 @@ block's input-processing setting. A frame is not inherently a radar pulse, PRI,
 or CPI. See [MathWorks' sample- and frame-based concepts](https://www.mathworks.com/help/dsp/ug/sample-and-frame-based-concepts.html).
 
 **Chunk**:
-The current MATLAB DDC implementation's term for one finite $N\times C$ block
-passed to `processChunk`. Its size is a processing and memory choice; successive
-chunks representing one continuous stream preserve mixer count, FIR history,
-and decimation phase. In this project, *frame* is the preferred explanatory
-term for blocks buffered for processing; this terminology does not prescribe a
-Simulink block's frame setting or fixed sample size.
+Legacy terminology in historical serialized fixture metadata, including the
+field names `chunkLengths` and `maxChunkSamples`. These names do not identify a
+separate live processing concept; the project term for a buffered block of
+consecutive samples is *frame*.
 
 **Pulse accumulation**:
 Collecting successive pulses into a slow-time ensemble for Doppler processing.

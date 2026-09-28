@@ -95,12 +95,16 @@ in force until Julio explicitly revises them. See the
    packages and gates, then consult the [architecture](docs/architecture/architecture.md),
    [requirements](docs/requirements/radar-matlab-v1.md), and [data contracts](docs/contracts/radar-v1-data-contracts.md)
    when you need their specific details.
-4. For domain vocabulary and equations, see [CONTEXT.md](CONTEXT.md) and its
+4. Run the [DDC learning walkthrough](docs/examples/ddc-walkthrough.md) in
+   MATLAB to inspect frequency translation, filtering, decimation, and
+   continuous chunk state.
+5. For domain vocabulary and equations, see [CONTEXT.md](CONTEXT.md) and its
    linked [radar equations reference](docs/reference/radar-equations.md).
 
 ## Repository guide
 
 - [CURRENT.md](CURRENT.md) — concise current state and next decision.
+- [docs/examples](docs/examples) — runnable learning examples and figures.
 - [docs/reference](docs/reference) — dated evidence snapshots and technical
   reference material.
 - [docs/architecture](docs/architecture) — system boundary, stages, and

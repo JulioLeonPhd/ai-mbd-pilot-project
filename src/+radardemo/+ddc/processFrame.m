@@ -1,8 +1,8 @@
-function [output, state] = processChunk(input, state, design)
-%PROCESSCHUNK Process one real ADC chunk with continuous DDC state.
-%   [OUTPUT, STATE] = RADARDEMO.DDC.PROCESSCHUNK(INPUT, STATE, DESIGN)
-%   mixes, filters, and decimates a finite real double [N,C] chunk. An empty
-%   chunk returns an empty output and an unchanged state.
+function [output, state] = processFrame(input, state, design)
+%PROCESSFRAME Process one real ADC frame with continuous DDC state.
+%   [OUTPUT, STATE] = RADARDEMO.DDC.PROCESSFRAME(INPUT, STATE, DESIGN)
+%   mixes, filters, and decimates a finite real double [N,C] frame. An empty
+%   frame returns an empty output and an unchanged state.
 
 arguments
     input double

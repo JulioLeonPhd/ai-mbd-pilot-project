@@ -31,8 +31,9 @@ Steps 1 and 2 are drafted and passed independent document review on 2026-09-26.
 The top-level overview and three diagrams are in the main working tree at
 `docs/architecture/radar-overview.md`; their PlantUML syntax/render checks and
 preview inspection passed, and the documents passed independent review. Julio's
-visual review of the redrawn views remains pending. The DDC walkthrough and
-repeat-component workflow are not complete.
+visual review of the redrawn views remains pending. The DDC walkthrough is
+prepared for human inspection; that inspection has not yet occurred. The
+repeat-component workflow remains incomplete.
 
 ## Ordered work
 
@@ -94,11 +95,13 @@ implied.
 ### 4. Build a guided DDC walkthrough on its own branch
 
 On `component/ddc-walkthrough`, build examples that call the existing MATLAB
-implementation. Explain translation, filtering, decimation, signal shapes,
-units, rates, mixer and filter behavior, and phase state. Include normal and
-broken-state experiments, spectra, and timing diagrams. The walkthrough is for
-learning first; use what it reveals to decide which refactors are needed, while
-preserving useful namespaces.
+implementation. Pair the runnable example with an algorithm/functionality
+diagram that traces its signal transformations and carried state. Explain
+translation, filtering, decimation, signal shapes, units, rates, mixer and
+filter behavior, and phase state. Include normal and broken-state experiments,
+spectra, and timing diagrams. The walkthrough is for learning first; use what
+it reveals to decide which refactors are needed, while preserving useful
+namespaces.
 
 After the MATLAB behavior and module interfaces are clear and reviewed, build a
 behavioral Simulink version first. It should express the approved algorithms,
@@ -115,10 +118,11 @@ left for an explicit decision.
 ### 5. Repeat the component workflow
 
 Apply the reviewed architecture and DDC learning workflow to the next
-component, selecting it with Julio. Open engineering tickets around a question
-and expected behavior first. Record the evidence question, experiment, result,
-and limits before adding traceability. Keep human decisions and agent
-contributions truthful and distinct.
+component, selecting it with Julio. Pair its runnable example with an
+algorithm/functionality diagram that tells the same behavior story. Open
+engineering tickets around a question and expected behavior first. Record the
+evidence question, experiment, result, and limits before adding traceability.
+Keep human decisions and agent contributions truthful and distinct.
 
 Completion: the next component has an agreed question and behavior, evidence
 and limits, and explicit human decisions before implementation proceeds.
@@ -274,21 +278,24 @@ and the test report distinguishes requirement evidence from code coverage.
 
 ### Align frame terminology in code and documentation
 
-Dependency: complete Julio's radar architecture and MATLAB module-interface
-review first; settle any naming or compatibility implications before editing.
+**Approved and implemented on 2026-09-28:** rename the live DDC entry point to
+`processFrame` and use *frame* for the MATLAB processing blocks. No runtime
+alias for `processChunk` is required. Preserve historical serialized names
+`chunkLengths` and `maxChunkSamples`, and leave historical fixture evidence
+unchanged; these are provenance fields, not live processing terminology.
 
-Inventory `chunk`/`Chunk` terminology across public DDC function names,
-variables, comments, tests, fixture generators, oracles, and documentation.
-Rename `processChunk` to `processFrame` and update callers coherently if that
-fits the reviewed interfaces. Check public and serialized identifiers before
-deciding compatibility; do not blindly rename schema fields or historical
-records. Preserve numerical behavior, state continuity, and variable block
-length support. The terminology change does not choose a Simulink frame size or
-timing policy.
+Preserve numerical behavior, state continuity, and MATLAB's variable frame
+length support. A future Simulink model uses fixed dimensions per configured
+model; this terminology change does not choose its frame size or timing policy.
+The MATLAB Code Analyzer and focused DDC walkthrough/state-continuity checks
+passed on 2026-09-28. The full WP4 MATLAB MCP suite completed on 2026-09-28
+with 54 passed, 0 failed, and 0 incomplete in 84.2901 seconds. The next human
+inspection is the DDC walkthrough and implementation evidence, followed by
+selecting the next component question under step 5.
 
-Completion: stale live terminology is removed or explicitly documented as a
-compatibility alias; relevant DDC tests and MATLAB Code Analyzer checks pass;
-edited documentation passes Markdown lint.
+Completion: the implementation and relevant checks pass, and the guide,
+glossary, diagrams, and current status describe the same API and compatibility
+boundary.
 
 ## Validation and completion gates
 

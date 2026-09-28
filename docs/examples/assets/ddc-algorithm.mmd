@@ -1,0 +1,15 @@
+flowchart TB
+    input["Real input<br/>[N, C] samples<br/>150 MS/s"]
+    mix["Complex mixer<br/>multiply by exp(−j 2π · 50 MHz · n / 150 MHz)<br/>complex samples, 150 MS/s"]
+    fir1["FIR 1 low-pass<br/>order 24 · 25 taps · cutoff 25 MHz<br/>150 MS/s"]
+    dec3["Keep every 3rd sample<br/>phase carried across frames<br/>complex samples, 50 MS/s"]
+    fir2["FIR 2 low-pass<br/>order 240 · 241 taps · cutoff 5.625 MHz<br/>50 MS/s"]
+    dec4["Keep every 4th sample<br/>phase carried across frames<br/>complex samples, 12.5 MS/s"]
+    output["Complex output<br/>[M, C] samples<br/>M depends on frame length and incoming phases"]
+
+    input --> mix --> fir1 --> dec3 --> fir2 --> dec4 --> output
+
+    classDef signal fill:#eaf3ff,stroke:#2864a0,color:#10263b
+    classDef operation fill:#f4f1ff,stroke:#6352a3,color:#201943
+    class input,output signal
+    class mix,fir1,dec3,fir2,dec4 operation

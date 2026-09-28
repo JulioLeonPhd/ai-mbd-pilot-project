@@ -116,7 +116,7 @@ switch domain
     case "timing"
         entryPoint = "radardemo.timing.evaluateReceiveTiming";
     case "ddc-streaming"
-        entryPoint = "radardemo.ddc.processChunk";
+        entryPoint = "radardemo.ddc.processFrame";
     case {"ddc", "ddc-zero"}
         entryPoint = "radardemo.ddc.createDesign";
     case "beam"

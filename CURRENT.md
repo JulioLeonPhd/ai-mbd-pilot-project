@@ -28,10 +28,18 @@ review of [ADR 0019](docs/adr/0019-adopt-human-led-module-design-and-simulink-st
 [ADR 0020](docs/adr/0020-adopt-pilot-adc-storage-and-sample-integrity.md), and
 [ADR 0021](docs/adr/0021-adopt-dsp-responsibilities-and-ambiguity-baseline.md)
 passed on 2026-09-26 with no unresolved semantic findings. The redrawn diagrams
-still await Julio's visual review. Then use the
-[top-level radar overview](docs/architecture/radar-overview.md) and DDC learning
-walkthrough to guide component work. WP6e's ambiguity method and ordering remain
-open study items. Issue 3 separately tracks manifest revision-provenance
+still await Julio's visual review; this walkthrough does not record or imply
+that review. On 2026-09-27 Julio confirmed proceeding to step 4 of the human-led
+development plan. Julio approved renaming the live DDC entry point to
+`processFrame` on 2026-09-28. Historical fixture provenance and serialized
+`chunkLengths`/`maxChunkSamples` fields remain unchanged; no runtime alias is
+required. The rename, five-file Code Analyzer run, focused walkthrough oracle,
+streaming-equivalence, and state-reset checks passed on 2026-09-28. The full
+WP4 MATLAB MCP suite completed on 2026-09-28 with 54 passed, 0 failed, and 0
+incomplete in 84.2901 seconds. The next human inspection is the [updated DDC
+walkthrough](docs/examples/ddc-walkthrough.md) and evidence, then selecting the
+next component question under step 5. WP6e's ambiguity method and ordering
+remain open study items. Issue 3 separately tracks manifest revision-provenance
 hardening.
 
 ## Evidence and history

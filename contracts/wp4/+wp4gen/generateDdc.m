@@ -28,21 +28,22 @@ sampleCount = 2400;
 sampleIndex = (0:sampleCount - 1).';
 inputSignal = cos(2 * pi * 50e6 / 150e6 * sampleIndex) + ...
     0.1 * cos(2 * pi * 2e6 / 150e6 * sampleIndex);
-chunkLengths = [317, 911, 503, sampleCount - 317 - 911 - 503];
+frameLengths = [317, 911, 503, sampleCount - 317 - 911 - 503];
 state = radardemo.ddc.initializeState(design, 1);
-outputChunks = cell(numel(chunkLengths), 1);
+outputFrames = cell(numel(frameLengths), 1);
 offset = 0;
-for index = 1:numel(chunkLengths)
-    chunk = inputSignal(offset + (1:chunkLengths(index)), :);
-    [outputChunks{index}, state] = radardemo.ddc.processChunk(chunk, state, design);
-    offset = offset + chunkLengths(index);
+for index = 1:numel(frameLengths)
+    frame = inputSignal(offset + (1:frameLengths(index)), :);
+    [outputFrames{index}, state] = radardemo.ddc.processFrame(frame, state, design);
+    offset = offset + frameLengths(index);
 end
 streaming = struct();
 streaming.schemaName = "radar.wp4.ddc-streaming";
 streaming.schemaVersion = "1.0.0-draft.2";
 streaming.input = inputSignal;
-streaming.chunkLengths = chunkLengths;
-streaming.expectedOutput = vertcat(outputChunks{:});
+% Keep the serialized chunkLengths field name for fixture compatibility.
+streaming.chunkLengths = frameLengths;
+streaming.expectedOutput = vertcat(outputFrames{:});
 streaming.expectedLength = numel(streaming.expectedOutput);
 streaming.tolerance = 5e-11;
 streaming.seed = options.Seeds.ddc;
@@ -54,7 +55,7 @@ zero.schemaName = "radar.wp4.ddc-zero";
 zero.schemaVersion = "1.0.0-draft.2";
 zero.input = zeros(240, 64);
 zeroState = radardemo.ddc.initializeState(design, 64);
-[zero.output, zeroState] = radardemo.ddc.processChunk(zero.input, zeroState, design);
+[zero.output, zeroState] = radardemo.ddc.processFrame(zero.input, zeroState, design);
 zero.output = complex(zero.output);
 zero.decimationFactors = design.decimationFactors;
 zero.tolerance = 0;
@@ -78,9 +79,9 @@ offsets = [-17, -5, 0, 7, 17, 23];
 boundaryCuts = reshape(boundaryTicks + offsets, [], 1);
 boundaryCuts = boundaryCuts(boundaryCuts > 0 & boundaryCuts < totalTicks);
 cuts = unique([regularCuts(:); boundaryCuts; totalTicks]);
-chunkLengths = diff(cuts);
-if any(chunkLengths <= 0) || any(chunkLengths > 8192) || sum(chunkLengths) ~= totalTicks
-    error("wp4gen:DdcChunkPlan", "Boundary stream chunks must cover the scan in bounded pieces.");
+frameLengths = diff(cuts);
+if any(frameLengths <= 0) || any(frameLengths > 8192) || sum(frameLengths) ~= totalTicks
+    error("wp4gen:DdcChunkPlan", "Boundary stream frames must cover the scan in bounded pieces.");
 end
 lastOutputTick = 12 * (ceil(totalTicks / 12) - 1);
 boundaryWindows = reshape(boundaryTicks + (-768:12:768), [], 1);
@@ -91,27 +92,27 @@ outputTicks = outputTicks(outputTicks >= 0 & outputTicks <= lastOutputTick & ...
     mod(outputTicks, 12) == 0);
 outputSamples = complex(zeros(numel(outputTicks), 1));
 outputOrdinals = outputTicks / 12;
-checkpoints = zeros(numel(chunkLengths), 4);
+checkpoints = zeros(numel(frameLengths), 4);
 state = radardemo.ddc.initializeState(design, 1);
 offset = 0;
 outputCount = 0;
-for chunkIndex = 1:numel(chunkLengths)
-    chunkSize = chunkLengths(chunkIndex);
-    indices = offset + (0:chunkSize - 1).';
+for frameIndex = 1:numel(frameLengths)
+    frameSize = frameLengths(frameIndex);
+    indices = offset + (0:frameSize - 1).';
     input = makeStimulus(indices, stimulus);
-    [chunkOutput, state] = radardemo.ddc.processChunk(input, state, design);
-    if ~isempty(chunkOutput)
+    [frameOutput, state] = radardemo.ddc.processFrame(input, state, design);
+    if ~isempty(frameOutput)
         firstOrdinal = ceil(offset / 12);
-        ordinals = firstOrdinal + (0:numel(chunkOutput) - 1).';
+        ordinals = firstOrdinal + (0:numel(frameOutput) - 1).';
         selected = find(outputOrdinals >= firstOrdinal & outputOrdinals <= ordinals(end));
         if ~isempty(selected)
             localIndices = outputOrdinals(selected) - firstOrdinal + 1;
-            outputSamples(selected) = chunkOutput(localIndices);
+            outputSamples(selected) = frameOutput(localIndices);
         end
     end
-    outputCount = outputCount + numel(chunkOutput);
-    offset = offset + chunkSize;
-    checkpoints(chunkIndex, :) = [double(state.inputSampleCount), ...
+    outputCount = outputCount + numel(frameOutput);
+    offset = offset + frameSize;
+    checkpoints(frameIndex, :) = [double(state.inputSampleCount), ...
         double(state.stage1Phase), double(state.stage2Phase), outputCount];
 end
 expectedOutputCount = ceil(totalTicks / 12);
@@ -120,9 +121,10 @@ if offset ~= totalTicks || outputCount ~= expectedOutputCount || ...
     error("wp4gen:DdcBoundaryStream", ...
         "The continuous DDC stream did not produce the expected bounded observations.");
 end
+% Retain chunkLengths and maxChunkSamples as serialized compatibility fields.
 evidence = struct("schedule", schedule, "stimulus", stimulus, ...
     "inputSampleCount", uint64(totalTicks), "channelCount", 1, ...
-    "maxChunkSamples", 8192, "chunkLengths", chunkLengths, ...
+    "maxChunkSamples", 8192, "chunkLengths", frameLengths, ...
     "checkpoints", checkpoints, "boundaryTicks", uint64(boundaryTicks), ...
     "windowRadiusTicks", 768, "outputTicks", uint64(outputTicks), ...
     "outputSamples", outputSamples, "expectedOutputCount", uint64(expectedOutputCount), ...
