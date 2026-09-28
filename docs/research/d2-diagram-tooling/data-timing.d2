@@ -1,0 +1,156 @@
+vars: {
+  d2-config: {
+    layout-engine: tala
+    theme-id: 0
+  }
+}
+
+direction: down
+style.fill: "#FFFFFF"
+style.font-size: 16
+
+title: |md
+  **Radar V1 · batch data shapes, implementation stage & execution questions**
+| { near: top-center }
+
+classes: {
+  panel: {
+    style: {
+      fill: "#F7F9FC"
+      stroke: "#D7DEE8"
+      stroke-width: 1
+      border-radius: 10
+      font-color: "#253247"
+      font-size: 17
+    }
+  }
+  evidence: {
+    style: {
+      fill: "#E5F3EB"
+      stroke: "#4B8B69"
+      stroke-width: 1
+      font-color: "#173D2A"
+      font-size: 16
+    }
+  }
+  confirmed: {
+    style: {
+      fill: "#FFF4D6"
+      stroke: "#B58B35"
+      stroke-width: 1
+      font-color: "#493A18"
+      font-size: 16
+    }
+  }
+  open: {
+    style: {
+      fill: "#F9E4E3"
+      stroke: "#B75C59"
+      stroke-width: 1
+      font-color: "#522423"
+      font-size: 16
+    }
+  }
+  flow: {
+    style: {
+      stroke: "#52657B"
+      stroke-width: 2
+      font-color: "#40536A"
+      font-size: 13
+    }
+  }
+}
+
+batch: "ILLUSTRATIVE BATCH DATA ORGANIZATION · TWO-ROW LAYOUT\nDDC behavior evidenced separately; grid placement does not define streaming modules" {
+  class: panel
+  grid-rows: 2
+  grid-columns: 3
+  grid-gap: 38
+  ddc: "DDC data\n[N,64] complex\n12.5 MS/s/channel candidate\n\nBOUNDED DDC EVIDENCE\n372 ADC-tick group delay (31 output\nsamples); state retained across PRI /\ntransition boundaries. MATLAB accepts\nvariable frame lengths while preserving\ncontinuous state. Simulink dimensions are\nfixed per configured model; runtime-\nvariable frame sizes are not allowed." {
+    class: evidence
+    shape: rectangle
+    width: 340
+  }
+  beam: "Commanded azimuth beamformed\n[N,4] complex elevation streams" {
+    class: evidence
+    shape: rectangle
+    width: 310
+  }
+  range: "Range processing\n[rangeBin,pulse,elevation]" {
+    class: confirmed
+    shape: rectangle
+    width: 340
+  }
+  range_note: "RANGE-AXIS INTERPRETATION\nBatch data organization only, not a\nsettled streaming module interface. The\npulse axis is per-pulse range results;\nseparate accumulation prepares the\nslow-time ensemble." {
+    class: confirmed
+    shape: rectangle
+    width: 340
+  }
+  doppler: "Doppler data\n[rangeBin,dopplerBin,elevation]\n\nACCEPTED TIMING EVIDENCE\nFive PRFs; usable pulse counts\n[22,25,28,32,35]; 151 schedule records;\n10,553,388 ADC ticks under the\n10,597,950-tick cap. This schedule\nevidence does not demonstrate end-to-end\ndetection performance." {
+    class: confirmed
+    shape: rectangle
+    width: 340
+  }
+  accum: "Pulse accumulation + range-migration\nhandling\nPrepare slow-time ensemble initially\nwithout compensation" {
+    class: confirmed
+    shape: rectangle
+    width: 340
+  }
+  ddc -> beam -> range -> accum -> doppler: { class: flow }
+}
+
+simulink: "FUTURE SIMULINK REPRESENTATIONS\nFixed dimensions per configured model" {
+  class: panel
+  direction: down
+  behavior: "Behavioral model first\napproved algorithms / interfaces\nnot required to be cycle-accurate" {
+    class: confirmed
+    shape: rectangle
+    width: 310
+  }
+  hardware: "Later hardware-oriented\nimplementation model" {
+    class: confirmed
+    shape: rectangle
+    width: 310
+  }
+  hdl: "HDL generation\ndeferred" {
+    class: open
+    shape: rectangle
+    width: 310
+  }
+  behavior -> hardware: "may follow" { class: flow }
+  hardware -> hdl: "future; no readiness implied" {
+    class: flow
+    style.stroke-dash: 6
+  }
+}
+
+boundary: "OPEN SIMULINK EXECUTION BOUNDARY\nRates · sample/frame execution · buffer owner\ncorner-turn implementation · latency · execution granularity" {
+  class: open
+  shape: rectangle
+  width: 460
+}
+
+batch.doppler -- boundary: "unresolved Simulink boundary details" {
+  class: flow
+  style.stroke-dash: 6
+}
+
+legend: "STATUS KEY" {
+  class: panel
+  direction: down
+  green: "GREEN\nBounded implementation evidence" {
+    class: evidence
+    shape: rectangle
+    width: 300
+  }
+  yellow: "YELLOW · Confirmed responsibility /\ncontract; full path incomplete" {
+    class: confirmed
+    shape: rectangle
+    width: 300
+  }
+  red: "RED · Method, ordering, or execution\nremains open" {
+    class: open
+    shape: rectangle
+    width: 300
+  }
+}
