@@ -60,3 +60,83 @@ implementation at commit # (TBD).
     complex rather than 12.5 MHz samples.
 - I may already have some terminology wrong in this document and the related
   walkthrough/ADR text.
+
+---
+
+## Joint findings and dispositions — 2026-09-29
+
+**Attribution:** Original review notes above are Julio's, preserved verbatim
+from the archived review at
+[`ff16d41b8886c4a4570c25e95dc343bdcc55e911`](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/ff16d41b8886c4a4570c25e95dc343bdcc55e911).
+The original notes themselves said the implementation commit was TBD; they are
+not retroactively attributed to a pinned source revision. Codex inspected the
+walkthrough at `58b3d3a80170d413aa88dd4408490e2056f49379` and the current
+walkthrough history includes last change `2389af89f05adf058b0939fe7a62a8cbfe2a8ab1`.
+The findings and technical analysis below are agent contributions. Decisions
+identified as Julio's were explicitly confirmed on 2026-09-29. The archived
+original remains the source for the initial review text.
+
+### Data flow and mixer
+
+- **Complex mixing before `/3` — accepted.** A real-only `/3` aliases the
+  50 MHz IF to DC; complex mixing or an equivalent operation must precede it.
+- **Three-phase/polyphase mixer — candidate; optimization deferred.** The
+  oscillator is three-sample periodic at 150 MS/s. Keep the current clear
+  implementation for the first refactor.
+- **Repeated processing view — accepted for a future diagram update.** Show
+  the repeated PRI boundary and state reset. The existing diagram still shows
+  current code until revised.
+
+### Filters and diagrams
+
+- **Frequency responses — accepted for walkthrough update.** Show each
+  response, the overall response, and a passband zoom; prefer `gramm` where
+  suitable.
+- **Cascade budgets — retained.** Evaluate candidates against 0.1 dB passband
+  ripple and 60 dB alias rejection, including the 6.25 MHz stage-2 stopband
+  constraint. The budget applies to final 12.5 MS/s complex output.
+- **Moving-average checks — resolved.** `/3` at 150 MS/s gives −0.127469 dB
+  at 5 MHz and −3.521825 dB at 25 MHz. `/4` at 50 MS/s gives −2.276721 dB
+  at 5 MHz. CIC compensation cannot undo aliasing already introduced.
+- **Final `/4` filtering — clarified.** Filter before `/4`, at 50 MS/s. The
+  final 25 MS/s half-band stage centers at 6.25 MHz and cannot alone meet the
+  60 dB stopband requirement. Keep filter and decimator separate in the
+  pedagogical diagram.
+
+### State, timing, and scan
+
+- **Stateful DDC question — superseded for future calls.** The current
+  implementation consumes and returns oscillator, FIR, and decimation state
+  across calls; this was not an unused-state defect. Julio approved one
+  complete physical PRI per call with fresh local state. MATLAB prepares the
+  complete ADC matrix before DUT calls. See [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md).
+- **Delay and tail — accepted with distinct meanings.** Group delay is 372
+  ADC ticks, 31 output periods, or 2.48 microseconds. Full memory is 744 ticks,
+  62 output periods, or 4.96 microseconds. Optional zero-flush exposes causal
+  tail only; it is not acquired input, cannot recreate blanked/missing samples,
+  and is not equivalent to next-PRI physical samples.
+- **Whole scan and future model — retained direction.** ADC ticks, five
+  priming records, four transition gaps, and prior-pulse echoes remain
+  physical. Future Simulink multishot resets per PRI and keeps startup
+  transient in blind range; topology remains open. Start serially; parallel
+  demonstration is optional.
+- **Glossary units — accepted.** MHz names frequency; MS/s names sample rate.
+  The output is 12.5 MS/s complex.
+
+### Scope and closure
+
+Julio closed the design discussion for the dispositions above on 2026-09-29.
+This closes the joint design review only. The implementation is pending Phase 0
+resolution of the exact API, output shape, metadata, tail representation, and
+window-validity ownership, followed by Julio's explicit go-ahead. Implementation
+review, targeted verification, and end-to-end detection evidence remain pending.
+The first refactor retains the existing five priming records and four transition
+gaps; removing or changing them is deferred. Padding can expose a causal FIR
+tail but is not acquired input and cannot repair missing or blanked samples.
+
+The bounded exploratory MATLAB comparison documented in ADR 0022 is evidence
+about one-channel local-state equivalence after the cascade memory. It is not a
+reusable test, full-scan verification, or detection proof. Historical G2
+streaming evidence applies only to the former continuous-state baseline.
+The implementation sequence and acceptance evidence are captured in the
+[per-PRI DDC plan](../plans/ddc-pri-processing.md).

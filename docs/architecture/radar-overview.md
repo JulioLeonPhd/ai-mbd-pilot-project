@@ -66,10 +66,12 @@ quality/validity semantics remain to be defined.
 ![Radar V1 data shapes and timing](diagrams/data-timing.svg)
 
 The current MATLAB reference supports variable-length frames while preserving
-continuous DDC state. Future Simulink models use fixed dimensions per configured
-model and do not support runtime-variable frame sizes. Build a behavioral
-Simulink model first; a later hardware-oriented implementation model may follow.
-HDL generation remains deferred.
+continuous DDC state; this is the historical implemented baseline. Julio has
+accepted per-PRI fresh local DDC state for future calls (ADR 0022), but that
+behavior is not yet implemented. Future Simulink models use fixed dimensions
+per configured model and do not support runtime-variable frame sizes. Build a
+behavioral Simulink model first; a later hardware-oriented implementation model
+may follow. HDL generation remains deferred.
 
 Simulink rates, sample-versus-frame execution, buffer ownership, corner-turn
 implementation, latency, and execution granularity remain open. Buffering once

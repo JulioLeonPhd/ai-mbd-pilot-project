@@ -31,9 +31,11 @@ Steps 1 and 2 are drafted and passed independent document review on 2026-09-26.
 The top-level overview and three diagrams are in the main working tree at
 `docs/architecture/radar-overview.md`; their PlantUML syntax/render checks and
 preview inspection passed, and the documents passed independent review. Julio's
-visual review of the redrawn views remains pending. The DDC walkthrough is
-prepared for human inspection; that inspection has not yet occurred. The
-repeat-component workflow remains incomplete.
+visual review of the redrawn views remains pending. Julio closed the joint DDC
+design discussion on 2026-09-29; implementation review and verification remain
+pending. The per-PRI implementation is gated on Phase 0 interface/evidence
+decisions and Julio's explicit go. The repeat-component workflow remains
+incomplete.
 
 ## Ordered work
 
@@ -136,12 +138,15 @@ work; they are decisions, not a statement that the current implementation
 already behaves this way. Implement them only after the shared architectural
 understanding is confirmed.
 
-**Settled:** MATLAB DDC accepts variable frame lengths while preserving
-continuous stream state. A future Simulink implementation uses fixed dimensions
-per configured model and does not support runtime-variable frame sizes. Channel
-count is configurable to support tests, with 64 as the default. Begin with the
-accepted DDC design; validate its supported configuration and keep configuration
-fixed during a run. Review and test any extension before adopting it.
+**Historical baseline / superseded DDC boundary:** The walkthrough implementation
+accepted variable frame lengths and preserved continuous stream state. On
+2026-09-29 Julio approved a future per-PRI DDC call with fresh local state; see
+[ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md) and the
+[implementation plan](ddc-pri-processing.md). That decision does not describe
+the current code until implementation is authorized and complete. A future
+Simulink implementation uses fixed dimensions per configured model and does
+not support runtime-variable frame sizes. Channel count is configurable for
+tests, with 64 as the default.
 
 **Settled:** Preserve raw ADC samples as `int16` on disk. The storage reader
 converts them to floating point when loading for MATLAB processing. The same
@@ -149,8 +154,10 @@ raw vectors can be reused by a future Simulink path.
 
 **Settled for the pilot:** ADC samples form a correctly sampled, contiguous
 timeline. Reject missing samples or discontinuous ADC ticks; do not infer or
-fill gaps. Frame, pulse, and PRF boundaries do not reset DDC state or remove
-elapsed samples. This continuity rule does not determine what signal values
+fill gaps. ADC timeline continuity and global ticks remain intact across frame,
+pulse, and PRF boundaries. The former no-reset DDC state clause is superseded
+by ADR 0022: each future DUT call starts fresh local state for one complete
+physical PRI. This continuity rule does not determine what signal values
 represent transmit blanking.
 
 **Direction:** Express ADC voltage at the ADC input, after modeled receiver
@@ -247,8 +254,9 @@ scenario rescaling, and Julio has reviewed the proposed choices.
 
 Dependency: confirm the architecture decisions above before changing producer,
 reader, or contract behavior. The pilot path must enforce contiguous ADC ticks
-and reject gaps without inserting samples or changing DDC state across frame,
-pulse, or PRF boundaries. Align the pilot producer and reader checks while
+and reject gaps without inserting samples. This storage/timeline task does not
+require preserving inter-PRI DDC state; ADR 0022 defines the accepted future
+per-PRI call boundary. Align the pilot producer and reader checks while
 preserving broader storage support for ordered/windowed slabs. Keep historical
 unit-only fixtures intact and classify them explicitly as outside the pilot
 ADC continuity scope. Decide separately what waveform values represent
@@ -284,14 +292,17 @@ alias for `processChunk` is required. Preserve historical serialized names
 `chunkLengths` and `maxChunkSamples`, and leave historical fixture evidence
 unchanged; these are provenance fields, not live processing terminology.
 
-Preserve numerical behavior, state continuity, and MATLAB's variable frame
-length support. A future Simulink model uses fixed dimensions per configured
-model; this terminology change does not choose its frame size or timing policy.
+Preserve numerical behavior, the then-current state continuity baseline, and
+MATLAB's variable frame length support. ADR 0022 later superseded the DDC
+inter-call boundary for future implementation. A future Simulink model uses
+fixed dimensions per configured model; this terminology change does not choose
+its frame size or timing policy.
 The MATLAB Code Analyzer and focused DDC walkthrough/state-continuity checks
 passed on 2026-09-28. The full WP4 MATLAB MCP suite completed on 2026-09-28
-with 54 passed, 0 failed, and 0 incomplete in 84.2901 seconds. The next human
-inspection is the DDC walkthrough and implementation evidence, followed by
-selecting the next component question under step 5.
+with 54 passed, 0 failed, and 0 incomplete in 84.2901 seconds. The joint design
+discussion closed on 2026-09-29; a new implementation review remains pending
+after Phase 0 decisions and explicit go. Then select the next component question
+under step 5.
 
 Completion: the implementation and relevant checks pass, and the guide,
 glossary, diagrams, and current status describe the same API and compatibility

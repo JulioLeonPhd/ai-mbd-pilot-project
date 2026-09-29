@@ -21,6 +21,12 @@ the configuration fixed during that run. Channel count is configurable for
 tests, with 64 as the default. This supports focused test cases while keeping
 each execution reproducible.
 
+The continuous-state-across-calls clause records the former DDC baseline and is
+superseded for future DDC execution by [ADR 0022](0022-adopt-independent-pri-ddc-processing.md):
+MATLAB processes complete physical PRIs with fresh local state per call. The
+fixed-dimension Simulink direction and configurable test channel count remain;
+the exact Simulink topology and execution mechanism are still open.
+
 Preserve [ADR 0003's](0003-stage-floating-point-fixed-point-simulink.md)
 floating-point MATLAB reference, fixed-point design and analysis, then
 Simulink order. Within the Simulink stage, build a behavioral model first,

@@ -243,10 +243,16 @@ detection performance. Phase 5 independent document review and the Phase 6 root
 gate passed; G2 is accepted for this evidence scope.
 
 The two-stage DDC group delay is 372 ADC ticks, or 31 output samples. The
-contract requires mixer, FIR, and decimator state to be zero-initialized at
-scan start and retained across PRIs and transitions, including continuous `/3`
-then `/4` decimator phase. Independent full-CPI evidence covers one channel,
-10,553,388 ticks, 150 PRI/transition boundaries, and 2,189 chunks. It compares
+following state contract and G2 evidence describe the historical continuous
+implementation profile. Julio accepted fresh local DDC state for each complete
+physical PRI in [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md);
+that profile is not yet implemented. Preserve the historical contract and its
+evidence for replay; future per-PRI acceptance and migration are separate.
+Under the historical profile, mixer, FIR, and decimator state were
+zero-initialized at scan start and retained across PRIs and transitions,
+including continuous `/3` then `/4` decimator phase. Independent full-CPI
+evidence covers one channel, 10,553,388 ticks, 150 PRI/transition boundaries,
+and 2,189 chunks. It compares
 19,480 observed output samples/timestamps selected across startup, end, and
 boundary observation windows; maximum absolute complex output-sample
 discrepancy against independent direct convolution is `1.5e-15`. The

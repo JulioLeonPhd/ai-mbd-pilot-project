@@ -45,6 +45,16 @@ columns; whether a block is interpreted as a frame depends on the processing
 block's input-processing setting. A frame is not inherently a radar pulse, PRI,
 or CPI. See [MathWorks' sample- and frame-based concepts](https://www.mathworks.com/help/dsp/ug/sample-and-frame-based-concepts.html).
 
+**Pulse repetition interval (PRI)**:
+The physical interval between successive transmitted pulses, represented here
+by a contiguous ADC-tick interval. A transition gap is not itself a PRI. See
+[ADR 0022](docs/adr/0022-adopt-independent-pri-ddc-processing.md) for the
+approved DDC boundary and its implementation status.
+
+**Frequency and sample-rate units**:
+MHz describes frequency (for example, IF, bandwidth, or filter edge); MS/s
+describes sample rate. The DDC output rate is 12.5 MS/s complex.
+
 **Chunk**:
 Legacy terminology in historical serialized fixture metadata, including the
 field names `chunkLengths` and `maxChunkSamples`. These names do not identify a

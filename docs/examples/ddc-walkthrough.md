@@ -23,7 +23,10 @@ This MATLAB example follows a synthetic, one-channel ADC stream through the
 existing floating-point digital down-converter (DDC). It demonstrates complex
 frequency translation, two FIR stages, decimation, and state that must persist
 across input frames. MATLAB accepts variable frame lengths and preserves state
-across calls; a future Simulink model will use fixed dimensions per configured
+across calls; this is the current historical implementation baseline. Julio
+approved independent fresh-state-per-PRI processing for future DDC calls in
+[ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md), which remains
+unimplemented. A future Simulink model will use fixed dimensions per configured
 model. It teaches selected DDC behavior; it does not verify the
 complete radar receiver or establish hardware performance.
 
