@@ -8,6 +8,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.8.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.8.0) - 2026-10-02
+
+<small>[Compare with v0.7.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.7.0...v0.8.0)</small>
+
+### Added
+
+- Added: preserve original human DDC walkthrough review ([ff16d41](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/ff16d41b8886c4a4570c25e95dc343bdcc55e911) by Julio Leon). SemVer impact: none
+- Added: record diagram tooling evaluation and selection ([58b3d3a](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/58b3d3a80170d413aa88dd4408490e2056f49379) by Julio Leon). SemVer impact: none
+- Added guidance for using the `gramm` library for MATLAB plotting and updated agent result structure to clarify UUID usage. ([830bf52](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/830bf5214cc12254aaf7a9fec726235c8326663f) by Julio Leon).
+
+### Changed
+
+- Changed: confirm sample-only per-PRI DDC contract ([a889647](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/a889647dc06bc70285f080ad7e1564df8b597a56) by Julio Leon). SemVer impact: none
+- Changed: record independent per-PRI DDC design ([b428d03](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/b428d03fe066447cc34292856aea259f136b1ad8) by Julio Leon). SemVer impact: none
+- Changed: make DDC frame processing reviewable ([2389af8](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/2389af89f05adf058b0939fe7a62a8cbfe2a8ab1) by Julio Leon). SemVer impact: minor
+
+### Removed
+
+- Removed: replace vendored mattpocock skills with marketplace plugin ([8e2feb1](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/8e2feb1c564a45893cde7c6ff94fe311ef4868e4) by Julio Leon). SemVer impact: none
+
+### Merged
+
+- Merge pull request #9 from JulioLeonPhd/component/ddc-walkthrough-continuation ([ce05063](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/ce05063a6a24276313f8deba6a9caf26033a0464) by Julio León).
+
+### Misc
+
+- Refine developer instructions for handling substantive model changes and clarify usage of the `gramm` library for MATLAB plots. ([8cdffa6](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/8cdffa63dca40c1d6aa462829794c2a8b8703976) by Julio Leon).
+
 ## [v0.7.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.7.0) - 2026-09-26
 
 <small>[Compare with v0.6.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.6.0...v0.7.0)</small>
