@@ -23,7 +23,11 @@ inferring or filling gaps; frame, pulse, and PRF boundaries do not reset DDC
 state or discard elapsed samples. This rule does not specify the signal values
 used for transmit blanking. It narrows no broader storage support for ordered
 or windowed slabs, and historical unit-only fixtures remain outside the pilot
-ADC continuity scope.
+ADC continuity scope. The pulse-boundary DDC-state clause describes the former
+continuous-stream DDC baseline. For the accepted per-PRI DDC execution boundary,
+see [ADR 0022](0022-adopt-independent-pri-ddc-processing.md): raw ADC timeline
+continuity and global timestamps remain intact, while each DUT call begins with
+fresh local DDC state.
 Rejecting gaps preserves elapsed-time and DDC-state meaning instead of
 fabricating samples. Broader ordered or windowed slab storage remains useful
 outside the stricter pilot stream rule.

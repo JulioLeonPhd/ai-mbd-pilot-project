@@ -530,11 +530,11 @@ methods (Access=private)
         state = radardemo.ddc.initializeState(design, 1);
         offset = 0;
         while offset < resetTick
-            chunkSize = min(8192, resetTick - offset);
-            indices = offset + (0:chunkSize - 1).';
+            frameSize = min(8192, resetTick - offset);
+            indices = offset + (0:frameSize - 1).';
             input = testCase.makeBoundaryStimulus(indices, evidence.stimulus);
-            [~, state] = radardemo.ddc.processChunk(input, state, design);
-            offset = offset + chunkSize;
+            [~, state] = radardemo.ddc.processFrame(input, state, design);
+            offset = offset + frameSize;
         end
         faultState = state;
         switch string(resetKind)
@@ -549,7 +549,7 @@ methods (Access=private)
         end
         indices = resetTick + (0:899).';
         input = testCase.makeBoundaryStimulus(indices, evidence.stimulus);
-        [faultOutput, ~] = radardemo.ddc.processChunk(input, faultState, design);
+        [faultOutput, ~] = radardemo.ddc.processFrame(input, faultState, design);
         firstOrdinal = ceil(resetTick / 12);
         outputTicks = 12 * (firstOrdinal + (0:numel(faultOutput) - 1).');
         [found, locations] = ismember(outputTicks, double(evidence.outputTicks(:)));

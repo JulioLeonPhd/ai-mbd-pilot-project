@@ -64,6 +64,13 @@ Numerical comparisons use an absolute tolerance of `1e-9 dB` after conversion
 to dB. The 95–105 MHz analog alias
 condition remains a front-end assumption, not a digital-filter claim.
 
+The DDC streaming assumptions in this Phase 0 baseline describe the historical
+continuous-state implementation and its G2 evidence. They are superseded for
+future DDC call boundaries by [ADR 0022](0022-adopt-independent-pri-ddc-processing.md),
+which preserves the filter budget and scan schedule while resetting local DDC
+state at each complete physical PRI. Existing G2 streaming evidence remains
+scoped to the pinned historical baseline.
+
 <a id="wp4-beamforming-shape"></a>
 <a id="ADR0018.beamforming"></a>
 DDC preserves shape `[N,64]`. For commanded look angle `theta`, with positive

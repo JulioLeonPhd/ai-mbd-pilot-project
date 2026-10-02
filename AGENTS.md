@@ -95,7 +95,6 @@ Every specialist result has this shape:
 
 ```yaml
 agent:
-  id: "agent-id (uuid)"
   name: "agent-name (e.g. technical-writer)"
   model: "model used"
   reasoning_effort: "reasoning effort used"
@@ -311,6 +310,11 @@ before reporting completion, and rerun the analyzer after fixes. Record the
 analyzer operation and result as validation evidence. If the MATLAB MCP or Code
 Analyzer operation is unavailable, record the check as unavailable and disclose
 that limitation; an unavailable check is not a pass.
+
+### Plotting
+
+We have `gramm` available as a `ggplot2` style plotting library. Prefer using it
+when appropriate instead of the MATLAB default plotting functions.
 
 ## Python linting
 

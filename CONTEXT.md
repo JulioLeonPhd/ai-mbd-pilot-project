@@ -45,13 +45,21 @@ columns; whether a block is interpreted as a frame depends on the processing
 block's input-processing setting. A frame is not inherently a radar pulse, PRI,
 or CPI. See [MathWorks' sample- and frame-based concepts](https://www.mathworks.com/help/dsp/ug/sample-and-frame-based-concepts.html).
 
+**Pulse repetition interval (PRI)**:
+The physical interval between successive transmitted pulses, represented here
+by a contiguous ADC-tick interval. A transition gap is not itself a PRI. See
+[ADR 0022](docs/adr/0022-adopt-independent-pri-ddc-processing.md) for the
+approved DDC boundary and its implementation status.
+
+**Frequency and sample-rate units**:
+MHz describes frequency (for example, IF, bandwidth, or filter edge); MS/s
+describes sample rate. The DDC output rate is 12.5 MS/s complex.
+
 **Chunk**:
-The current MATLAB DDC implementation's term for one finite $N\times C$ block
-passed to `processChunk`. Its size is a processing and memory choice; successive
-chunks representing one continuous stream preserve mixer count, FIR history,
-and decimation phase. In this project, *frame* is the preferred explanatory
-term for blocks buffered for processing; this terminology does not prescribe a
-Simulink block's frame setting or fixed sample size.
+Legacy terminology in historical serialized fixture metadata, including the
+field names `chunkLengths` and `maxChunkSamples`. These names do not identify a
+separate live processing concept; the project term for a buffered block of
+consecutive samples is *frame*.
 
 **Pulse accumulation**:
 Collecting successive pulses into a slow-time ensemble for Doppler processing.

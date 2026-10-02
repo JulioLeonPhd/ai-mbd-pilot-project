@@ -70,6 +70,25 @@ human decisions and agent analysis or implementation as agent contributions.
 Tests and experiments establish observations, not human understanding or
 approval.
 
+## Walkthrough reviews
+
+For a human review of a walkthrough, Julio creates a sibling
+`<walkthrough>-review.md` file and records the human notes before agent edits.
+Commit the original notes before any agent edits. Keep that committed text
+unchanged at the start of the file; later findings and resolutions are appended
+with clear authorship and dates. Record
+the reviewed source revision and snapshot commit, but do not infer that the
+human author pinned their initial notes to a particular commit unless the
+record says so. Preserve the original with Git history.
+
+The joint findings record separates human observations, agent analysis, and
+explicit human decisions. It includes a dated disposition for each item and
+labels it accepted, deferred, or open. Julio may close the design discussion
+after reviewing the dispositions; this does not close implementation review or
+verification. Reopen the design review with a dated note and a new reviewed
+commit when subsequent work raises a new question. Agents and validators
+provide evidence and recommendations; neither grants human approval.
+
 ## References
 
 - [Agent orchestration contract](../../AGENTS.md) — task routing, specialist

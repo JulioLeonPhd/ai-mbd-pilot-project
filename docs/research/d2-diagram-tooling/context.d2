@@ -1,0 +1,55 @@
+direction: down
+
+title: |md
+  **Radar V1 system context**
+| { near: top-center }
+
+vars: {
+  d2-legend: {
+    green: "Bounded implementation evidence" {
+      style.fill: "#B7E1CD"
+    }
+    yellow: "Confirmed responsibility/requirement; full path incomplete" {
+      style.fill: "#FFF2CC"
+    }
+    red: "Method, ordering, or execution remains open" {
+      style.fill: "#F4CCCC"
+    }
+  }
+}
+
+H: Julio\narchitecture decision owner {
+  shape: person
+}
+
+CFG: Radar configuration +\ntarget scenario {
+  style.fill: "#FFF2CC"
+}
+
+GEN: Planned MATLAB stimulus\ngenerator {
+  style.fill: "#FFF2CC"
+}
+
+DUT: "Radar DUT\nADC samples → detection list\n\nApproved boundary: ADC samples through detection list.\nStimulus generation, test fixtures, and verification\nremain outside the production detection path." {
+  style.fill: "#FFF2CC"
+}
+
+EV: WP4/G2 evidence\nDDC streaming, selected dimensions,\nschedule, fusion, clustering {
+  style.fill: "#B7E1CD"
+}
+
+ORACLE: "Test-only truth-assisted\ncomparison / oracle\n\nTruth-assisted migration comparison is test/oracle-only;\nscenario truth never enters the production DUT." {
+  style.fill: "#FFF2CC"
+}
+
+OPEN: Full detection behavior,\nhardware, real-time performance {
+  style.fill: "#F4CCCC"
+}
+
+H -> CFG: approves system decisions
+CFG -> GEN: reproducible inputs
+GEN -> DUT: planned direct ADC vectors
+DUT -> EV: bounded verification
+DUT -> OPEN: not established by current evidence {
+  style.stroke-dash: 3
+}

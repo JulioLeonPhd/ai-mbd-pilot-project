@@ -265,15 +265,23 @@ rejection is the minimum stopband attenuation relative to maximum passband
 amplitude. Compare each metric with absolute tolerance `1e-9 dB`.
 
 <a id="DDC.streaming-state"></a>
-Streaming DDC validation shall process a real mixer input in unequal chunks
-while preserving mixer, FIR, and decimator state continuously from scan start
-across PRIs and transitions; the `/3` then `/4` decimator phases shall remain
-continuous across those boundaries. Independent full-CPI evidence covers one
-channel, 10,553,388 ticks, 150 PRI/transition boundaries, and 2,189 chunks.
-It compares 19,480 observed output samples/timestamps selected across startup,
-end, and boundary observation windows. Maximum absolute complex output-sample
-discrepancy against independent direct convolution is `1.5e-15`. The zero-input
-fixture separately verifies exact-zero output with the 64-channel shape.
+The following streaming requirement and DDC-002 evidence describe the accepted
+historical continuous-state implementation profile. The `shall` applies only
+to replay and interpretation of that pinned profile. [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md)
+records the accepted per-PRI direction; its confirmed interface and evidence
+migration are in the [per-PRI plan](../plans/ddc-pri-processing.md). Preserve
+the historical numbers and schema below.
+
+For the historical profile, streaming DDC validation processes real mixer
+input in unequal chunks while preserving mixer, FIR, and decimator state
+continuously from scan start across PRIs and transitions; `/3` then `/4`
+decimator phases remain continuous across those boundaries. Independent
+full-CPI evidence covers one channel, 10,553,388 ticks, 150 PRI/transition
+boundaries, and 2,189 chunks. It compares 19,480 observed output
+samples/timestamps selected across startup, end, and boundary observation
+windows. Maximum absolute complex output-sample discrepancy against independent
+direct convolution is `1.5e-15`. The zero-input fixture separately verifies
+exact-zero output with the 64-channel shape.
 
 <a id="DDC.zero-input"></a>
 For a nonempty input whose samples are exactly zero, the DDC shall return an

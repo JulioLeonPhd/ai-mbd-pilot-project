@@ -23,16 +23,35 @@ items. The ±45° sector and one-second update remain provisional.
 
 ## Next open question
 
+On 2026-09-29 Julio approved independent per-PRI DDC processing; on 2026-10-02
+he confirmed the sample-only API, retained no-tail output, caller timing and
+alignment responsibilities, downstream range-window validity ownership, and
+narrow evidence migration. Implementation and independent verification remain
+pending Julio's separate explicit go. Current DDC code and G2 streaming evidence
+still describe the historical continuous-state baseline. See [ADR 0022](docs/adr/0022-adopt-independent-pri-ddc-processing.md),
+the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md), and the
+[joint walkthrough review](docs/examples/ddc-walkthrough-review.md).
+
 Julio confirmed the architecture interview summary on 2026-09-26. Independent
 review of [ADR 0019](docs/adr/0019-adopt-human-led-module-design-and-simulink-staging.md),
 [ADR 0020](docs/adr/0020-adopt-pilot-adc-storage-and-sample-integrity.md), and
 [ADR 0021](docs/adr/0021-adopt-dsp-responsibilities-and-ambiguity-baseline.md)
 passed on 2026-09-26 with no unresolved semantic findings. The redrawn diagrams
-still await Julio's visual review. Then use the
-[top-level radar overview](docs/architecture/radar-overview.md) and DDC learning
-walkthrough to guide component work. WP6e's ambiguity method and ordering remain
-open study items. Issue 3 separately tracks manifest revision-provenance
-hardening.
+still await Julio's visual review; this walkthrough does not record or imply
+that review. On 2026-09-27 Julio confirmed proceeding to step 4 of the human-led
+development plan. Julio approved renaming the live DDC entry point to
+`processFrame` on 2026-09-28. Historical fixture provenance and serialized
+`chunkLengths`/`maxChunkSamples` fields remain unchanged; no runtime alias is
+required. The rename, five-file Code Analyzer run, focused walkthrough oracle,
+streaming-equivalence, and state-reset checks passed on 2026-09-28. The full
+WP4 MATLAB MCP suite completed on 2026-09-28 with 54 passed, 0 failed, and 0
+incomplete in 84.2901 seconds. Julio closed the joint DDC design discussion on
+2026-09-29. The per-PRI Phase 0 contract was confirmed 2026-10-02. Its
+implementation and verification remain pending Julio's separate explicit go;
+the current walkthrough documents the historical continuous-state
+implementation. Then select the next component question under step 5. WP6e's ambiguity
+method and ordering remain open study items. Issue 3 separately tracks manifest
+revision-provenance hardening.
 
 ## Evidence and history
 
