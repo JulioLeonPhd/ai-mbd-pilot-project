@@ -1,7 +1,7 @@
 ---
 status: accepted
 accepted: 2026-09-29
-implementation: pending
+implementation: in-progress
 ---
 
 # Adopt independent per-PRI DDC processing
@@ -18,9 +18,8 @@ continuous across PRI boundaries.
 This supersedes only the continuous-state-across-PRI clauses of ADRs 0019 and
 0020, and derived streaming obligations from [ADR 0018](0018-freeze-wp4-g2-phase0-contract.md).
 It does not change ADC gap rejection, storage, scan schedule, filter design,
-fixed-point staging, or HDL deferral. The current continuous-state MATLAB code,
-walkthrough, diagrams, and tests describe the prior implementation baseline;
-they are not evidence that this accepted decision is implemented. Historical
+fixed-point staging, or HDL deferral. At acceptance, the continuous-state
+MATLAB code, walkthrough, diagrams, and tests described the prior baseline. Historical
 G2 streaming evidence remains evidence for that old baseline only.
 
 ## Timing and boundary behavior
@@ -87,13 +86,16 @@ as a historical continuous-state witness replayable at
 `58b3d3a80170d413aa88dd4408490e2056f49379`; do not relabel old G2 evidence or
 make an unrelated global schema-version change. Retain passband and alias
 regressions. Describe the independent oracle as combined-FIR convolution with
-retained no-tail outputs, not DUT zero extension. Keep `5e-11` as proposed,
-pending numerical justification. Compare historical continuous output only
-at local raw offsets of at least 744 ADC ticks; startup equivalence is not
-required. Preserve one/64-channel coverage, isolation, zero and impulse/chirp
-boundary cases, multitone/noise, shape, sample metadata, caller timestamp/delay
-mapping, and call-order invariance. Report unit/oracle, full-scan, and
-end-to-end scopes separately.
+retained no-tail outputs, not DUT zero extension. Independent numerical review
+accepts the unchanged `5e-11` input-peak-normalized bound for the bounded
+five-PRI comparison; it does not establish a full-CPI, global-tick, or hardware
+bound. Keep exact-zero and inactive-channel
+invariants as separate acceptance checks. Compare historical continuous
+output only at local raw offsets of at least 744 ADC ticks; startup
+equivalence is not required. Preserve one/64-channel coverage, isolation,
+zero and impulse/chirp boundary cases, multitone/noise, shape, sample metadata,
+caller timestamp/delay mapping, and call-order invariance. Report unit/oracle,
+full-scan, and end-to-end scopes separately.
 
 Source inspection of the [DDC design](../../src/+radardemo/+ddc/createDesign.m)
 and [receive timing evaluator](../../src/+radardemo/+timing/evaluateReceiveTiming.m),
@@ -136,8 +138,14 @@ test, full 64-channel/full-scan result, or end-to-end detection verification.
 The prior G2 streaming evidence remains tied to its historical continuous-state
 baseline.
 
-The Phase 0 interface and migration contract are confirmed. Implementation is
-pending Julio's separate explicit go-ahead. Future work must preserve the historical
-DDC-002 witness and replay it at its pinned baseline; it must not relabel that
-evidence as acceptance of per-PRI behavior. A narrow evidence-schema migration
-is preferred to an unrelated global schema-version change.
+The Phase 0 interface and migration contract are confirmed. Julio explicitly
+authorized implementation on 2026-10-02. The per-PRI MATLAB implementation,
+scoped core and WP4 suites, full-scan walkthrough, pinned DDC-002 replay, and
+fixture-preservation audit passed. Independent numerical validation also passed
+after the exact-zero and inactive-channel oracle checks were made explicit and
+verified. The bounded five-PRI tolerance is justified by independent numerical
+review; it is not a full-CPI, global-tick, or hardware error bound. Preserve
+DDC-002 as historical continuous-state evidence, not per-PRI acceptance. The
+implementation is ready for Julio's implementation and walkthrough review. A
+narrow evidence-schema migration is preferred to an unrelated global schema
+version change.

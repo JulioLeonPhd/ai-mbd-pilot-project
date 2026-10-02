@@ -1,11 +1,13 @@
 function ddc = generateDdc(schedule, options)
-%GENERATEDDC Record DDC response, short-stream, schedule-boundary, and zero evidence.
+%GENERATEDDC Generate current DDC response and independent-PRI witnesses.
 arguments
     schedule struct
     options struct
 end
+
 design = radardemo.ddc.createDesign(struct());
 metrics = radardemo.ddc.measureResponse(design, struct());
+design.responseMetricProfile = metrics.responseMetricProfile;
 design.frequencyHz = metrics.frequencyHz;
 design.sampleRateHz = design.adcRateHz;
 design.stage1Response = metrics.stage1Response;
@@ -22,120 +24,128 @@ design.stage2AliasRejectionDb = metrics.stage2AliasRejectionDb;
 design.digitalAliasRejectionDb = metrics.digitalAliasRejectionDb;
 design.gridResolutionHz = metrics.gridResolutionHz;
 design.seed = options.Seeds.ddc;
-design = wp4gen.addProvenance(design, options, options.Seeds.ddc, "ddc");
+design = wp4gen.addProvenance(design, options, options.Seeds.ddc, "ddc-response-pri");
 
-sampleCount = 2400;
-sampleIndex = (0:sampleCount - 1).';
-inputSignal = cos(2 * pi * 50e6 / 150e6 * sampleIndex) + ...
-    0.1 * cos(2 * pi * 2e6 / 150e6 * sampleIndex);
-frameLengths = [317, 911, 503, sampleCount - 317 - 911 - 503];
-state = radardemo.ddc.initializeState(design, 1);
-outputFrames = cell(numel(frameLengths), 1);
-offset = 0;
-for index = 1:numel(frameLengths)
-    frame = inputSignal(offset + (1:frameLengths(index)), :);
-    [outputFrames{index}, state] = radardemo.ddc.processFrame(frame, state, design);
-    offset = offset + frameLengths(index);
-end
-streaming = struct();
-streaming.schemaName = "radar.wp4.ddc-streaming";
-streaming.schemaVersion = "1.0.0-draft.2";
-streaming.input = inputSignal;
-% Keep the serialized chunkLengths field name for fixture compatibility.
-streaming.chunkLengths = frameLengths;
-streaming.expectedOutput = vertcat(outputFrames{:});
-streaming.expectedLength = numel(streaming.expectedOutput);
-streaming.tolerance = 5e-11;
-streaming.seed = options.Seeds.ddc;
-streaming.boundaryEvidence = generateBoundaryEvidence(schedule, design);
-streaming = wp4gen.addProvenance(streaming, options, options.Seeds.ddc, "ddc-streaming");
-
-zero = struct();
-zero.schemaName = "radar.wp4.ddc-zero";
-zero.schemaVersion = "1.0.0-draft.2";
-zero.input = zeros(240, 64);
-zeroState = radardemo.ddc.initializeState(design, 64);
-[zero.output, zeroState] = radardemo.ddc.processFrame(zero.input, zeroState, design);
-zero.output = complex(zero.output);
-zero.decimationFactors = design.decimationFactors;
-zero.tolerance = 0;
-zero.expectedInputShape = [240, 64];
-zero.expectedOutputShape = [20, 64];
-zero.finalState = zeroState;
-zero.seed = options.Seeds.ddc;
-zero = wp4gen.addProvenance(zero, options, options.Seeds.ddc, "ddc-zero");
-ddc = struct("design", design, "streaming", streaming, "zero", zero);
+processingDesign = struct("adcRateHz", design.adcRateHz, ...
+    "intermediateRateHz", design.intermediateRateHz, ...
+    "outputRateHz", design.outputRateHz, ...
+    "mixerFrequencyHz", design.mixerFrequencyHz, ...
+    "decimationFactors", design.decimationFactors, ...
+    "stage1Order", design.stage1Order, "stage2Order", design.stage2Order, ...
+    "delayTicks", design.delayTicks, ...
+    "delayOutputSamples", design.delayOutputSamples, ...
+    "stage1Numerator", design.stage1Numerator, ...
+    "stage2Numerator", design.stage2Numerator);
+pri = generatePriEvidence(schedule, processingDesign, options);
+ddc = struct("design", design, "pri", pri);
 end
 
-function evidence = generateBoundaryEvidence(schedule, design)
-totalTicks = double(schedule.totalTicks);
-boundaryTicks = double([schedule.records(1:end - 1).endTick]).';
-stimulus = struct("frequenciesHz", [49e6, 49.6e6, 50.4e6, 51e6], ...
-    "amplitudes", [0.41, 0.32, 0.23, 0.17], ...
-    "phasesRad", [0.17, 0.73, 1.19, 2.07], "sampleRateHz", 150e6, ...
-    "mixerFrequencyHz", 50e6);
-regularCuts = 0:8192:totalTicks;
-offsets = [-17, -5, 0, 7, 17, 23];
-boundaryCuts = reshape(boundaryTicks + offsets, [], 1);
-boundaryCuts = boundaryCuts(boundaryCuts > 0 & boundaryCuts < totalTicks);
-cuts = unique([regularCuts(:); boundaryCuts; totalTicks]);
-frameLengths = diff(cuts);
-if any(frameLengths <= 0) || any(frameLengths > 8192) || sum(frameLengths) ~= totalTicks
-    error("wp4gen:DdcChunkPlan", "Boundary stream frames must cover the scan in bounded pieces.");
-end
-lastOutputTick = 12 * (ceil(totalTicks / 12) - 1);
-boundaryWindows = reshape(boundaryTicks + (-768:12:768), [], 1);
-startupWindow = 0:12:min(lastOutputTick, 768);
-endWindow = (lastOutputTick - 768):12:lastOutputTick;
-outputTicks = unique([startupWindow(:); endWindow(:); boundaryWindows]);
-outputTicks = outputTicks(outputTicks >= 0 & outputTicks <= lastOutputTick & ...
-    mod(outputTicks, 12) == 0);
-outputSamples = complex(zeros(numel(outputTicks), 1));
-outputOrdinals = outputTicks / 12;
-checkpoints = zeros(numel(frameLengths), 4);
-state = radardemo.ddc.initializeState(design, 1);
-offset = 0;
-outputCount = 0;
-for frameIndex = 1:numel(frameLengths)
-    frameSize = frameLengths(frameIndex);
-    indices = offset + (0:frameSize - 1).';
-    input = makeStimulus(indices, stimulus);
-    [frameOutput, state] = radardemo.ddc.processFrame(input, state, design);
-    if ~isempty(frameOutput)
-        firstOrdinal = ceil(offset / 12);
-        ordinals = firstOrdinal + (0:numel(frameOutput) - 1).';
-        selected = find(outputOrdinals >= firstOrdinal & outputOrdinals <= ordinals(end));
-        if ~isempty(selected)
-            localIndices = outputOrdinals(selected) - firstOrdinal + 1;
-            outputSamples(selected) = frameOutput(localIndices);
-        end
+function evidence = generatePriEvidence(schedule, design, options)
+caseTemplate = struct("caseId", "", "priIndex", 0, ...
+    "scheduleRecordIndex", 0, "signalType", "", "input", [], ...
+    "expectedOutput", [], "metadata", struct(), "coordinateMap", struct(), ...
+    "targetChannel", 0);
+caseIds = ["zero-one-channel", "first-sample-impulse", ...
+    "last-sample-impulse", "boundary-chirp", "multitone-noise", ...
+    "zero-64-channel", "channel-isolation-64"];
+priIndices = [1, 2, 3, 4, 5, 1, 1];
+signalTypes = ["zero", "first-impulse", "last-impulse", ...
+    "boundary-chirp", "multitone-noise", "zero", "channel-isolation"];
+channelCounts = [1, 1, 1, 1, 1, 64, 64];
+cases = repmat(caseTemplate, numel(caseIds), 1);
+randomStream = RandStream("mt19937ar", "Seed", options.Seeds.ddc);
+
+for caseIndex = 1:numel(cases)
+    priIndex = priIndices(caseIndex);
+    recordIndex = firstPhysicalRecord(schedule, priIndex);
+    record = schedule.records(recordIndex);
+    sampleCount = double(schedule.priSampleCounts(priIndex));
+    inputSignal = zeros(sampleCount, channelCounts(caseIndex));
+    switch caseIndex
+        case 1
+            % The exact zero case covers all output rows of a physical PRI.
+            inputSignal(:) = 0;
+        case 2
+            inputSignal(1, 1) = 1;
+        case 3
+            inputSignal(end, 1) = 1;
+        case 4
+            inputSignal(:, 1) = makeBoundaryChirp(sampleCount, design.adcRateHz);
+        case 5
+            inputSignal(:, 1) = makeMultitoneNoise(sampleCount, design.adcRateHz, randomStream);
+        case 6
+            inputSignal(:) = 0;
+        case 7
+            sampleIndex = (0:sampleCount - 1).';
+            inputSignal(:, 17) = 0.7 .* cos(2 * pi * 49.8e6 / ...
+                design.adcRateHz .* sampleIndex + 0.13);
+        otherwise
+            error("wp4gen:DdcPriCase", "Unknown per-PRI DDC case index.");
     end
-    outputCount = outputCount + numel(frameOutput);
-    offset = offset + frameSize;
-    checkpoints(frameIndex, :) = [double(state.inputSampleCount), ...
-        double(state.stage1Phase), double(state.stage2Phase), outputCount];
-end
-expectedOutputCount = ceil(totalTicks / 12);
-if offset ~= totalTicks || outputCount ~= expectedOutputCount || ...
-        any(~isfinite(outputSamples))
-    error("wp4gen:DdcBoundaryStream", ...
-        "The continuous DDC stream did not produce the expected bounded observations.");
-end
-% Retain chunkLengths and maxChunkSamples as serialized compatibility fields.
-evidence = struct("schedule", schedule, "stimulus", stimulus, ...
-    "inputSampleCount", uint64(totalTicks), "channelCount", 1, ...
-    "maxChunkSamples", 8192, "chunkLengths", frameLengths, ...
-    "checkpoints", checkpoints, "boundaryTicks", uint64(boundaryTicks), ...
-    "windowRadiusTicks", 768, "outputTicks", uint64(outputTicks), ...
-    "outputSamples", outputSamples, "expectedOutputCount", uint64(expectedOutputCount), ...
-    "tolerance", 5e-11);
+
+    [expectedOutput, metadata] = radardemo.ddc.processFrame(inputSignal, design);
+    outputCount = size(inputSignal, 1) / 12;
+    startTick = int64(record.startTick);
+    lastTick = startTick + int64((outputCount - 1) * 12);
+    coordinateMap = struct("timeEpoch", uint64(1), "startTick", startTick, ...
+        "rawOutputStartTick", startTick, "rawOutputLastTick", lastTick, ...
+        "compensatedOutputStartTick", startTick - 372, ...
+        "compensatedOutputLastTick", lastTick - 372, ...
+        "groupDelayInputSamples", 372);
+    targetChannel = 0;
+    if ismember(caseIndex, [2, 3, 4, 5])
+        targetChannel = 1;
+    end
+    if caseIndex == 7
+        targetChannel = 17;
+    end
+    cases(caseIndex) = struct("caseId", caseIds(caseIndex), ...
+        "priIndex", priIndex, "scheduleRecordIndex", recordIndex, ...
+        "signalType", signalTypes(caseIndex), "input", inputSignal, ...
+        "expectedOutput", expectedOutput, "metadata", metadata, ...
+        "coordinateMap", coordinateMap, "targetChannel", targetChannel);
 end
 
-function samples = makeStimulus(sampleIndices, stimulus)
-samples = zeros(numel(sampleIndices), 1);
-for toneIndex = 1:numel(stimulus.frequenciesHz)
-    samples = samples + stimulus.amplitudes(toneIndex) .* ...
-        cos(2 * pi * stimulus.frequenciesHz(toneIndex) / stimulus.sampleRateHz .* ...
-        sampleIndices + stimulus.phasesRad(toneIndex));
+evidence = struct("schemaName", "radar.wp4.ddc-pri", ...
+    "schemaVersion", "1.0.0-draft.2", ...
+    "processingProfile", "independent-pri-v1", ...
+    "processingProfileVersion", "1.0.0", "schedule", schedule, ...
+    "design", design, "cases", cases, "normalizedTolerance", 5e-11, ...
+    "seed", options.Seeds.ddc);
+evidence = wp4gen.addProvenance(evidence, options, options.Seeds.ddc, "ddc-pri");
 end
+
+function recordIndex = firstPhysicalRecord(schedule, priIndex)
+recordRoles = string({schedule.records.role});
+recordPrfIndices = [schedule.records.prfIndex];
+recordIndex = find(recordPrfIndices == priIndex & ...
+    ismember(recordRoles, ["priming", "usable"]), 1, "first");
+if isempty(recordIndex)
+    error("wp4gen:DdcPriRecord", "The schedule does not contain a physical PRI for this PRF.");
+end
+end
+
+function signal = makeBoundaryChirp(sampleCount, sampleRateHz)
+chirpSamples = round(40e-6 * sampleRateHz);
+chirpTime = (0:chirpSamples - 1).' / sampleRateHz;
+bandwidthHz = 3e6;
+chirp = 0.5 .* cos(2 * pi * (48.5e6 .* chirpTime + ...
+    0.5 * bandwidthHz / 40e-6 .* chirpTime .^ 2));
+signal = zeros(sampleCount, 1);
+signal(1:chirpSamples) = chirp;
+signal(end - chirpSamples + 1:end) = chirp;
+end
+
+function signal = makeMultitoneNoise(sampleCount, sampleRateHz, randomStream)
+sampleIndex = (0:sampleCount - 1).';
+frequenciesHz = [49.2e6, 50.15e6, 51e6];
+amplitudes = [0.31, 0.23, 0.17];
+phasesRad = [0.17, 1.19, 2.07];
+signal = zeros(sampleCount, 1);
+for toneIndex = 1:numel(frequenciesHz)
+    signal = signal + amplitudes(toneIndex) .* ...
+        cos(2 * pi * frequenciesHz(toneIndex) / sampleRateHz .* ...
+        sampleIndex + phasesRad(toneIndex));
+end
+signal = signal + 0.05 .* randn(randomStream, sampleCount, 1);
 end

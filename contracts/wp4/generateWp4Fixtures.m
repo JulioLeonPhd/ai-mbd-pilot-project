@@ -41,15 +41,9 @@ clustering = wp4gen.generateClusteringFixtures(options);
 
 writeJson(fullfile(outputDirectory, "schedule.json"), schedule);
 writeMat(fullfile(outputDirectory, "timing-gate.mat"), "timingGate", timing);
-writeMat(fullfile(outputDirectory, "ddc-design.mat"), "ddcDesign", ddc.design);
-invalidRipple = ddc.design;
-invalidRipple.stage2Numerator = fir1(240, 5.625e6 / 25e6, kaiser(241, 2));
-writeMat(fullfile(outputDirectory, "ddc-ripple-invalid.mat"), "ddcDesign", invalidRipple);
-invalidAlias = ddc.design;
-invalidAlias.stage2Numerator = fir1(240, 5.625e6 / 25e6, kaiser(241, 5));
-writeMat(fullfile(outputDirectory, "ddc-alias-invalid.mat"), "ddcDesign", invalidAlias);
-writeMat(fullfile(outputDirectory, "ddc-streaming.mat"), "ddcStreaming", ddc.streaming);
-writeMat(fullfile(outputDirectory, "ddc-zero.mat"), "ddcZero", ddc.zero);
+copyHistoricalDdcFixtures(outputDirectory);
+writeMat(fullfile(outputDirectory, "ddc-response-pri.mat"), "ddcDesign", ddc.design);
+writeMat(fullfile(outputDirectory, "ddc-pri.mat"), "ddcPri", ddc.pri);
 writeMat(fullfile(outputDirectory, "beam-boresight.mat"), "beamFixture", beam.boresight);
 writeMat(fullfile(outputDirectory, "beam-positive-30deg.mat"), "beamFixture", beam.positive);
 writeMat(fullfile(outputDirectory, "beam-negative-30deg.mat"), "beamFixture", beam.negative);
@@ -77,7 +71,8 @@ report.outputDirectory = char(outputDirectory);
 report.manifestPath = char(fullfile(outputDirectory, "fixture-manifest.json"));
 report.artifacts = {"schedule.json", "timing-gate.mat", "ddc-design.mat", ...
     "ddc-ripple-invalid.mat", "ddc-alias-invalid.mat", ...
-    "ddc-streaming.mat", "ddc-zero.mat", "beam-boresight.mat", ...
+    "ddc-streaming.mat", "ddc-zero.mat", "ddc-response-pri.mat", ...
+    "ddc-pri.mat", "beam-boresight.mat", ...
     "beam-positive-30deg.mat", "beam-negative-30deg.mat", "beam-zero.mat", ...
     "fusion-cases.json", "fusion-zero.json"};
 report.artifacts = [report.artifacts, cellstr(strcat(fileNames, ".json"))];
@@ -87,6 +82,30 @@ report.seed = options.Seed;
 report.seeds = options.Seeds;
 report.fixtureCount = numel(manifest.fixtures);
 report.scope = char(options.FixtureScope);
+end
+
+function copyHistoricalDdcFixtures(outputDirectory)
+% Preserve the checked-in continuous-state witnesses byte for byte.
+generatorDirectory = fileparts(mfilename("fullpath"));
+sourceDirectory = fullfile(generatorDirectory, "fixtures");
+historicalFiles = ["ddc-design.mat", "ddc-streaming.mat", "ddc-zero.mat", ...
+    "ddc-ripple-invalid.mat", "ddc-alias-invalid.mat"];
+for fileIndex = 1:numel(historicalFiles)
+    fileName = historicalFiles(fileIndex);
+    sourcePath = fullfile(sourceDirectory, fileName);
+    destinationPath = fullfile(outputDirectory, fileName);
+    if strcmp(sourcePath, destinationPath)
+        continue
+    end
+    if ~isfile(sourcePath)
+        error("wp4:HistoricalDdcFixture", ...
+            "Pinned historical DDC fixture %s is unavailable.", sourcePath);
+    end
+    [copied, message] = copyfile(sourcePath, destinationPath);
+    if ~copied
+        error("wp4:HistoricalDdcFixture", "%s", message);
+    end
+end
 end
 
 function merged = mergeOptions(defaults, supplied)

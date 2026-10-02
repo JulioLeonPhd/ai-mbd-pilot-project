@@ -260,17 +260,56 @@ Passband is `[-5,+5] MHz`; stage-2 stopband is `|f| >= 6.25 MHz` in the 50 MHz
 pre-decimation input domain through 25 MHz. Stage-1 folding is into
 `[-25,25] MHz` after `/3`; stage 2 folds that 50 MHz input before `/4`.
 The cascade reference includes mixer, both filters, and both decimators.
-Evaluate a deterministic 1 kHz grid including endpoints. Cascade digital alias
-rejection is the minimum stopband attenuation relative to maximum passband
-amplitude. Compare each metric with absolute tolerance `1e-9 dB`.
+Evaluate a deterministic 1 kHz grid including endpoints. Compare each metric
+with absolute tolerance `1e-9 dB`.
+
+<a id="DDC.cascade-profile"></a>
+The current response profile is `cascade-peak-v1`. Its passband ripple uses the
+principal cascade response `|H1*H2|` over `[-5,+5] MHz`; cascade alias rejection
+compares non-principal cascade branches with the peak principal passband gain.
+Stage-2 alias rejection remains a separate metric referenced to the peak
+stage-2 passband and measured over `|f| >= 6.25 MHz` through its 25 MHz
+pre-decimation Nyquist frequency. Acceptance limits remain ripple `<=0.1 dB`
+and both alias-rejection metrics `>=60 dB`, with absolute metric tolerance
+`1e-9 dB` and a deterministic 1 kHz grid including endpoints. Legacy fixture
+profile `legacy-stage2-v1` retains its prior stage-2-referenced ripple formula
+for historical fixture replay; it is not interchangeable with
+`cascade-peak-v1`. DDC-010 identifies the current response profile, and DDC-PRI-001
+identifies the independent per-PRI profile. Preserve both identifiers and never
+rewrite old fixture claims as current-profile evidence.
+
+<a id="DDC.per-pri"></a>
+The current per-PRI profile accepts one complete physical PRI per call as finite
+real double `[N,C]`, with `N` divisible by 12. It returns complex `[N/12,C]`
+including all produced startup rows. It does not append zero input, flush the
+filters, or return a causal tail. Mixer index `n=0`, FIR delays, and `/3` and
+`/4` phases start fresh on every call; no state carries between PRIs. Calls are
+independent of their order. Scalar double metadata fields are
+`inputSampleCount`, `outputSampleCount`, `decimationFactor`,
+`groupDelayInputSamples`, `groupDelayOutputSamples`, `startupInputSamples`, and
+`startupOutputSamples`. Their frozen values are 372/31 samples for group delay
+and 744/62 samples for full startup memory. The caller owns physical PRI
+selection, sample alignment, identity and global time, transition gaps, and
+one-time group-delay coordinate mapping. Downstream range processing owns
+complete-window validity through startup, blanking, and PRI-end truncation.
+Inconsistent finite positive rate chains are rejected unless the intermediate
+rate is ADC rate divided by 3 and output rate is intermediate rate divided by 4
+within floating-point tolerance. Fixture DDC-PRI-001 identifies this distinct
+working-tree profile; it does not alter historical DDC-002 evidence. Independent
+numerical validation passed the per-PRI profile, including exact-zero and
+inactive-channel invariants. The bounded five-PRI comparison accepts the reviewed
+`5e-11` input-peak-normalized tolerance; see the [implementation plan](../plans/ddc-pri-processing.md)
+for the evidence scope and limits.
 
 <a id="DDC.streaming-state"></a>
 The following streaming requirement and DDC-002 evidence describe the accepted
 historical continuous-state implementation profile. The `shall` applies only
-to replay and interpretation of that pinned profile. [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md)
-records the accepted per-PRI direction; its confirmed interface and evidence
-migration are in the [per-PRI plan](../plans/ddc-pri-processing.md). Preserve
-the historical numbers and schema below.
+to replay and interpretation of that pinned profile. The current approved
+interface processes one complete physical PRI per call with fresh local state,
+as recorded in [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md).
+The narrow evidence migration and new profile identifiers are tracked in the
+[per-PRI plan](../plans/ddc-pri-processing.md). Preserve the historical numbers
+and schema below; DDC-002 is not per-PRI acceptance evidence.
 
 For the historical profile, streaming DDC validation processes real mixer
 input in unequal chunks while preserving mixer, FIR, and decimator state

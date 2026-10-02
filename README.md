@@ -29,15 +29,16 @@ scope.
 The bounded analytic and ideal simulation baseline passed revised G1. WP3 data
 contracts and WP4 DSP/timing evidence are accepted at G2. The current WP4
 evidence verifies schedule timing, priming, post-CFAR 3-of-5 fusion, and
-single-channel DDC streaming within stated limits. It does not establish
-hardware or real-time performance, full FIR precursor/waveform retention, or
-detection performance. Partial production-like floating-point modules, fixture
-generation, an independent oracle, and adapters are present; the complete
-ADC-to-detection floating-point reference is not complete. Fixed-point design
-and the Simulink representation also remain incomplete. See [CURRENT.md](CURRENT.md)
-for active questions and the
-[dated evidence handoff](docs/reference/current-evidence-2026-09-25.md) for
-detailed replay instructions and historical results.
+historical single-channel DDC streaming within stated limits. The approved
+per-PRI MATLAB implementation passed scoped core and WP4 suites, full-scan
+walkthrough checks, independent numerical validation, pinned DDC-002 replay,
+and the fixture-preservation audit. The new per-PRI evidence is distinct from
+historical continuous-state evidence; neither scope establishes hardware or
+real-time performance, full FIR precursor/waveform retention, or detection
+performance. The complete ADC-to-detection floating-point reference, fixed-point
+design, and Simulink representation are incomplete. See [CURRENT.md](CURRENT.md)
+for status and the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md)
+for evidence and limitations.
 
 ## Architecture
 
@@ -97,7 +98,7 @@ in force until Julio explicitly revises them. See the
    when you need their specific details.
 4. Run the [DDC learning walkthrough](docs/examples/ddc-walkthrough.md) in
    MATLAB to inspect frequency translation, filtering, decimation, and
-   continuous chunk state.
+   independent fresh local state for each physical PRI.
 5. For domain vocabulary and equations, see [CONTEXT.md](CONTEXT.md) and its
    linked [radar equations reference](docs/reference/radar-equations.md).
 

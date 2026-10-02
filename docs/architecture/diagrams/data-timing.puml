@@ -37,10 +37,13 @@ component "Rates, sample/frame execution,\nbuffer owner, corner-turn implementat
 V .. OPEN : unresolved Simulink boundary details
 
 note bottom of D
-DDC bounded evidence: 372 ADC-tick group delay (31 output samples);
-state retained across PRI/transition boundaries. MATLAB accepts variable
-frame lengths while preserving continuous state; Simulink dimensions are fixed
-per configured model and do not allow runtime-variable frame sizes.
+Historical DDC-002 evidence: 372 ADC-tick group delay (31 output samples);
+continuous state across PRI/transition boundaries. Current approved API:
+one complete physical PRI per call, fresh local state. Scoped per-PRI
+unit/fixture and full-scan DDC observations passed. No end-to-end or hardware
+claim. See CURRENT.md for pinned DDC-002 replay and independent-review status.
+Simulink dimensions are fixed per configured model; execution details remain
+unresolved.
 end note
 
 note bottom of R

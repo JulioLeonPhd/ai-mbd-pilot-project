@@ -33,9 +33,14 @@ The top-level overview and three diagrams are in the main working tree at
 preview inspection passed, and the documents passed independent review.
 Julio's visual review of the redrawn views remains pending. Julio closed the
 joint DDC design discussion on 2026-09-29 and confirmed the Phase 0 interface
-and evidence migration on 2026-10-02. Implementation and verification remain
-pending his separate explicit go. The repeat-component workflow remains
-incomplete.
+and evidence migration on 2026-10-02, then explicitly authorized implementation.
+The per-PRI core and WP4 suites and full-scan walkthrough pass. Pinned DDC-002
+replay passed strict 1/1 at its historical revision, and all 23 historical
+fixture hashes remain unchanged. Independent numerical validation passed,
+including the exact-zero and inactive-channel oracle checks. The MATLAB
+implementation is ready for Julio's implementation and walkthrough review.
+Julio's visual review of the redrawn views remains unapproved; see [CURRENT.md](../../CURRENT.md).
+The repeat-component workflow remains incomplete.
 
 ## Ordered work
 
@@ -96,9 +101,9 @@ implied.
 
 ### 4. Build a guided DDC walkthrough on its own branch
 
-On `component/ddc-walkthrough`, build examples that call the existing MATLAB
+On `component/ddc-walkthrough`, build examples that call the MATLAB
 implementation. Pair the runnable example with an algorithm/functionality
-diagram that traces its signal transformations and carried state. Explain
+diagram that traces its signal transformations and per-PRI state reset. Explain
 translation, filtering, decimation, signal shapes, units, rates, mixer and
 filter behavior, and phase state. Include normal and broken-state experiments,
 spectra, and timing diagrams. The walkthrough is for learning first; use what
@@ -113,9 +118,9 @@ version may follow with more detailed hardware-oriented structure. HDL remains
 deferred. Neither stage requires a one-to-one mapping from MATLAB functions to
 Simulink internals.
 
-Completion: a reader can trace the existing DDC behavior and inspect
-reproducible normal and broken-state evidence, with any proposed refactoring
-left for an explicit decision.
+Completion: a reader can run the DDC example, trace the implemented per-PRI
+behavior, and inspect its oracle, response, and timing evidence. Preserve pinned
+historical continuous-state evidence as a separate profile.
 
 ### 5. Repeat the component workflow
 
@@ -133,23 +138,17 @@ and limits, and explicit human decisions before implementation proceeds.
 
 ### DDC architecture review decisions
 
-Julio's architecture review established these design choices for future DDC
-work; they are decisions, not a statement that the current implementation
-already behaves this way. Implement them only after the shared architectural
-understanding is confirmed.
-
-**Historical baseline / confirmed per-PRI contract:** The walkthrough implementation
-accepted variable frame lengths and preserved continuous stream state. On
-2026-09-29 Julio approved future per-PRI calls with fresh local state; on
-2026-10-02 he confirmed the `processFrame(adcPriSamples, design)` API, finite
-real `double` `[N,C]` input, complex `[N/12,C]` retained no-tail output, and
-sample-only metadata. Caller timing/alignment duties and downstream range-window
-validity are settled in [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md)
-and the [implementation plan](ddc-pri-processing.md). These decisions do not
-describe current code until implementation is separately authorized and
-complete. A future Simulink implementation uses fixed dimensions per
-configured model and does not support runtime-variable frame sizes. Channel
-count is configurable for tests, with 64 as the default.
+The DDC design choices below are approved and implemented in the MATLAB
+reference. The historical implementation accepted variable frames with
+continuous state. Julio approved independent per-PRI processing on 2026-09-29,
+confirmed the sample-only API and responsibilities on 2026-10-02, and authorized
+implementation that day. Scoped core and WP4 tests, the full-scan walkthrough,
+pinned DDC-002 replay, and fixture-preservation audit passed. Independent
+numerical validation passed, including exact-zero and inactive-channel checks.
+The MATLAB implementation is ready for Julio's implementation and walkthrough
+review; the historical G2 continuous-state baseline remains separate. Future
+Simulink models use fixed dimensions per configured model; execution choices
+remain deferred. Channel count is configurable for tests, with 64 as the default.
 
 **Settled:** Preserve raw ADC samples as `int16` on disk and in the loaded ADC
 matrix. The caller converts each selected complete physical PRI to `double` at
@@ -160,7 +159,7 @@ Simulink path.
 timeline. Reject missing samples or discontinuous ADC ticks; do not infer or
 fill gaps. ADC timeline continuity and global ticks remain intact across frame,
 pulse, and PRF boundaries. The former no-reset DDC state clause is superseded
-by ADR 0022: each future DUT call starts fresh local state for one complete
+by ADR 0022: each current DUT call starts fresh local state for one complete
 physical PRI. This continuity rule does not determine what signal values
 represent transmit blanking.
 
@@ -259,8 +258,8 @@ scenario rescaling, and Julio has reviewed the proposed choices.
 Dependency: confirm the architecture decisions above before changing producer,
 reader, or contract behavior. The pilot path must enforce contiguous ADC ticks
 and reject gaps without inserting samples. This storage/timeline task does not
-require preserving inter-PRI DDC state; ADR 0022 defines the accepted future
-per-PRI call boundary. Align the pilot producer and reader checks while
+require preserving inter-PRI DDC state; ADR 0022 defines the approved per-PRI
+call boundary. Align the pilot producer and reader checks while
 preserving broader storage support for ordered/windowed slabs. Keep historical
 unit-only fixtures intact and classify them explicitly as outside the pilot
 ADC continuity scope. Decide separately what waveform values represent
@@ -304,9 +303,13 @@ its frame size or timing policy.
 The MATLAB Code Analyzer and focused DDC walkthrough/state-continuity checks
 passed on 2026-09-28. The full WP4 MATLAB MCP suite completed on 2026-09-28
 with 54 passed, 0 failed, and 0 incomplete in 84.2901 seconds. The joint design
-discussion closed on 2026-09-29; Julio confirmed the Phase 0 contract on
-2026-10-02. A new implementation review remains pending his separate explicit
-go. Then select the next component question under step 5.
+discussion closed on 2026-09-29; Julio confirmed the Phase 0 contract and
+authorized implementation on 2026-10-02. The per-PRI implementation, scoped
+core and WP4 suites, full-scan walkthrough, pinned DDC-002 replay, and
+independent numerical validation have passed. The
+MATLAB implementation is ready for Julio's implementation and walkthrough
+review; visual review of the redrawn diagrams remains unapproved. Then select
+the next component question under step 5.
 
 Completion: the implementation and relevant checks pass, and the guide,
 glossary, diagrams, and current status describe the same API and compatibility

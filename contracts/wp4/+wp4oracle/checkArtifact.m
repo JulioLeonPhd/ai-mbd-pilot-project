@@ -19,6 +19,10 @@ switch domain
         diagnostic = wp4oracle.checkTiming(data);
     case "ddc"
         diagnostic = wp4oracle.checkDdc(data);
+    case "ddc-response-pri"
+        diagnostic = wp4oracle.checkDdc(data, "cascade-peak-v1");
+    case "ddc-pri"
+        diagnostic = wp4oracle.checkDdcPri(data);
     case "ddc-streaming"
         diagnostic = wp4oracle.checkDdcStreaming(data);
     case "ddc-zero"

@@ -1,22 +1,25 @@
 flowchart TB
-    init["Initialize one DDC run<br/>FIR delay buffers = zero<br/>inputSampleCount = 0<br/>stage1Phase = 0 · stage2Phase = 0"]
-    chunk1["Input frame 1<br/>[N₁, C] real samples"]
-    call1["processFrame call 1<br/>mix · filter · decimate"]
-    output1["Output frame 1<br/>[M₁, C] complex samples"]
-    state1["Returned state<br/>inputSampleCount = N₁<br/>stage1Delay [24, C]<br/>stage2Delay [240, C]<br/>stage1Phase ∈ {0,1,2}<br/>stage2Phase ∈ {0,1,2,3}"]
-    chunk2["Input frame 2<br/>[N₂, C] real samples"]
-    call2["processFrame call 2<br/>continues from returned state"]
-    output2["Output frame 2<br/>[M₂, C] complex samples"]
-    nextState["Next returned state<br/>count, both FIR delays,<br/>and both phases advanced"]
+    scan["Caller walks the physical scan timeline"]
+    select{"Schedule record type?"}
+    gap["Transition gap<br/>preserve ADC samples and global ticks;<br/>no DDC call"]
+    prepare["Select one complete PRI<br/>convert stored int16 to real double [N,C]<br/>retain identity and global start tick"]
+    ddc["One vectorized MATLAB call<br/>processFrame(adcPriSamples, design)<br/>fresh oscillator n=0 and local FIR/decimator state"]
+    out["Return complex [N/12,C]<br/>scalar sample-domain metadata<br/>retain startup; no appended zero flush or tail"]
+    discard["Discard local state at call end"]
+    timing["Caller assigns global timestamps and applies<br/>372-tick delay mapping once"]
+    validity["Downstream range responsibility<br/>complete-window validity for startup,<br/>blanking, and PRI end; not implemented here"]
+    more{"More scan records?"}
+    finish([End scan])
 
-    init -. "initial state" .-> call1
-    chunk1 --> call1 --> output1
-    call1 -. "returns" .-> state1
-    state1 -. "same run; no frame-boundary reset" .-> call2
-    chunk2 --> call2 --> output2
-    call2 -. "returns" .-> nextState
+    scan --> select
+    select -- "transition" --> gap --> more
+    select -- "priming or usable PRI" --> prepare --> ddc --> out --> discard --> timing --> more
+    out -. "validity ownership" .-> validity
+    more -- "yes" --> select
+    more -- "no" --> finish
 
     classDef data fill:#eaf3ff,stroke:#2864a0,color:#10263b
     classDef state fill:#f5f1e8,stroke:#80642e,color:#34280d
-    class chunk1,chunk2,output1,output2 data
-    class init,state1,nextState state
+    class scan,gap,prepare,out,timing,validity data
+    class discard state
+    linkStyle default stroke:#43515e,color:#10263b

@@ -1,11 +1,11 @@
 flowchart TB
-    input["Real input<br/>[N, C] samples<br/>150 MS/s"]
-    mix["Complex mixer<br/>multiply by exp(−j 2π · 50 MHz · n / 150 MHz)<br/>complex samples, 150 MS/s"]
+    input["One complete physical PRI<br/>real double [N,C]<br/>150 MS/s per channel"]
+    mix["Complex mixer<br/>multiply by exp(−j 2π · 50 MHz · n / 150 MHz)<br/>complex, 150 MS/s"]
     fir1["FIR 1 low-pass<br/>order 24 · 25 taps · cutoff 25 MHz<br/>150 MS/s"]
-    dec3["Keep every 3rd sample<br/>phase carried across frames<br/>complex samples, 50 MS/s"]
+    dec3["Decimator /3<br/>keep every third sample<br/>complex, 50 MS/s"]
     fir2["FIR 2 low-pass<br/>order 240 · 241 taps · cutoff 5.625 MHz<br/>50 MS/s"]
-    dec4["Keep every 4th sample<br/>phase carried across frames<br/>complex samples, 12.5 MS/s"]
-    output["Complex output<br/>[M, C] samples<br/>M depends on frame length and incoming phases"]
+    dec4["Decimator /4<br/>keep every fourth sample<br/>complex, 12.5 MS/s"]
+    output["Complex output [N/12,C]<br/>all produced samples retained<br/>no appended zero flush or tail"]
 
     input --> mix --> fir1 --> dec3 --> fir2 --> dec4 --> output
 
@@ -13,3 +13,4 @@ flowchart TB
     classDef operation fill:#f4f1ff,stroke:#6352a3,color:#201943
     class input,output signal
     class mix,fir1,dec3,fir2,dec4 operation
+    linkStyle default stroke:#43515e,color:#10263b

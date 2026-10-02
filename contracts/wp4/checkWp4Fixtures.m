@@ -85,6 +85,8 @@ report.passedCount = sum([results.passed]);
 report.failedCount = report.caseCount - report.passedCount;
 report.passed = report.failedCount == 0;
 report.provenanceValid = provenanceValid;
+report.evidenceScopes = collectEvidenceScopes(manifest, rows);
+report.includesWorkingTreeEvidence = hasWorkingTreeEvidence(manifest, rows);
 report.tolerances = struct("ddcDb", 1e-9, "firSymmetry", 1e-13, ...
     "coefficientRegeneration", 5e-15, "streaming", 5e-11, "beam", 1e-12, ...
     "cluster", 1e-12, ...
@@ -162,6 +164,7 @@ if identifier == "META-001"
         isfield(manifest, "generatorRevision") && isfield(manifest, "createdUtc") && ...
         isfield(manifest, "generatorSeed") && manifest.generatorSeed == 401002 && ...
         isfield(manifest, "generationParameters") && ...
+        validArtifactProvenanceRecords(manifest) && ...
         string(manifest.generationParameters.fixtureScope) == string(manifest.fixtureScope) && ...
         ((string(manifest.fixtureScope) == "temporary-unit-evidence" && ...
         string(manifest.status) == "temporary-generator-evidence") || ...
@@ -201,7 +204,8 @@ end
 
 function valid = checkProvenance(manifest, root, rows)
 valid = isfield(manifest, "fixtureScope") && isfield(manifest, "generatorVersion") && ...
-    isfield(manifest, "generatorRevision") && isfield(manifest, "createdUtc");
+    isfield(manifest, "generatorRevision") && isfield(manifest, "createdUtc") && ...
+    validArtifactProvenanceRecords(manifest);
 if ~valid
     return
 end
@@ -235,17 +239,97 @@ for index = 1:numel(rows)
     end
     required = ["generatorRevision", "generatorVersion", "generatorSeed", ...
         "generationParameters", "createdUtc"];
+    provenance = artifactEvidenceRecord(manifest, string(row.artifact));
+    if isempty(provenance)
+        expectedRevision = revision;
+        expectedVersion = string(manifest.generatorVersion);
+        expectedScope = scope;
+        expectedCreatedUtc = string(manifest.createdUtc);
+    else
+        expectedRevision = string(provenance.generatorRevision);
+        expectedVersion = string(provenance.generatorVersion);
+        expectedScope = string(provenance.evidenceScope);
+        expectedCreatedUtc = string(provenance.createdUtc);
+    end
     if ~all(isfield(artifact, required)) || ...
-            string(artifact.generatorRevision) ~= revision || ...
-            string(artifact.generatorVersion) ~= string(manifest.generatorVersion) || ...
+            string(artifact.generatorRevision) ~= expectedRevision || ...
+            string(artifact.generatorVersion) ~= expectedVersion || ...
             artifact.generatorSeed ~= row.provenanceSeed || ...
             ~isfield(artifact.generationParameters, "fixtureScope") || ...
-            string(artifact.generationParameters.fixtureScope) ~= scope || ...
+            string(artifact.generationParameters.fixtureScope) ~= expectedScope || ...
             strlength(string(artifact.createdUtc)) == 0 || ...
-            string(artifact.createdUtc) ~= string(manifest.createdUtc)
+            string(artifact.createdUtc) ~= expectedCreatedUtc
         valid = false;
         return
     end
+end
+end
+
+function provenance = artifactEvidenceRecord(manifest, artifact)
+provenance = struct([]);
+if ~isfield(manifest, "artifactProvenance") || isempty(manifest.artifactProvenance)
+    return
+end
+records = manifest.artifactProvenance;
+if ~isstruct(records) || ~isfield(records, "artifact")
+    return
+end
+matches = string({records.artifact}) == artifact;
+if any(matches)
+    provenance = records(find(matches, 1));
+end
+end
+
+function scopes = collectEvidenceScopes(manifest, rows)
+scopes = strings(numel(rows), 1);
+scopeCount = 0;
+for index = 1:numel(rows)
+    if isempty(rows(index).artifact)
+        continue
+    end
+    provenance = artifactEvidenceRecord(manifest, string(rows(index).artifact));
+    scopeCount = scopeCount + 1;
+    if isempty(provenance)
+        scopes(scopeCount) = string(manifest.fixtureScope);
+    else
+        scopes(scopeCount) = string(provenance.evidenceScope);
+    end
+end
+scopes = unique(scopes(1:scopeCount), "stable");
+end
+
+function output = hasWorkingTreeEvidence(manifest, rows)
+output = false;
+for index = 1:numel(rows)
+    if isempty(rows(index).artifact)
+        continue
+    end
+    provenance = artifactEvidenceRecord(manifest, string(rows(index).artifact));
+    if isempty(provenance)
+        output = output || string(manifest.generatorRevision) == "working-tree";
+    else
+        output = output || string(provenance.sourceRevision) == "working-tree" || ...
+            string(provenance.generatorRevision) == "working-tree";
+    end
+end
+end
+
+function valid = validArtifactProvenanceRecords(manifest)
+if ~isfield(manifest, "artifactProvenance")
+    valid = true;
+    return
+end
+records = manifest.artifactProvenance;
+if isempty(records)
+    valid = true;
+    return
+end
+required = ["artifact", "profile", "evidenceScope", "generatorVersion", ...
+    "generatorRevision", "createdUtc", "generatorSeed", "sourceRevision", "sha256"];
+valid = isstruct(records) && all(isfield(records, required));
+if valid
+    artifacts = string({records.artifact});
+    valid = numel(unique(artifacts)) == numel(artifacts);
 end
 end
 

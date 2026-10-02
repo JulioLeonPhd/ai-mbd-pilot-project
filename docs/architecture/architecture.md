@@ -242,12 +242,20 @@ usable records. It does not claim full FIR precursor or waveform retention, or
 detection performance. Phase 5 independent document review and the Phase 6 root
 gate passed; G2 is accepted for this evidence scope.
 
-The two-stage DDC group delay is 372 ADC ticks, or 31 output samples. The
-following state contract and G2 evidence describe the historical continuous
-implementation profile. Julio accepted fresh local DDC state for each complete
-physical PRI in [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md);
-that profile is not yet implemented. Preserve the historical contract and its
-evidence for replay; future per-PRI acceptance and migration are separate.
+The two-stage DDC group delay is 372 ADC sample periods, or 31 output periods;
+the full memory span is 744 ADC periods, or 62 output periods. The following
+state contract and G2 evidence describe the historical continuous implementation
+profile. The current approved API processes one complete physical PRI per call
+with fresh local state, as recorded in
+[ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md). Core and WP4
+suites pass, all 23 historical fixture hashes are preserved, and
+pinned DDC-002 replay passed strict 1/1 at its historical revision. Independent
+numerical validation passed for the per-PRI profile, including explicit exact-
+zero and inactive-channel checks. The per-PRI MATLAB implementation is ready
+for Julio's implementation and walkthrough review. Preserve the historical
+contract and evidence for replay; DDC-002 does not accept the new profile. The
+range-processing boundary is the next component review. Simulink execution,
+fixed-point, end-to-end, and hardware claims remain outside this DDC evidence.
 Under the historical profile, mixer, FIR, and decimator state were
 zero-initialized at scan start and retained across PRIs and transitions,
 including continuous `/3` then `/4` decimator phase. Independent full-CPI

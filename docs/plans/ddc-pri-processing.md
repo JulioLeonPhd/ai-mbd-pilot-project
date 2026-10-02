@@ -1,8 +1,11 @@
 # Per-PRI DDC implementation plan
 
 **Status:** ADR 0022 records the accepted direction and confirmed 2026-10-02
-Phase 0 contract. Implementation awaits Julio's separate explicit go. This
-plan does not authorize MATLAB or Simulink changes.
+Phase 0 contract. Julio explicitly authorized implementation on 2026-10-02.
+The MATLAB implementation, scoped tests, full-scan walkthrough, pinned-history
+replay, fixture-preservation audit, and independent numerical validation passed.
+The implementation is ready for Julio's implementation and walkthrough review.
+The range-processing boundary is the next component review.
 
 ## Phase 0: confirmed contract (2026-10-02)
 
@@ -10,11 +13,12 @@ Julio confirmed `[output, metadata] = processFrame(adcPriSamples, design)`. The
 input is one complete physical PRI as finite real `double` `[N,C]`; mixer, FIR,
 and decimator state is fresh and local for each call. Calls are independent of
 order. The output is complex `[N/12,C]`, retaining every produced row including
-startup. Do not append zeros, flush filters, or return a tail. Metadata describes
-input/output sample counts, decimation factor, group delay, and startup span in
-sample-domain terms; exact field names and types are not human-approved. Group
-delay is 372 ADC sample periods or 31 output sample periods; startup full-memory
-span is 744 ADC sample periods or 62 output sample periods.
+startup. Do not append zeros, flush filters, or return a tail. Metadata uses
+scalar double fields `inputSampleCount`, `outputSampleCount`,
+`decimationFactor`, `groupDelayInputSamples`, `groupDelayOutputSamples`,
+`startupInputSamples`, and `startupOutputSamples`. Group delay is 372 ADC
+sample periods or 31 output sample periods; startup full-memory span is 744 ADC
+sample periods or 62 output sample periods.
 
 The caller selects the physical PRI, provides a correctly sized and 12-tick-
 aligned slice, handles identity and global timing (`startTick`/`timeEpoch`),
@@ -30,6 +34,11 @@ group-delay compensation exactly once when assigning coordinates. Downstream
 range processing owns complete-window validity, including startup, blanking,
 and PRI-end truncation. No per-range validity masks are returned by the DDC.
 
+The fixed design accepts finite positive sample rates only when the intermediate
+rate equals the ADC rate divided by 3 and the output rate equals the intermediate
+rate divided by 4, within floating-point rate tolerance. Inconsistent rates are
+rejected; `/3` and `/4` may not silently use a mismatched rate chain.
+
 For the frozen 50 MHz mixer at 150 MHz ADC and PRI starts divisible by 12
 ticks, local `n=0` mixing preserves global phase mathematically; large-global
 and small-local floating exponent evaluation need not be bit-identical. No
@@ -39,72 +48,165 @@ The narrow versioned evidence migration is approved. Keep DDC-002 historical
 and replayable at `58b3d3a80170d413aa88dd4408490e2056f49379`; do not relabel
 old G2 evidence or bump an unrelated global schema. Keep passband and alias
 regressions. The independent oracle represents combined-FIR convolution with
-retained no-tail outputs, not DUT zero extension. `5e-11` remains a proposed
-tolerance pending numerical justification. Compare historical continuous
-processing only for local raw offsets at least 744 ADC ticks; startup
-equivalence is not required. Retain channel, isolation, zero/impulse/chirp
-boundary, multitone/noise, shape, sample-metadata, caller-time-mapping, and
-call-order coverage. Keep unit/oracle, full-scan, and end-to-end claims distinct.
+retained no-tail outputs, not DUT zero extension. Independent numerical review
+accepts the unchanged `5e-11` input-peak-normalized bound for the bounded
+five-PRI comparison. The observed `3.34852e-11` maximum leaves `1.65148e-11`
+margin; this is not a bound for full-CPI, global-tick, or hardware behavior.
+Keep exact-zero and inactive-channel invariants as separate acceptance checks.
+Compare historical continuous processing only for local raw offsets at least
+744 ADC ticks; startup equivalence is not required. Retain channel, isolation,
+zero/impulse/chirp boundary, multitone/noise, shape, sample-metadata, caller-
+time-mapping, and call-order coverage. Keep unit/oracle, full-scan, and
+end-to-end claims distinct.
+
+The pinned fixture byte hashes are `ddc-streaming.mat`
+`2979d3d0c68c1deacbe097a202b2b3a125b2d7fd6aba19ef842d76bb98d6c616` and
+`ddc-design.mat`
+`541d89c6f98d4f292a2e8ca4504537440b591cea7348859c44d04276e6ab9a0d`.
 
 Existing arithmetic establishes delay 372 ADC ticks, full startup memory 744
 ADC ticks, and first gated raw tick 7128 with support 6384..7128, after
 blanking ends at 6000. This supports the first gated DDC sample only, not the
 full matched-filter window or end-to-end detection. No-tail PRI-end truncation
-remains a downstream validity limitation. Phase 0 does not authorize
-implementation; obtain Julio's separate explicit go before changing MATLAB or
-Simulink.
+remains a downstream validity limitation. The 2026-10-02 explicit go authorizes
+the scoped MATLAB implementation. It
+does not authorize deferred Simulink topology or execution choices.
 
-## Implementation sequence after Julio's go
+## Implementation evidence and validation
+
+The core MATLAB MCP suite reports 32 passed, 0 failed, and 0 incomplete in
+7.73 seconds. It covers all five PRI lengths at one and 64 channels against a
+combined 745-tap FFT convolution oracle, boundary stimuli, call-order and
+caller-time behavior, metadata and shape, inconsistent-rate rejection, and the
+cascade 12 MHz stage-1 cutoff witness, rejected at 0.79347008136 dB cascade
+ripple. Oracle error is normalized by peak input amplitude.
+The combined-oracle tests report maximum input-peak-normalized error
+`1.12962634928e-15` across all five PRI lengths at one and 64 channels. The
+test helper's per-PRI versus continuous-reference comparison, after full memory,
+reported a largest error of `3.08285e-11` absolute, or `3.34852e-11` normalized
+with reference amplitudes from `0.911` to `0.927`. Independent numerical
+review accepts the unchanged `5e-11` input-peak-normalized bound for this
+bounded comparison, with `1.65148e-11` margin. This is not a bound for
+full-CPI, global-tick, or hardware behavior, and remains separate from the
+pinned full-CPI DDC-002 replay.
+
+The final MATLAB walkthrough smoke completed in 8.7 seconds. It processed 147
+physical PRIs (5 priming, 142 usable), skipped four 106872-tick transition
+gaps, retained the full 10,553,388-tick contiguous `int16` timeline, processed
+10,125,900 physical input samples, and produced 843,825 output samples. The
+`cascade-peak-v1` response metrics were 0.00146437058836 dB cascade ripple,
+87.7676669047 dB stage-2 alias rejection, and 85.2548307898 dB full-cascade
+alias rejection. Independent fresh WP4 generation with strict traceability
+passed all 56 rows, including seven new per-PRI cases. The independent WP4
+MATLAB suite passed 56/56 in 83.4439 seconds; independent direct DDC tests
+passed 32/32 in 10.6756 seconds. The tracked strict checker passed 56/56 with
+valid provenance, explicitly including working-tree evidence under mixed
+acceptance-evidence and temporary-unit-evidence scopes. The six corruption
+probes (real/imaginary perturbations at 1e-12 for one- and 64-channel zero cases
+and the inactive channel) all rejected with `NUMERICAL_MISMATCH`. New MAT
+witness hashes are unchanged; all 23 historical fixture hashes, 54 original
+manifest rows, and original global manifest metadata are preserved. These are
+bounded unit/oracle and full-scan observations, not end-to-end detection or
+hardware evidence.
+
+Reproduce the targeted MATLAB unit suite and walkthrough from the repository
+root with MATLAB available:
+
+```matlab
+repoRoot = pwd;
+addpath(fullfile(repoRoot, "src"));
+addpath(fullfile(repoRoot, "examples"));
+testResults = runtests(fullfile(repoRoot, "tests", "ddc"));
+assertSuccess(testResults);
+walkthrough = runDdcWalkthrough(fullfile(tempdir, "ddc-pri-walkthrough"));
+```
+
+Reproduce the WP4 fresh-generation and strict-traceability check from the
+project root through MATLAB MCP. This generated evidence declares its generator
+revision as `working-tree`; it is temporary evidence and does not replace the
+pinned DDC-002 profile:
+
+```matlab
+addpath(fullfile(pwd, "src"));
+addpath(fullfile(pwd, "contracts", "wp4"));
+fixtureRoot = tempname("/private/tmp");
+mkdir(fixtureRoot);
+generation = generateWp4Fixtures(string(fixtureRoot), struct( ...
+    "GeneratorRevision", "working-tree", ...
+    "CreatedUtc", "2026-10-02T20:22:43Z"));
+checked = checkWp4Fixtures(string(generation.manifestPath), ...
+    struct("StrictTraceability", true));
+responseData = load(fullfile(fixtureRoot, "ddc-response-pri.mat"), "-mat");
+responseDiagnostic = wp4oracle.checkDdc( ...
+    responseData.ddcDesign, "cascade-peak-v1");
+priData = load(fullfile(fixtureRoot, "ddc-pri.mat"), "-mat");
+priDiagnostic = wp4oracle.checkDdcPri(priData.ddcPri);
+assert(checked.passed && checked.provenanceValid);
+assert(responseDiagnostic.accepted && priDiagnostic.accepted);
+```
+
+Code Analyzer reported no findings across the 5 core and 9 WP4 MATLAB source
+files; the two oracle-fix files were reanalyzed and also reported no findings.
+The four MATLAB code fences in the walkthrough and this plan were extracted and
+analyzed with zero findings. Tracked fixture integration/preservation audit
+passed. Pinned DDC-002 replay passed strict 1/1 at revision
+`58b3d3a80170d413aa88dd4408490e2056f49379`. Independent numerical validation
+passed after exact-zero and inactive-channel invariants were added to the oracle
+and verified by the six corruption probes. The per-PRI witnesses use new profile
+identifiers; they do not relabel historical G2 evidence. Issue #3 provenance
+hardening remains separate.
+
+## Implementation record
+
+The following approved implementation steps are complete:
 
 1. Preserve and pin the old continuous-state witness and source revision at
    `58b3d3a80170d413aa88dd4408490e2056f49379`.
 2. Make mixer, FIR, and decimation state local to each complete PRI in
-   `src/+radardemo/+ddc/processFrame.m` and
-   `src/+radardemo/+ddc/initializeState.m`. Remove
-   public continuation state only after the interface is approved; do not
-   silently ignore legacy arguments.
+   `src/+radardemo/+ddc/processFrame.m`. The approved implementation removes
+   `initializeState.m` and the public continuation-state argument; it does not
+   silently accept legacy arguments.
 3. Adapt the complete pre-generated ADC matrix in
    `examples/runDdcWalkthrough.m` and the WP4 path by slicing and calling only
    physical priming and usable PRIs. Preserve global timestamps and transition
    gaps. Keep `int16` storage compact and convert each selected PRI to `double`
    at the call boundary.
-4. Add an independent per-PRI oracle and narrowly migrate `contracts/wp4/`
-   artifacts: `+wp4gen/generateDdc.m`, `+wp4gen/buildManifest.m`,
-   `generateWp4Fixtures.m`, `fixture-manifest.json`, `checkWp4Fixtures.m`,
-   `+wp4oracle/checkArtifact.m`, `+wp4oracle/checkDdcStreaming.m`, and
-   `+wp4oracle/checkDdcZero.m`; update `tests/wp4/TestWp4Fixtures.m`. Replace
-   carried-state and reset-is-defect assertions for the new profile while
-   keeping historical DDC-002 evidence replayable at its pinned baseline.
+4. Add an independent per-PRI oracle and migrate the WP4 generator, checker,
+   adapter, and test integration: `+wp4gen/generateDdc.m`,
+   `+wp4gen/buildManifest.m`, `+wp4oracle/checkArtifact.m`,
+   `+wp4oracle/checkDdc.m`, new `+wp4oracle/checkDdcPri.m`,
+   `adaptWp4Draft1.m`, `generateWp4Fixtures.m`, `checkWp4Fixtures.m`,
+   `fixture-manifest.json`, and `tests/wp4/TestWp4Fixtures.m`. Add the
+   `ddc-pri.mat` and `ddc-response-pri.mat` witnesses. Preserve the unchanged
+   historical `+wp4oracle/checkDdcStreaming.m` and `checkDdcZero.m` checkers
+   and keep DDC-002 replayable at its pinned baseline.
 5. Update `examples/runDdcWalkthrough.m` and its documentation/plots. Add
-   individual and cascade alias-response plots, a passband zoom, and a
-   per-PRI state-reset loop diagram. Prefer `gramm` where suitable; keep filter
+   individual `/3` and `/4` and cascade alias-response plots, a passband zoom,
+   and a per-PRI state-reset loop diagram. Prefer `gramm` where suitable; keep filter
    and decimator as distinct diagram blocks. Three-phase/polyphase mixing
    remains a later optimization candidate.
-6. Run targeted regression, MATLAB Code Analyzer, and independent deep
-   validation. Resolve error findings and repeat validation before acceptance.
+6. Targeted regression, MATLAB Code Analyzer, and independent deep validation
+   passed; the MATLAB implementation is ready for Julio's review.
 
-## Required implementation evidence
+## Validated acceptance criteria
 
-Use an independently derived combined-FIR convolution oracle and compare the
-retained no-tail output rows after local mixing. The proposed normalized
-tolerance is `5e-11`; justify it against oracle numerical behavior rather than
-treating it as an approved relaxation. Cover all five PRI lengths, one and 64
-channels, channel isolation, exact zero, first/last-sample impulses, and
-40-microsecond chirps near boundaries, and multitone plus seeded noise. Check
-exact output shape,
-sample-domain metadata, caller timestamp/delay mapping, and call-order
-invariance across the physical PRI set. Alignment and expected length are
-caller preconditions; do not require DDC-specific rejection behavior for empty,
-incomplete, or misaligned calls in this trusted MVP. Repeated, reversed, and
-shuffled calls must produce identical per-PRI results and metadata.
+Independent numerical review accepts the unchanged `5e-11` input-peak-
+normalized tolerance for the bounded five-PRI comparison. The measured
+`3.34852e-11` maximum leaves `1.65148e-11` margin. This criterion is not a
+full-CPI, global-tick, or hardware error bound. Validation covered all five PRI
+lengths, one and 64 channels, channel isolation, exact zero, first/last-sample
+impulses, 40-microsecond boundary chirps, multitone and seeded noise, output
+shape, sample-domain metadata, caller time mapping, and call-order invariance.
+Alignment and expected length remain caller preconditions in this trusted MVP.
+Repeated, reversed, and shuffled calls produce identical per-PRI results and
+metadata.
 
-Compare the old continuous reference only at local raw offsets `>= 744` ADC
-sample periods (zero-based output index 62), after full cascade memory. Do not
-require startup equivalence. Keep startup transient in the blind range. There
-are no padded-tail rows. Downstream range processing handles startup, blanking,
-and PRI-end window validity. Retain filter passband and
-alias-rejection regressions. Report unit/oracle, full-scan, and end-to-end
-detection evidence as distinct scopes.
+The historical continuous reference was compared only at local raw offsets
+`>= 744` ADC sample periods (zero-based output index 62), after full cascade
+memory; startup equivalence was not required. The output has no padded tail.
+Downstream range processing owns startup, blanking, and PRI-end window validity.
+Filter passband and alias-rejection regressions passed. Unit/oracle, full-scan,
+and end-to-end detection evidence remain distinct scopes.
 
 ## Deferred choices
 

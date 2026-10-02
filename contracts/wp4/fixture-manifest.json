@@ -306,6 +306,32 @@
       }
     },
     {
+      "id": "DDC-010",
+      "artifact": "ddc-response-pri.mat",
+      "domain": "ddc-response-pri",
+      "testMethod": "testDdcPerPriResponse",
+      "expected": "accept",
+      "expectedCode": "",
+      "expectedPath": "",
+      "clause": "docs/contracts/radar-v1-data-contracts.md#DDC.cascade-profile",
+      "productionEntryPoint": "radardemo.ddc.measureResponse",
+      "provenanceSeed": 401021,
+      "mutation": []
+    },
+    {
+      "id": "DDC-PRI-001",
+      "artifact": "ddc-pri.mat",
+      "domain": "ddc-pri",
+      "testMethod": "testDdcPerPriProcessing",
+      "expected": "accept",
+      "expectedCode": "",
+      "expectedPath": "",
+      "clause": "docs/contracts/radar-v1-data-contracts.md#DDC.per-pri",
+      "productionEntryPoint": "radardemo.ddc.processFrame",
+      "provenanceSeed": 401021,
+      "mutation": []
+    },
+    {
       "id": "BEAM-001",
       "artifact": "beam-boresight.mat",
       "domain": "beam",
@@ -1032,5 +1058,84 @@
       "mutation": []
     }
   ],
-  "testMethodCount": 54
+  "testMethodCount": 56,
+  "artifactProvenance": [
+    {
+      "artifact": "ddc-design.mat",
+      "profile": "legacy-stage2-v1",
+      "evidenceScope": "acceptance-evidence",
+      "generatorVersion": "wp4gen-1.0.0",
+      "generatorRevision": "0fe89d45fa20a9f0f68ae6908855dbc61835b083",
+      "createdUtc": "2026-09-24T13:56:08Z",
+      "generatorSeed": 401021,
+      "sourceRevision": "0fe89d45fa20a9f0f68ae6908855dbc61835b083",
+      "sha256": "541d89c6f98d4f292a2e8ca4504537440b591cea7348859c44d04276e6ab9a0d"
+    },
+    {
+      "artifact": "ddc-streaming.mat",
+      "profile": "continuous-state-g2-v1",
+      "evidenceScope": "acceptance-evidence",
+      "generatorVersion": "wp4gen-1.0.0",
+      "generatorRevision": "0fe89d45fa20a9f0f68ae6908855dbc61835b083",
+      "createdUtc": "2026-09-24T13:56:08Z",
+      "generatorSeed": 401021,
+      "sourceRevision": "58b3d3a80170d413aa88dd4408490e2056f49379",
+      "sha256": "2979d3d0c68c1deacbe097a202b2b3a125b2d7fd6aba19ef842d76bb98d6c616"
+    },
+    {
+      "artifact": "ddc-zero.mat",
+      "profile": "continuous-state-zero-v1",
+      "evidenceScope": "acceptance-evidence",
+      "generatorVersion": "wp4gen-1.0.0",
+      "generatorRevision": "0fe89d45fa20a9f0f68ae6908855dbc61835b083",
+      "createdUtc": "2026-09-24T13:56:08Z",
+      "generatorSeed": 401021,
+      "sourceRevision": "0fe89d45fa20a9f0f68ae6908855dbc61835b083",
+      "sha256": "101c7af4cc54b60e87657f627642dd1a26d19e37c9b1f4b4172f7a09e289c04e"
+    },
+    {
+      "artifact": "ddc-ripple-invalid.mat",
+      "profile": "legacy-stage2-v1",
+      "evidenceScope": "acceptance-evidence",
+      "generatorVersion": "wp4gen-1.0.0",
+      "generatorRevision": "0fe89d45fa20a9f0f68ae6908855dbc61835b083",
+      "createdUtc": "2026-09-24T13:56:08Z",
+      "generatorSeed": 401021,
+      "sourceRevision": "0fe89d45fa20a9f0f68ae6908855dbc61835b083",
+      "sha256": "fe4c2d5a629666ac2af9e65984e1556c5e3a8fa702e9a4da2c5126d04892bfde"
+    },
+    {
+      "artifact": "ddc-alias-invalid.mat",
+      "profile": "legacy-stage2-v1",
+      "evidenceScope": "acceptance-evidence",
+      "generatorVersion": "wp4gen-1.0.0",
+      "generatorRevision": "0fe89d45fa20a9f0f68ae6908855dbc61835b083",
+      "createdUtc": "2026-09-24T13:56:08Z",
+      "generatorSeed": 401021,
+      "sourceRevision": "0fe89d45fa20a9f0f68ae6908855dbc61835b083",
+      "sha256": "e75f61c434d6bca47ce315a32b34e5395e6e272c298d6a8ebaad1a5f13b2956f"
+    },
+    {
+      "artifact": "ddc-response-pri.mat",
+      "profile": "cascade-peak-v1",
+      "evidenceScope": "temporary-unit-evidence",
+      "generatorVersion": "wp4gen-1.0.0",
+      "generatorRevision": "working-tree",
+      "createdUtc": "2026-10-02T20:22:43Z",
+      "generatorSeed": 401021,
+      "sourceRevision": "working-tree",
+      "sha256": "00cdfe12920e99edeb8e3f317b123f103a2f6ad78cc6c94b35d937c5ee4eb455"
+    },
+    {
+      "artifact": "ddc-pri.mat",
+      "profile": "independent-pri-v1",
+      "evidenceScope": "temporary-unit-evidence",
+      "generatorVersion": "wp4gen-1.0.0",
+      "generatorRevision": "working-tree",
+      "createdUtc": "2026-10-02T20:22:43Z",
+      "generatorSeed": 401021,
+      "sourceRevision": "working-tree",
+      "sha256": "6f7c9a8e7df41280b2b3d702dad1d107a9ba01c7113e580f204e867ef5d45207"
+    }
+  ]
 }

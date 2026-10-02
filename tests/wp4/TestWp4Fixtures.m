@@ -1,5 +1,5 @@
 classdef TestWp4Fixtures < matlab.unittest.TestCase
-%TESTWP4FIXTURES Execute the 54 approved WP4/G2 acceptance rows.
+%TESTWP4FIXTURES Execute the WP4/G2 acceptance rows.
 
 methods (TestClassSetup)
     function setupPathsAndFixtures(testCase)
@@ -167,6 +167,71 @@ methods (Test)
         diagnostic = radardemo.conformance.validateArtifact("ddc", design);
         testCase.verifyFalse(diagnostic.accepted);
     end
+    function testDdcPerPriResponse(testCase)
+        testCase.verifyTrue(testCase.runCase("Ddc-PerPri-Response"));
+        fixtureRoot = fileparts(TestWp4Fixtures.getManifestPath());
+        loaded = load(fullfile(fixtureRoot, "ddc-response-pri.mat"), "-mat");
+        response = loaded.ddcDesign;
+        diagnostic = wp4oracle.checkArtifact("ddc-response-pri", response);
+        testCase.verifyTrue(diagnostic.accepted);
+        testCase.verifyEqual(string(response.responseMetricProfile), "cascade-peak-v1");
+        testCase.verifyLessThanOrEqual(response.passbandRippleDb, 0.1 + response.metricToleranceDb);
+        testCase.verifyGreaterThanOrEqual(response.digitalAliasRejectionDb, ...
+            60 - response.metricToleranceDb);
+
+        stage1Changed = response;
+        stage1Changed.stage1Numerator = fir1(24, 25e6 / 75e6, kaiser(25, 2));
+        changedMetrics = radardemo.ddc.measureResponse(stage1Changed, struct());
+        testCase.verifyFalse(changedMetrics.accepted);
+        diagnostic = wp4oracle.checkArtifact("ddc-response-pri", stage1Changed);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "DDC_COEFFICIENT_MISMATCH");
+        testCase.verifyEqual(string(diagnostic.path), "stage1Numerator");
+
+        nonfinite = response;
+        nonfinite.digitalAliasRejectionDb = NaN;
+        diagnostic = wp4oracle.checkArtifact("ddc-response-pri", nonfinite);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NONFINITE");
+        badPrincipal = response;
+        badPrincipal.principalCascadeResponse(1) = complex(NaN, 0);
+        diagnostic = wp4oracle.checkArtifact("ddc-response-pri", badPrincipal);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NONFINITE");
+        badBranch = response;
+        badBranch.stage2AliasBranches(1) = complex(0, Inf);
+        diagnostic = wp4oracle.checkArtifact("ddc-response-pri", badBranch);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NONFINITE");
+        badTolerance = response;
+        badTolerance.metricToleranceDb = NaN;
+        diagnostic = wp4oracle.checkArtifact("ddc-response-pri", badTolerance);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NONFINITE");
+        badPassband = response;
+        badPassband.passbandHz(1) = NaN;
+        diagnostic = wp4oracle.checkArtifact("ddc-response-pri", badPassband);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NONFINITE");
+    end
+    function testDdcPerPriProcessing(testCase)
+        testCase.verifyTrue(testCase.runCase("Ddc-PerPri-Processing"));
+        fixtureRoot = fileparts(TestWp4Fixtures.getManifestPath());
+        loaded = load(fullfile(fixtureRoot, "ddc-pri.mat"), "-mat");
+        evidence = loaded.ddcPri;
+        design = radardemo.ddc.createDesign(struct());
+        probe = TestWp4Fixtures.probePerPriProcessing(evidence, design);
+        testCase.verifyTrue(probe.orderInvariant);
+        testCase.verifyLessThanOrEqual(probe.maximumNormalizedError, ...
+            evidence.normalizedTolerance);
+        testCase.verifyTrue(probe.zero64IsExact);
+        testCase.verifyTrue(probe.channelIsolationIsExact);
+        testCase.verifyEqual(string(probe.badMetadataCode), "VALUE_OUT_OF_RANGE");
+        testCase.verifyEqual(string(probe.badOutputCode), "NUMERICAL_MISMATCH");
+        testCase.verifyEqual(string(probe.badCoordinateCode), "VALUE_OUT_OF_RANGE");
+        testCase.verifyEqual(probe.tinyOutputCodes, ...
+            repmat("NUMERICAL_MISMATCH", 1, 6));
+    end
     function testDdcStreamingState(testCase)
         testCase.verifyTrue(testCase.runCase("Ddc-Streaming-State"));
         fixtureRoot = fileparts(TestWp4Fixtures.getManifestPath());
@@ -185,26 +250,11 @@ methods (Test)
             testCase.verifyEqual(checkpoint(3), mod(ceil(importantTicks(index) / 3), 4));
             testCase.verifyEqual(checkpoint(4), ceil(importantTicks(index) / 12));
         end
-        firstPriBoundary = double(evidence.boundaryTicks(1));
-        fault = testCase.resetBoundaryStream(streaming, firstPriBoundary, "stage1");
-        diagnostic = wp4oracle.checkDdcStreaming(fault);
-        testCase.verifyFalse(diagnostic.accepted);
-        testCase.verifyEqual(string(diagnostic.code), "NUMERICAL_MISMATCH");
-        transitionIndex = find(string({evidence.schedule.records.role}) == "transition", 1);
-        transitionEntry = double(evidence.schedule.records(transitionIndex).startTick);
-        transitionExit = double(evidence.schedule.records(transitionIndex).endTick);
-        fault = testCase.resetBoundaryStream(streaming, transitionEntry, "stage2");
-        diagnostic = wp4oracle.checkDdcStreaming(fault);
-        testCase.verifyFalse(diagnostic.accepted);
-        testCase.verifyEqual(string(diagnostic.code), "NUMERICAL_MISMATCH");
-        fault = testCase.resetBoundaryStream(streaming, transitionExit, "stage2");
-        diagnostic = wp4oracle.checkDdcStreaming(fault);
-        testCase.verifyFalse(diagnostic.accepted);
-        testCase.verifyEqual(string(diagnostic.code), "NUMERICAL_MISMATCH");
-        fault = testCase.resetBoundaryStream(streaming, firstPriBoundary + 7, "mixerCount");
-        diagnostic = wp4oracle.checkDdcStreaming(fault);
-        testCase.verifyFalse(diagnostic.accepted);
-        testCase.verifyEqual(string(diagnostic.code), "NUMERICAL_MISMATCH");
+        testCase.verifyEqual(string(streaming.schemaName), "radar.wp4.ddc-streaming");
+        testCase.verifyEqual(string(streaming.generatorRevision), ...
+            "0fe89d45fa20a9f0f68ae6908855dbc61835b083");
+        diagnostic = wp4oracle.checkDdcStreaming(streaming);
+        testCase.verifyTrue(diagnostic.accepted);
     end
     function testDdcZeroInput(testCase)
         testCase.verifyTrue(testCase.runCase("Ddc-Zero-Input"));
@@ -371,6 +421,7 @@ methods (Test)
         [migrated, diagnostic] = adaptWp4Draft1("ddc", draft, context);
         testCase.verifyTrue(diagnostic.accepted);
         testCase.verifyEqual(numel(migrated.stage2Numerator), 241);
+        testCase.verifyEqual(string(migrated.responseMetricProfile), "cascade-peak-v1");
     end
 
     function testDraft1FusionAdapter(testCase)
@@ -420,14 +471,17 @@ methods (Test)
     function testManifestTraceability(testCase)
         temporaryManifestPath = TestWp4Fixtures.getManifestPath();
         manifest = jsondecode(fileread(temporaryManifestPath));
-        testCase.verifyEqual(numel(manifest.fixtures), 54);
-        testCase.verifyEqual(numel(unique(string({manifest.fixtures.id}))), 54);
-        testCase.verifyEqual(numel(unique(string({manifest.fixtures.testMethod}))), 54);
+        testCase.verifyEqual(numel(manifest.fixtures), 56);
+        testCase.verifyEqual(numel(unique(string({manifest.fixtures.id}))), 56);
+        testCase.verifyEqual(numel(unique(string({manifest.fixtures.testMethod}))), 56);
         testCase.verifyTrue(all(contains(string({manifest.fixtures.clause}), "#")));
         testCase.verifyTrue(all(strlength(string({manifest.fixtures.productionEntryPoint})) > 0));
         temporaryReport = checkWp4Fixtures(temporaryManifestPath, ...
             struct("StrictTraceability", true));
         testCase.verifyTrue(temporaryReport.passed);
+        testCase.verifyTrue(temporaryReport.includesWorkingTreeEvidence);
+        testCase.verifyTrue(ismember("temporary-unit-evidence", temporaryReport.evidenceScopes));
+        testCase.verifyTrue(ismember("acceptance-evidence", temporaryReport.evidenceScopes));
 
         invalidRoot = tempname;
         mkdir(invalidRoot);
@@ -448,6 +502,7 @@ methods (Test)
         acceptanceChecked = checkWp4Fixtures(acceptanceReport.manifestPath, ...
             struct("StrictTraceability", true));
         testCase.verifyTrue(acceptanceChecked.passed);
+        testCase.verifyFalse(acceptanceChecked.includesWorkingTreeEvidence);
         for artifactIndex = 1:numel(acceptanceReport.artifacts)
             artifactName = string(acceptanceReport.artifacts{artifactIndex});
             artifactPath = fullfile(acceptanceRoot, artifactName);
@@ -458,10 +513,24 @@ methods (Test)
                 variableNames = fieldnames(loaded);
                 artifact = loaded.(variableNames{1});
             end
-            testCase.verifyEqual(string(artifact.generatorRevision), testRevision);
-            testCase.verifyEqual(string(artifact.generatorVersion), "wp4gen-test");
+            provenanceRows = acceptanceManifest.artifactProvenance( ...
+                string({acceptanceManifest.artifactProvenance.artifact}) == artifactName);
+            if isempty(provenanceRows)
+                expectedRevision = testRevision;
+                expectedVersion = "wp4gen-test";
+                expectedScope = "acceptance-evidence";
+                expectedCreatedUtc = "2026-09-21T00:00:00Z";
+            else
+                expectedRevision = string(provenanceRows.generatorRevision);
+                expectedVersion = string(provenanceRows.generatorVersion);
+                expectedScope = string(provenanceRows.evidenceScope);
+                expectedCreatedUtc = string(provenanceRows.createdUtc);
+            end
+            testCase.verifyEqual(string(artifact.generatorRevision), expectedRevision);
+            testCase.verifyEqual(string(artifact.generatorVersion), expectedVersion);
             testCase.verifyEqual(string(artifact.generationParameters.fixtureScope), ...
-                "acceptance-evidence");
+                expectedScope);
+            testCase.verifyEqual(string(artifact.createdUtc), expectedCreatedUtc);
             matchingRows = acceptanceManifest.fixtures( ...
                 string({acceptanceManifest.fixtures.artifact}) == artifactName);
             testCase.verifyNotEmpty(matchingRows);
@@ -524,54 +593,98 @@ methods (Access=private)
         matches = string({artifact.cases.caseId}) == string(caseId);
         fusionCase = artifact.cases(find(matches, 1));
     end
-    function mutated = resetBoundaryStream(testCase, streaming, resetTick, resetKind)
-        evidence = streaming.boundaryEvidence;
-        design = radardemo.ddc.createDesign(struct());
-        state = radardemo.ddc.initializeState(design, 1);
-        offset = 0;
-        while offset < resetTick
-            frameSize = min(8192, resetTick - offset);
-            indices = offset + (0:frameSize - 1).';
-            input = testCase.makeBoundaryStimulus(indices, evidence.stimulus);
-            [~, state] = radardemo.ddc.processFrame(input, state, design);
-            offset = offset + frameSize;
-        end
-        faultState = state;
-        switch string(resetKind)
-            case "stage1"
-                faultState.stage1Delay = zeros(size(faultState.stage1Delay));
-            case "stage2"
-                faultState.stage2Delay = zeros(size(faultState.stage2Delay));
-            case "mixerCount"
-                faultState.inputSampleCount = uint64(0);
-            otherwise
-                error("TestWp4Fixtures:UnknownReset", "Unknown DDC reset mutation.");
-        end
-        indices = resetTick + (0:899).';
-        input = testCase.makeBoundaryStimulus(indices, evidence.stimulus);
-        [faultOutput, ~] = radardemo.ddc.processFrame(input, faultState, design);
-        firstOrdinal = ceil(resetTick / 12);
-        outputTicks = 12 * (firstOrdinal + (0:numel(faultOutput) - 1).');
-        [found, locations] = ismember(outputTicks, double(evidence.outputTicks(:)));
-        if ~any(found)
-            error("TestWp4Fixtures:ResetWindowMissing", ...
-                "The reset segment does not overlap a recorded output window.");
-        end
-        mutated = streaming;
-        selected = find(found);
-        mutated.boundaryEvidence.outputSamples(locations(selected)) = faultOutput(selected);
-    end
-
-    function samples = makeBoundaryStimulus(~, sampleIndices, stimulus)
-        samples = zeros(numel(sampleIndices), 1);
-        for toneIndex = 1:numel(stimulus.frequenciesHz)
-            samples = samples + stimulus.amplitudes(toneIndex) .* ...
-                cos(2 * pi * stimulus.frequenciesHz(toneIndex) / ...
-                stimulus.sampleRateHz .* sampleIndices + stimulus.phasesRad(toneIndex));
-        end
-    end
 end
 methods (Static, Access=private)
+    function result = probePerPriProcessing(evidence, design)
+        canonicalOutput = cell(5, 1);
+        canonicalMetadata = cell(5, 1);
+        shuffledOrder = [4, 1, 5, 2, 3, 4, 1];
+        callOrders = {1:5, 5:-1:1, shuffledOrder, shuffledOrder};
+        maximumNormalizedError = 0;
+        orderInvariant = true;
+        for orderIndex = 1:numel(callOrders)
+            order = callOrders{orderIndex};
+            for caseIndex = order
+                item = evidence.cases(caseIndex);
+                [output, metadata] = radardemo.ddc.processFrame(item.input, design);
+                referenceAmplitude = max(abs(item.input(:)));
+                if referenceAmplitude == 0
+                    referenceAmplitude = 1;
+                end
+                normalizedError = max(abs(output(:) - item.expectedOutput(:))) / ...
+                    referenceAmplitude;
+                maximumNormalizedError = max(maximumNormalizedError, normalizedError);
+                orderInvariant = orderInvariant && isequal(size(output), size(item.expectedOutput)) && ...
+                    isequal(metadata, item.metadata);
+                if orderIndex == 1
+                    canonicalOutput{caseIndex} = output;
+                    canonicalMetadata{caseIndex} = metadata;
+                else
+                    orderInvariant = orderInvariant && ...
+                        isequal(output, canonicalOutput{caseIndex}) && ...
+                        isequal(metadata, canonicalMetadata{caseIndex});
+                end
+            end
+        end
+
+        zero64 = evidence.cases(6);
+        [zeroOutput, zeroMetadata] = radardemo.ddc.processFrame(zero64.input, design);
+        expectedZero = complex(zeros(size(zeroOutput)));
+        zero64IsExact = isequal(size(zeroOutput), [size(zero64.input, 1) / 12, 64]) && ...
+            isequal(zeroOutput, expectedZero) && isequal(zeroMetadata, zero64.metadata);
+        isolation = evidence.cases(7);
+        isolationOutput = radardemo.ddc.processFrame(isolation.input, design);
+        inactiveChannels = setdiff(1:64, isolation.targetChannel);
+        expectedInactive = complex(zeros(size(isolationOutput, 1), numel(inactiveChannels)));
+        channelIsolationIsExact = isequal(isolationOutput(:, inactiveChannels), expectedInactive);
+
+        badMetadata = evidence;
+        badMetadata.cases(2).metadata.outputSampleCount = ...
+            badMetadata.cases(2).metadata.outputSampleCount + 1;
+        metadataDiagnostic = wp4oracle.checkDdcPri(badMetadata);
+        badOutput = evidence;
+        badOutput.cases(4).expectedOutput(100, 1) = ...
+            badOutput.cases(4).expectedOutput(100, 1) + 0.01;
+        outputDiagnostic = wp4oracle.checkDdcPri(badOutput);
+        badCoordinates = evidence;
+        badCoordinates.cases(2).coordinateMap.compensatedOutputStartTick = ...
+            badCoordinates.cases(2).coordinateMap.compensatedOutputStartTick + 1;
+        coordinateDiagnostic = wp4oracle.checkDdcPri(badCoordinates);
+        tinyOutputCodes = TestWp4Fixtures.checkTinyOutputCorruptions(evidence);
+        result = struct("orderInvariant", orderInvariant, ...
+            "maximumNormalizedError", maximumNormalizedError, ...
+            "zero64IsExact", zero64IsExact, ...
+            "channelIsolationIsExact", channelIsolationIsExact, ...
+            "badMetadataCode", metadataDiagnostic.code, ...
+            "badOutputCode", outputDiagnostic.code, ...
+            "badCoordinateCode", coordinateDiagnostic.code, ...
+            "tinyOutputCodes", tinyOutputCodes);
+    end
+
+    function codes = checkTinyOutputCorruptions(evidence)
+        mutated = evidence;
+        mutated.cases(1).expectedOutput(1, 1) = 1e-12;
+        oneChannelReal = wp4oracle.checkDdcPri(mutated);
+        mutated = evidence;
+        mutated.cases(1).expectedOutput(1, 1) = complex(0, 1e-12);
+        oneChannelImaginary = wp4oracle.checkDdcPri(mutated);
+        mutated = evidence;
+        mutated.cases(6).expectedOutput(1, 1) = 1e-12;
+        sixtyFourChannelReal = wp4oracle.checkDdcPri(mutated);
+        mutated = evidence;
+        mutated.cases(6).expectedOutput(1, 1) = complex(0, 1e-12);
+        sixtyFourChannelImaginary = wp4oracle.checkDdcPri(mutated);
+        mutated = evidence;
+        mutated.cases(7).expectedOutput(1, 1) = 1e-12;
+        inactiveChannelReal = wp4oracle.checkDdcPri(mutated);
+        mutated = evidence;
+        mutated.cases(7).expectedOutput(1, 1) = complex(0, 1e-12);
+        inactiveChannelImaginary = wp4oracle.checkDdcPri(mutated);
+        codes = [string(oneChannelReal.code), string(oneChannelImaginary.code), ...
+            string(sixtyFourChannelReal.code), string(sixtyFourChannelImaginary.code), ...
+            string(inactiveChannelReal.code), string(inactiveChannelImaginary.code)];
+    end
+
     function manifestPath = getManifestPath()
         persistent savedManifestPath
         if isempty(savedManifestPath) || ~isfile(savedManifestPath)

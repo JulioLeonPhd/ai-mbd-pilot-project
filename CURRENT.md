@@ -24,13 +24,18 @@ items. The ±45° sector and one-second update remain provisional.
 ## Next open question
 
 On 2026-09-29 Julio approved independent per-PRI DDC processing; on 2026-10-02
-he confirmed the sample-only API, retained no-tail output, caller timing and
-alignment responsibilities, downstream range-window validity ownership, and
-narrow evidence migration. Implementation and independent verification remain
-pending Julio's separate explicit go. Current DDC code and G2 streaming evidence
-still describe the historical continuous-state baseline. See [ADR 0022](docs/adr/0022-adopt-independent-pri-ddc-processing.md),
-the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md), and the
-[joint walkthrough review](docs/examples/ddc-walkthrough-review.md).
+he confirmed the sample-only API and responsibilities, then explicitly authorized
+implementation. The MATLAB implementation, scoped core and WP4 suites, full-scan
+walkthrough, pinned DDC-002 replay, and fixture-preservation audit have passed.
+Independent numerical validation passed, including the exact-zero and inactive-
+channel oracle checks. The bounded numerical tolerance and all evidence scopes
+are recorded in the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md).
+The MATLAB implementation is ready for Julio's implementation and walkthrough
+review. Human visual review of the redrawn diagrams remains unapproved. Then
+review the range-component boundary. Historical G2 streaming evidence remains
+continuous-state evidence only, not per-PRI acceptance evidence. Unit/oracle,
+full-scan, end-to-end, and hardware claims remain separate. See [ADR 0022](docs/adr/0022-adopt-independent-pri-ddc-processing.md)
+and the [joint walkthrough review](docs/examples/ddc-walkthrough-review.md).
 
 Julio confirmed the architecture interview summary on 2026-09-26. Independent
 review of [ADR 0019](docs/adr/0019-adopt-human-led-module-design-and-simulink-staging.md),
@@ -46,10 +51,13 @@ required. The rename, five-file Code Analyzer run, focused walkthrough oracle,
 streaming-equivalence, and state-reset checks passed on 2026-09-28. The full
 WP4 MATLAB MCP suite completed on 2026-09-28 with 54 passed, 0 failed, and 0
 incomplete in 84.2901 seconds. Julio closed the joint DDC design discussion on
-2026-09-29. The per-PRI Phase 0 contract was confirmed 2026-10-02. Its
-implementation and verification remain pending Julio's separate explicit go;
-the current walkthrough documents the historical continuous-state
-implementation. Then select the next component question under step 5. WP6e's ambiguity
+2026-09-29. The per-PRI MATLAB implementation and independent numerical
+validation are complete. The pinned continuous-state DDC-002 replay passed, as
+did preservation of all 23 historical fixture hashes. Julio's implementation
+and walkthrough review is the next DDC step. Visual review of the redrawn
+architecture diagrams remains unapproved. Then review the range-component
+boundary under step 5. Do not
+represent DDC results as full-receiver or hardware evidence. WP6e's ambiguity
 method and ordering remain open study items. Issue 3 separately tracks manifest
 revision-provenance hardening.
 

@@ -65,13 +65,19 @@ quality/validity semantics remain to be defined.
 
 ![Radar V1 data shapes and timing](diagrams/data-timing.svg)
 
-The current MATLAB reference supports variable-length frames while preserving
-continuous DDC state; this is the historical implemented baseline. Julio has
-accepted per-PRI fresh local DDC state for future calls (ADR 0022), but that
-behavior is not yet implemented. Future Simulink models use fixed dimensions
-per configured model and do not support runtime-variable frame sizes. Build a
-behavioral Simulink model first; a later hardware-oriented implementation model
-may follow. HDL generation remains deferred.
+The historical MATLAB reference and G2 evidence use variable-length frames
+with continuous DDC state. The current approved DDC API processes one complete
+physical PRI per call with fresh local state (ADR 0022). Core and WP4 suites and
+the full-scan DDC walkthrough pass; historical fixture hashes are preserved.
+Pinned DDC-002 replay passed at its historical revision. Independent numerical
+validation passed for the current per-PRI profile, and all 23 historical fixture
+hashes were preserved. The MATLAB implementation is ready for Julio's
+implementation and walkthrough review; visual review of the redrawn diagrams
+remains unapproved. The range-processing boundary is the next component review.
+Future Simulink models use fixed dimensions per configured model and do not
+support runtime-variable frame sizes. Build a behavioral Simulink model first;
+a later hardware-oriented implementation model may follow. HDL generation
+remains deferred.
 
 Simulink rates, sample-versus-frame execution, buffer ownership, corner-turn
 implementation, latency, and execution granularity remain open. Buffering once
@@ -79,7 +85,7 @@ per PRI is only a hypothesis. Pulse accumulation and corner turning are distinct
 accumulation gathers successive pulses into a slow-time ensemble; corner turning
 reorders data for range-wise Doppler processing.
 
-Bounded WP4/G2 evidence includes DDC streaming and delay, receive dimensions,
+Historical bounded WP4/G2 evidence includes DDC streaming and delay, receive dimensions,
 the five-PRF schedule, post-CFAR 3-of-5 fusion, and clustering contract behavior.
 The schedule is evidence for its frozen timing contract, not for end-to-end
 detection performance. The complete production-like floating-point reference

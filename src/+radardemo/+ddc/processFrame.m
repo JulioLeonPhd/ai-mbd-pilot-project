@@ -1,41 +1,56 @@
-function [output, state] = processFrame(input, state, design)
-%PROCESSFRAME Process one real ADC frame with continuous DDC state.
-%   [OUTPUT, STATE] = RADARDEMO.DDC.PROCESSFRAME(INPUT, STATE, DESIGN)
-%   mixes, filters, and decimates a finite real double [N,C] frame. An empty
-%   frame returns an empty output and an unchanged state.
+function [output, metadata] = processFrame(adcPriSamples, design)
+%PROCESSFRAME Process one complete physical PRI with fresh local DDC state.
+%   [OUTPUT, METADATA] = RADARDEMO.DDC.PROCESSFRAME(ADCPRISAMPLES, DESIGN)
+%   mixes, filters, and decimates finite real double [N,C] samples from one
+%   aligned physical PRI. The complex [N/12,C] output retains startup rows
+%   and contains no padded or flushed tail. The sample-domain metadata does
+%   not include a global timestamp or range coordinate.
 
 arguments
-    input double
-    state struct
+    adcPriSamples double
     design struct
 end
 
-if isempty(input)
-    output = complex(zeros(0, state.channelCount));
-    return
+if ~ismatrix(adcPriSamples)
+    error("radardemo:ddc:InputShape", ...
+        "DDC input must be a two-dimensional [N,C] sample matrix.");
 end
-if ~isreal(input)
-    error("radardemo:ddc:InputType", "DDC input must be real double samples.");
+if ~isreal(adcPriSamples)
+    error("radardemo:ddc:InputType", "DDC input must contain real double samples.");
 end
-if ~ismatrix(input) || size(input, 2) ~= state.channelCount
-    error("radardemo:ddc:InputShape", "DDC input must have shape [N, channelCount].");
+if any(~isfinite(adcPriSamples), "all")
+    error("radardemo:ddc:NonfiniteInput", "DDC input must contain finite samples.");
 end
-if any(~isfinite(input), "all")
-    error("radardemo:ddc:NonfiniteInput", "DDC input must be finite real double.");
+
+inputSampleCount = size(adcPriSamples, 1);
+channelCount = size(adcPriSamples, 2);
+decimationFactor = prod(design.decimationFactors);
+sampleIndex = (0:inputSampleCount - 1).';
+mixer = exp(-1i * 2 * pi * design.mixerFrequencyHz / ...
+    design.adcRateHz * sampleIndex);
+mixed = adcPriSamples .* mixer;
+
+stage1InitialConditions = zeros(design.stage1Order, channelCount);
+stage1Output = filter(design.stage1Numerator, 1, mixed, ...
+    stage1InitialConditions, 1);
+stage1Samples = stage1Output(1:design.decimationFactors(1):end, :);
+
+stage2InitialConditions = zeros(design.stage2Order, channelCount);
+stage2Output = filter(design.stage2Numerator, 1, stage1Samples, ...
+    stage2InitialConditions, 1);
+output = stage2Output(1:design.decimationFactors(2):end, :);
+if isreal(output)
+    output = complex(output);
 end
-sampleCount = size(input, 1);
-sampleIndex = double(state.inputSampleCount) + (0:sampleCount - 1).';
-mixer = exp(-1i * 2 * pi * design.mixerFrequencyHz / design.adcRateHz * sampleIndex);
-mixed = input .* mixer;
-[stage1Output, state.stage1Delay] = filter(design.stage1Numerator, 1, mixed, ...
-    state.stage1Delay, 1);
-firstStageIndex = 1 + mod(3 - double(state.stage1Phase), 3);
-stage1Samples = stage1Output(firstStageIndex:3:end, :);
-state.stage1Phase = uint8(mod(double(state.stage1Phase) + sampleCount, 3));
-[stage2Output, state.stage2Delay] = filter(design.stage2Numerator, 1, stage1Samples, ...
-    state.stage2Delay, 1);
-firstOutputIndex = 1 + mod(4 - double(state.stage2Phase), 4);
-output = stage2Output(firstOutputIndex:4:end, :);
-state.stage2Phase = uint8(mod(double(state.stage2Phase) + size(stage1Samples, 1), 4));
-state.inputSampleCount = state.inputSampleCount + uint64(sampleCount);
+
+startupInputSamples = design.stage1Order + ...
+    design.stage2Order * design.decimationFactors(1);
+metadata = struct();
+metadata.inputSampleCount = double(inputSampleCount);
+metadata.outputSampleCount = double(size(output, 1));
+metadata.decimationFactor = double(decimationFactor);
+metadata.groupDelayInputSamples = double(design.delayTicks);
+metadata.groupDelayOutputSamples = double(design.delayOutputSamples);
+metadata.startupInputSamples = double(startupInputSamples);
+metadata.startupOutputSamples = double(startupInputSamples / decimationFactor);
 end

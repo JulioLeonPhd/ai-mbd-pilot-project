@@ -173,6 +173,7 @@ end
 output.schemaVersion = "1.0.0-draft.2";
 output.stage1Numerator = design.stage1Numerator;
 output.stage2Numerator = design.stage2Numerator;
+output.responseMetricProfile = metrics.responseMetricProfile;
 output.sampleRateHz = design.adcRateHz;
 output.intermediateRateHz = design.intermediateRateHz;
 output.outputRateHz = design.outputRateHz;
