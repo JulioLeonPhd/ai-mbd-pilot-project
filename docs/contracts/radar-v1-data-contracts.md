@@ -267,12 +267,10 @@ amplitude. Compare each metric with absolute tolerance `1e-9 dB`.
 <a id="DDC.streaming-state"></a>
 The following streaming requirement and DDC-002 evidence describe the accepted
 historical continuous-state implementation profile. The `shall` applies only
-to replay and interpretation of that pinned profile; it is not the future
-per-PRI acceptance contract. [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md)
-records the accepted fresh-state-per-PRI direction. Its implementation
-acceptance contract and evidence migration remain a Phase 0 task in the
-[per-PRI plan](../plans/ddc-pri-processing.md); do not rewrite historical
-numbers or schema under this note.
+to replay and interpretation of that pinned profile. [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md)
+records the accepted per-PRI direction; its confirmed interface and evidence
+migration are in the [per-PRI plan](../plans/ddc-pri-processing.md). Preserve
+the historical numbers and schema below.
 
 For the historical profile, streaming DDC validation processes real mixer
 input in unequal chunks while preserving mixer, FIR, and decimator state

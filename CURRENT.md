@@ -23,12 +23,12 @@ items. The ±45° sector and one-second update remain provisional.
 
 ## Next open question
 
-On 2026-09-29 Julio approved independent per-PRI DDC processing with fresh
-local state for each complete physical PRI and closed the joint design discussion.
-Implementation review and verification are pending Phase 0 interface and
-evidence-migration decisions plus explicit go. The current DDC
-code, walkthrough, diagrams, and G2 streaming evidence describe the former
-continuous-state baseline. See [ADR 0022](docs/adr/0022-adopt-independent-pri-ddc-processing.md),
+On 2026-09-29 Julio approved independent per-PRI DDC processing; on 2026-10-02
+he confirmed the sample-only API, retained no-tail output, caller timing and
+alignment responsibilities, downstream range-window validity ownership, and
+narrow evidence migration. Implementation and independent verification remain
+pending Julio's separate explicit go. Current DDC code and G2 streaming evidence
+still describe the historical continuous-state baseline. See [ADR 0022](docs/adr/0022-adopt-independent-pri-ddc-processing.md),
 the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md), and the
 [joint walkthrough review](docs/examples/ddc-walkthrough-review.md).
 
@@ -46,11 +46,11 @@ required. The rename, five-file Code Analyzer run, focused walkthrough oracle,
 streaming-equivalence, and state-reset checks passed on 2026-09-28. The full
 WP4 MATLAB MCP suite completed on 2026-09-28 with 54 passed, 0 failed, and 0
 incomplete in 84.2901 seconds. Julio closed the joint DDC design discussion on
-2026-09-29. The new per-PRI implementation review and verification remain
-pending Phase 0 interface/evidence decisions and explicit go; the current
-walkthrough documents the historical continuous-state implementation. Then
-select the next component question under step 5. WP6e's ambiguity method and
-ordering remain open study items. Issue 3 separately tracks manifest
+2026-09-29. The per-PRI Phase 0 contract was confirmed 2026-10-02. Its
+implementation and verification remain pending Julio's separate explicit go;
+the current walkthrough documents the historical continuous-state
+implementation. Then select the next component question under step 5. WP6e's ambiguity
+method and ordering remain open study items. Issue 3 separately tracks manifest
 revision-provenance hardening.
 
 ## Evidence and history

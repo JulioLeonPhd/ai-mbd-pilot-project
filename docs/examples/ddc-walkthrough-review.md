@@ -140,3 +140,25 @@ reusable test, full-scan verification, or detection proof. Historical G2
 streaming evidence applies only to the former continuous-state baseline.
 The implementation sequence and acceptance evidence are captured in the
 [per-PRI DDC plan](../plans/ddc-pri-processing.md).
+
+---
+
+## Phase 0 continuation — 2026-10-02
+
+See [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md) and the
+[per-PRI plan](../plans/ddc-pri-processing.md) for Julio's confirmed sample-only
+API and implementation contract. Each call takes one complete, correctly sized,
+12-tick-aligned PRI as finite real `double` `[N,C]`; mixer/FIR/decimator state
+is local to the call. It returns complex `[N/12,C]`, keeps startup rows, and
+appends no zeros or tail. Metadata describes sample counts, decimation, group
+delay, and startup span; exact field names and types are not fixed.
+
+The caller owns PRI slicing, expected length and identity, global
+`startTick`/`timeEpoch`, and timeline reconstruction. It converts stored
+`int16` samples per PRI; transition gaps remain in the timeline and are not DDC
+calls. Empty, incomplete, and misaligned calls need no DDC-specific rejection
+behavior in this trusted MVP, though they are not valid physical PRI inputs.
+The caller/integration applies group-delay compensation once. Downstream range
+processing owns window validity for startup, blanking, and PRI-end truncation;
+DDC is sample-only and emits no range masks or global timestamps.
+Implementation remains pending Julio's separate explicit go.

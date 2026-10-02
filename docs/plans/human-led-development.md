@@ -30,11 +30,11 @@ approval.
 Steps 1 and 2 are drafted and passed independent document review on 2026-09-26.
 The top-level overview and three diagrams are in the main working tree at
 `docs/architecture/radar-overview.md`; their PlantUML syntax/render checks and
-preview inspection passed, and the documents passed independent review. Julio's
-visual review of the redrawn views remains pending. Julio closed the joint DDC
-design discussion on 2026-09-29; implementation review and verification remain
-pending. The per-PRI implementation is gated on Phase 0 interface/evidence
-decisions and Julio's explicit go. The repeat-component workflow remains
+preview inspection passed, and the documents passed independent review.
+Julio's visual review of the redrawn views remains pending. Julio closed the
+joint DDC design discussion on 2026-09-29 and confirmed the Phase 0 interface
+and evidence migration on 2026-10-02. Implementation and verification remain
+pending his separate explicit go. The repeat-component workflow remains
 incomplete.
 
 ## Ordered work
@@ -138,19 +138,23 @@ work; they are decisions, not a statement that the current implementation
 already behaves this way. Implement them only after the shared architectural
 understanding is confirmed.
 
-**Historical baseline / superseded DDC boundary:** The walkthrough implementation
+**Historical baseline / confirmed per-PRI contract:** The walkthrough implementation
 accepted variable frame lengths and preserved continuous stream state. On
-2026-09-29 Julio approved a future per-PRI DDC call with fresh local state; see
-[ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md) and the
-[implementation plan](ddc-pri-processing.md). That decision does not describe
-the current code until implementation is authorized and complete. A future
-Simulink implementation uses fixed dimensions per configured model and does
-not support runtime-variable frame sizes. Channel count is configurable for
-tests, with 64 as the default.
+2026-09-29 Julio approved future per-PRI calls with fresh local state; on
+2026-10-02 he confirmed the `processFrame(adcPriSamples, design)` API, finite
+real `double` `[N,C]` input, complex `[N/12,C]` retained no-tail output, and
+sample-only metadata. Caller timing/alignment duties and downstream range-window
+validity are settled in [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md)
+and the [implementation plan](ddc-pri-processing.md). These decisions do not
+describe current code until implementation is separately authorized and
+complete. A future Simulink implementation uses fixed dimensions per
+configured model and does not support runtime-variable frame sizes. Channel
+count is configurable for tests, with 64 as the default.
 
-**Settled:** Preserve raw ADC samples as `int16` on disk. The storage reader
-converts them to floating point when loading for MATLAB processing. The same
-raw vectors can be reused by a future Simulink path.
+**Settled:** Preserve raw ADC samples as `int16` on disk and in the loaded ADC
+matrix. The caller converts each selected complete physical PRI to `double` at
+the DDC call boundary. The same compact raw matrix can be reused by a future
+Simulink path.
 
 **Settled for the pilot:** ADC samples form a correctly sampled, contiguous
 timeline. Reject missing samples or discontinuous ADC ticks; do not infer or
@@ -300,9 +304,9 @@ its frame size or timing policy.
 The MATLAB Code Analyzer and focused DDC walkthrough/state-continuity checks
 passed on 2026-09-28. The full WP4 MATLAB MCP suite completed on 2026-09-28
 with 54 passed, 0 failed, and 0 incomplete in 84.2901 seconds. The joint design
-discussion closed on 2026-09-29; a new implementation review remains pending
-after Phase 0 decisions and explicit go. Then select the next component question
-under step 5.
+discussion closed on 2026-09-29; Julio confirmed the Phase 0 contract on
+2026-10-02. A new implementation review remains pending his separate explicit
+go. Then select the next component question under step 5.
 
 Completion: the implementation and relevant checks pass, and the guide,
 glossary, diagrams, and current status describe the same API and compatibility
