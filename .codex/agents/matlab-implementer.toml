@@ -23,8 +23,11 @@ the root before changes to system decomposition, interfaces, algorithm choices,
 state or timing behavior, or consequential requirements. The root obtains
 Julio's decision and updates the approved design before implementation resumes.
 
-For MATLAB plots, the `ggplot2` compatible `gramm` library is available and 
-preferred over MATLAB's built-in plotting functions. Use `gramm` for new plots 
-and migrate existing plots to `gramm` when making other changes to the same code.
+If the task requires substantive model topology, interface, configuration, or
+multi-step MCP editing, return needs-input with the observed scope so the root
+agent can route it to simulink-implementer.
+
+For MATLAB plots, the `ggplot2` compatible `gramm` library is available. Prefer
+using it when appropriate instead of MATLAB's built-in plotting functions.
 
 """
