@@ -1,6 +1,6 @@
 function diagnostic = checkTiming(data)
 %CHECKTIMING Independently enforce the frozen timing profile and proof.
-diagnostic = checkVersion(data);
+diagnostic = wp4oracle.checkVersion(data);
 if ~diagnostic.accepted
     return
 end
@@ -11,14 +11,14 @@ required = ["decimationFactors", "delayTicks", "delayOutputSamples", ...
     "motionBoundAlignedMarginTicks", "nearRangeMarginTicks", ...
     "finalPhaseModuloTicks", "scheduleRecordCount", "scanMidpointOffsetTicks", ...
     "accepted", "schedule", "timingDesign", "timingSpec"];
-diagnostic = requireFields(data, required);
+diagnostic = wp4oracle.requireFields(data, required, "A required timing evidence field is missing.");
 if ~diagnostic.accepted
     return
 end
 design = data.timingDesign;
 designRequired = ["decimationFactors", "stage1Numerator", "stage2Numerator", "adcRateHz"];
 if ~isstruct(design) || any(~isfield(design, designRequired))
-    diagnostic = failDiagnostic("MISSING_FIELD", "timingDesign", ...
+    diagnostic = wp4oracle.failDiagnostic("MISSING_FIELD", "timingDesign", ...
         "Timing design coefficients, factors, and sample rate are required.");
     return
 end
@@ -31,7 +31,7 @@ spec = data.timingSpec;
 specRequired = ["adcRateHz", "speedOfLightMps", "nominalRangeM", ...
     "radialSpeedBoundMps", "transmitBlankingTicks", "guardTicks"];
 if ~isstruct(spec) || any(~isfield(spec, specRequired))
-    diagnostic = failDiagnostic("MISSING_FIELD", "timingSpec", ...
+    diagnostic = wp4oracle.failDiagnostic("MISSING_FIELD", "timingSpec", ...
         "Frozen physical timing inputs are required.");
     return
 end
@@ -53,14 +53,14 @@ factors = double(design.decimationFactors(:).');
 stage1 = double(design.stage1Numerator(:));
 stage2 = double(design.stage2Numerator(:));
 if ~isequal(factors, [3, 4]) || numel(stage1) ~= 25 || numel(stage2) ~= 241
-    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "timingDesign.stage2Numerator", ...
+    diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", "timingDesign.stage2Numerator", ...
         "Timing oracle requires 25- and 241-tap stages with factors [3 4].");
     return
 end
 if ~isreal(stage1) || ~isreal(stage2) || any(~isfinite(stage1)) || ...
         any(~isfinite(stage2)) || max(abs(stage1 - flipud(stage1))) > 1e-13 || ...
         max(abs(stage2 - flipud(stage2))) > 1e-13
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "timingDesign.stage1Numerator", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "timingDesign.stage1Numerator", ...
         "Timing coefficients must be finite, real, and symmetric.");
     return
 end
@@ -118,18 +118,18 @@ if ~isequal(double(data.decimationFactors(:).'), factors) || ...
         double(data.delayOutputSamples) ~= derivedDelay / lattice || ...
         double(data.historySpanTicks) ~= derivedHistory || ...
         ~logical(data.primingRequired) || ~logical(data.primingVerified) || ~primerValid
-    diagnostic = failDiagnostic("TICK_DISCONTINUITY", "delayTicks", ...
+    diagnostic = wp4oracle.failDiagnostic("TICK_DISCONTINUITY", "delayTicks", ...
         "Stored delay or priming evidence differs from independently derived timing.");
     return
 end
 if ~isequal(double(data.primingRecordIndices(:).'), double(primerIndices - 1)) || ...
         ~isequal(uint64(data.primingDurationsTicks(:)), primerDurations)
-    diagnostic = failDiagnostic("TICK_DISCONTINUITY", "primingRecordIndices", ...
+    diagnostic = wp4oracle.failDiagnostic("TICK_DISCONTINUITY", "primingRecordIndices", ...
         "Priming records or durations do not match the frozen schedule.");
     return
 end
 if ~isequaln(data.usableRecordEvidence, recordEvidence)
-    diagnostic = failDiagnostic("TICK_DISCONTINUITY", "usableRecordEvidence", ...
+    diagnostic = wp4oracle.failDiagnostic("TICK_DISCONTINUITY", "usableRecordEvidence", ...
         "A pulse gate, guard, lattice minimum, or compensated tick is incorrect.");
     return
 end
@@ -143,7 +143,7 @@ for index = 1:numel(marginNames)
         return
     end
     if double(data.(fieldName)) ~= expectedMargins(index)
-        diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", fieldName, ...
+        diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", fieldName, ...
             "Stored integer margin differs from the frozen-profile derivation.");
         return
     end
@@ -153,73 +153,41 @@ if data.finalPhaseModuloTicks ~= mod(derivedDelay, lattice) || ...
         double(data.scanMidpointOffsetTicks) ~= midpoint || ...
         any(~[recordEvidence.minimalGate]) || any(~[recordEvidence.guardSupported]) || ...
         any(alignedMargins <= 0) || ~logical(data.accepted)
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "motionBoundAlignedMarginTicks", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "motionBoundAlignedMarginTicks", ...
         "Derived aligned margins or accepted timing status are inconsistent.");
 else
-    diagnostic = passDiagnostic();
+    diagnostic = wp4oracle.passDiagnostic();
 end
 end
 
 function diagnostic = validateFrozenScalar(data, name, expected, path)
 value = data.(name);
 if ~isnumeric(value) || ~isscalar(value) || ~isreal(value)
-    diagnostic = failDiagnostic("TYPE_MISMATCH", path, ...
+    diagnostic = wp4oracle.failDiagnostic("TYPE_MISMATCH", path, ...
         "Frozen timing profile values must be real numeric scalars.");
 elseif ~isfinite(double(value))
-    diagnostic = failDiagnostic("NONFINITE", path, ...
+    diagnostic = wp4oracle.failDiagnostic("NONFINITE", path, ...
         "Frozen timing profile values must be finite.");
 elseif double(value) ~= expected
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", path, ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", path, ...
         "Timing profile differs from the frozen 6800 m radar contract.");
 else
-    diagnostic = passDiagnostic();
+    diagnostic = wp4oracle.passDiagnostic();
 end
 end
 
 function diagnostic = validateIntegralScalar(data, name, path)
 value = data.(name);
 if ~isnumeric(value) || ~isscalar(value) || ~isreal(value)
-    diagnostic = failDiagnostic("TYPE_MISMATCH", path, ...
+    diagnostic = wp4oracle.failDiagnostic("TYPE_MISMATCH", path, ...
         "Stored timing margins must be real numeric scalars.");
 elseif ~isfinite(double(value))
-    diagnostic = failDiagnostic("NONFINITE", path, ...
+    diagnostic = wp4oracle.failDiagnostic("NONFINITE", path, ...
         "Stored timing margins must be finite.");
 elseif double(value) ~= fix(double(value))
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", path, ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", path, ...
         "Stored timing margins must be integral tick counts.");
 else
-    diagnostic = passDiagnostic();
+    diagnostic = wp4oracle.passDiagnostic();
 end
-end
-
-function diagnostic = checkVersion(data)
-if ~isstruct(data) || ~isfield(data, "schemaVersion")
-    diagnostic = failDiagnostic("MISSING_FIELD", "schemaVersion", "Schema version is required.");
-elseif string(data.schemaVersion) ~= "1.0.0-draft.2"
-    diagnostic = failDiagnostic("VERSION_MISMATCH", "schemaVersion", ...
-        "Only schema 1.0.0-draft.2 is accepted.");
-else
-    diagnostic = passDiagnostic();
-end
-end
-
-function diagnostic = requireFields(data, fields)
-diagnostic = passDiagnostic();
-for index = 1:numel(fields)
-    if ~isstruct(data) || ~isfield(data, fields(index))
-        diagnostic = failDiagnostic("MISSING_FIELD", fields(index), ...
-            "A required timing evidence field is missing.");
-        return
-    end
-end
-end
-
-function diagnostic = passDiagnostic()
-diagnostic = struct("accepted", true, "code", "", "path", "", "message", "", ...
-    "output", struct());
-end
-
-function diagnostic = failDiagnostic(code, path, message)
-diagnostic = struct("accepted", false, "code", string(code), "path", string(path), ...
-    "message", string(message), "output", struct());
 end

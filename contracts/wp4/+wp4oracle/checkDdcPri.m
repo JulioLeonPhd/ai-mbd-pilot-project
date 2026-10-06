@@ -1,31 +1,31 @@
 function diagnostic = checkDdcPri(data)
 %CHECKDDCPRI Validate independent per-PRI DDC evidence.
 
-diagnostic = checkVersion(data);
+diagnostic = wp4oracle.checkVersion(data);
 if ~diagnostic.accepted
     return
 end
 required = ["processingProfile", "processingProfileVersion", "schedule", ...
     "design", "cases", "normalizedTolerance", "seed"];
-diagnostic = requireFields(data, required);
+diagnostic = wp4oracle.requireFields(data, required, "A required per-PRI evidence field is missing.");
 if ~diagnostic.accepted
     return
 end
 if string(data.processingProfile) ~= "independent-pri-v1" || ...
         string(data.processingProfileVersion) ~= "1.0.0"
-    diagnostic = failDiagnostic("VERSION_MISMATCH", "processingProfile", ...
+    diagnostic = wp4oracle.failDiagnostic("VERSION_MISMATCH", "processingProfile", ...
         "Per-PRI evidence must identify independent-pri-v1 version 1.0.0.");
     return
 end
 if ~isa(data.normalizedTolerance, "double") || ...
         ~isscalar(data.normalizedTolerance) || data.normalizedTolerance ~= 5e-11
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "normalizedTolerance", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "normalizedTolerance", ...
         "Per-PRI evidence must use the proposed normalized tolerance 5e-11.");
     return
 end
 if ~isa(data.seed, "double") || ~isscalar(data.seed) || ...
         ~isfinite(data.seed) || data.seed < 0 || data.seed ~= fix(data.seed)
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "seed", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "seed", ...
         "Per-PRI evidence must record its nonnegative integer stimulus seed.");
     return
 end
@@ -47,7 +47,7 @@ expectedCaseIds = ["zero-one-channel", "first-sample-impulse", ...
     "zero-64-channel", "channel-isolation-64"];
 if ~isstruct(data.cases) || numel(data.cases) ~= numel(expectedCaseIds) || ...
         ~isequal(string({data.cases.caseId}), expectedCaseIds)
-    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "cases", ...
+    diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", "cases", ...
         "Per-PRI evidence must contain the seven ordered boundary and channel cases.");
     return
 end
@@ -77,7 +77,7 @@ for caseIndex = 1:numel(data.cases)
     maximumAbsoluteError = max(maximumAbsoluteError, ...
         caseDiagnostic.output.maximumAbsoluteError);
 end
-diagnostic = passDiagnostic();
+diagnostic = wp4oracle.passDiagnostic();
 diagnostic.output = struct("maximumNormalizedError", maximumError, ...
     "maximumAbsoluteError", maximumAbsoluteError, ...
     "normalizationReferenceAmplitude", referenceAmplitude, ...
@@ -89,7 +89,7 @@ required = ["adcRateHz", "intermediateRateHz", "outputRateHz", ...
     "mixerFrequencyHz", "decimationFactors", "stage1Numerator", ...
     "stage2Numerator", "stage1Order", "stage2Order", ...
     "delayTicks", "delayOutputSamples"];
-diagnostic = requireFields(design, required);
+diagnostic = wp4oracle.requireFields(design, required, "A required per-PRI evidence field is missing.");
 if ~diagnostic.accepted
     return
 end
@@ -98,13 +98,13 @@ if ~isequal([design.adcRateHz, design.intermediateRateHz, design.outputRateHz], 
         ~isequal(design.decimationFactors, [3, 4]) || ...
         design.stage1Order ~= 24 || design.stage2Order ~= 240 || ...
         design.delayTicks ~= 372 || design.delayOutputSamples ~= 31
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "rates", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "rates", ...
         "Per-PRI evidence differs from the frozen DDC rates and factors.");
     return
 end
 if ~isTapVector(design.stage1Numerator, 25) || ...
         ~isTapVector(design.stage2Numerator, 241)
-    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "stage1Numerator", ...
+    diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", "stage1Numerator", ...
         "The frozen two-stage DDC requires 25 and 241 taps.");
     return
 end
@@ -112,14 +112,14 @@ expectedStage1 = fir1(24, 25e6 / (150e6 / 2), kaiser(25, 8.6));
 expectedStage2 = fir1(240, 5.625e6 / (50e6 / 2), kaiser(241, 8.6));
 if any(~isfinite(design.stage1Numerator(:))) || ...
         max(abs(design.stage1Numerator(:) - expectedStage1(:))) > 5e-15
-    diagnostic = failDiagnostic("DDC_COEFFICIENT_MISMATCH", "stage1Numerator", ...
+    diagnostic = wp4oracle.failDiagnostic("DDC_COEFFICIENT_MISMATCH", "stage1Numerator", ...
         "Per-PRI evidence does not contain the frozen stage-one coefficients.");
 elseif any(~isfinite(design.stage2Numerator(:))) || ...
         max(abs(design.stage2Numerator(:) - expectedStage2(:))) > 5e-15
-    diagnostic = failDiagnostic("DDC_COEFFICIENT_MISMATCH", "stage2Numerator", ...
+    diagnostic = wp4oracle.failDiagnostic("DDC_COEFFICIENT_MISMATCH", "stage2Numerator", ...
         "Per-PRI evidence does not contain the frozen stage-two coefficients.");
 else
-    diagnostic = passDiagnostic();
+    diagnostic = wp4oracle.passDiagnostic();
 end
 end
 
@@ -128,26 +128,26 @@ function diagnostic = checkCase(item, caseIndex, expectedPriIndex, ...
 required = ["caseId", "priIndex", "scheduleRecordIndex", "signalType", ...
     "input", "expectedOutput", "metadata", "coordinateMap", ...
     "targetChannel"];
-diagnostic = requireFields(item, required);
+diagnostic = wp4oracle.requireFields(item, required, "A required per-PRI evidence field is missing.");
 if ~diagnostic.accepted
     return
 end
 if ~isa(item.input, "double") || ~isreal(item.input) || ...
         any(~isfinite(item.input(:))) || ...
         ~isequal(size(item.input), [expectedPriLengths(expectedPriIndex), expectedChannels])
-    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "input", ...
+    diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", "input", ...
         "Each call must contain one complete finite real PRI with its declared channel count.");
     return
 end
 if double(item.priIndex) ~= expectedPriIndex
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "priIndex", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "priIndex", ...
         "The evidence case references the wrong PRF index.");
     return
 end
 recordIndex = double(item.scheduleRecordIndex);
 if ~isscalar(recordIndex) || recordIndex < 1 || recordIndex > numel(schedule.records) || ...
         recordIndex ~= fix(recordIndex)
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "scheduleRecordIndex", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "scheduleRecordIndex", ...
         "The case must reference a physical PRI record in the schedule.");
     return
 end
@@ -155,7 +155,7 @@ record = schedule.records(recordIndex);
 if ~ismember(string(record.role), ["priming", "usable"]) || ...
         double(record.prfIndex) ~= expectedPriIndex || ...
         double(record.sampleCount) ~= size(item.input, 1)
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "scheduleRecordIndex", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "scheduleRecordIndex", ...
         "DDC calls may reference complete priming or usable PRIs, never transition gaps.");
     return
 end
@@ -163,7 +163,7 @@ outputCount = size(item.input, 1) / 12;
 if outputCount ~= fix(outputCount) || ...
         ~isequal(size(item.expectedOutput), [outputCount, expectedChannels]) || ...
         ~isa(item.expectedOutput, "double") || any(~isfinite(item.expectedOutput(:)))
-    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "expectedOutput", ...
+    diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", "expectedOutput", ...
         "Retained no-tail output must be complex [N/12,C].");
     return
 end
@@ -189,20 +189,20 @@ end
 oracleOutput = directPriConvolution(item.input, design);
 if caseIndex == 1 || caseIndex == 6
     if any(item.expectedOutput(:) ~= 0)
-        diagnostic = failDiagnostic("NUMERICAL_MISMATCH", "expectedOutput", ...
+        diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", "expectedOutput", ...
             "Zero-input PRIs must produce exact complex zeros in every channel.");
         return
     end
 elseif caseIndex == 7
     inactiveChannels = setdiff(1:expectedChannels, item.targetChannel);
     if any(item.expectedOutput(:, inactiveChannels) ~= 0, "all")
-        diagnostic = failDiagnostic("NUMERICAL_MISMATCH", "expectedOutput", ...
+        diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", "expectedOutput", ...
             "Inactive channel outputs must remain exact zeros.");
         return
     end
 end
 if isreal(item.expectedOutput)
-    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "expectedOutput", ...
+    diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", "expectedOutput", ...
         "Retained no-tail output must have a complex sample type.");
     return
 end
@@ -213,14 +213,14 @@ end
 maximumAbsoluteError = max(abs(oracleOutput(:) - item.expectedOutput(:)));
 maximumNormalizedError = maximumAbsoluteError / referenceAmplitude;
 if maximumNormalizedError > tolerance
-    diagnostic = failDiagnostic("NUMERICAL_MISMATCH", "expectedOutput", ...
+    diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", "expectedOutput", ...
         "Stored output differs from independent retained combined-FIR convolution.");
     diagnostic.output.maximumNormalizedError = maximumNormalizedError;
     diagnostic.output.maximumAbsoluteError = maximumAbsoluteError;
     diagnostic.output.referenceAmplitude = referenceAmplitude;
     return
 end
-diagnostic = passDiagnostic();
+diagnostic = wp4oracle.passDiagnostic();
 diagnostic.output.maximumNormalizedError = maximumNormalizedError;
 diagnostic.output.maximumAbsoluteError = maximumAbsoluteError;
 diagnostic.output.referenceAmplitude = referenceAmplitude;
@@ -230,12 +230,12 @@ function diagnostic = checkMetadata(metadata, inputCount, outputCount)
 fields = ["inputSampleCount", "outputSampleCount", "decimationFactor", ...
     "groupDelayInputSamples", "groupDelayOutputSamples", ...
     "startupInputSamples", "startupOutputSamples"];
-diagnostic = requireFields(metadata, fields);
+diagnostic = wp4oracle.requireFields(metadata, fields, "A required per-PRI evidence field is missing.");
 if ~diagnostic.accepted
     return
 end
 if numel(fieldnames(metadata)) ~= numel(fields)
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "metadata", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "metadata", ...
         "DDC metadata must remain sample-domain only.");
     return
 end
@@ -244,19 +244,19 @@ for fieldIndex = 1:numel(fields)
     value = metadata.(char(fields(fieldIndex)));
     if ~isa(value, "double") || ~isscalar(value) || ~isfinite(value) || ...
             value ~= expected(fieldIndex)
-        diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", fields(fieldIndex), ...
+        diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", fields(fieldIndex), ...
             "Sample-domain DDC metadata differs from the approved per-PRI contract.");
         return
     end
 end
-diagnostic = passDiagnostic();
+diagnostic = wp4oracle.passDiagnostic();
 end
 
 function diagnostic = checkCoordinateMap(map, record, outputCount)
 required = ["timeEpoch", "startTick", "rawOutputStartTick", ...
     "rawOutputLastTick", "compensatedOutputStartTick", ...
     "compensatedOutputLastTick", "groupDelayInputSamples"];
-diagnostic = requireFields(map, required);
+diagnostic = wp4oracle.requireFields(map, required, "A required per-PRI evidence field is missing.");
 if ~diagnostic.accepted
     return
 end
@@ -269,10 +269,10 @@ actual = [double(map.startTick), double(map.rawOutputStartTick), ...
     double(map.compensatedOutputLastTick), double(map.groupDelayInputSamples)];
 if ~isa(map.timeEpoch, "uint64") || ~isscalar(map.timeEpoch) || ...
         map.timeEpoch ~= uint64(1) || any(actual ~= expected)
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "compensatedOutputStartTick", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "compensatedOutputStartTick", ...
         "Caller tick mapping must apply the 372-tick delay exactly once.");
 else
-    diagnostic = passDiagnostic();
+    diagnostic = wp4oracle.passDiagnostic();
 end
 end
 
@@ -341,9 +341,9 @@ randomStream = RandStream("mt19937ar", "Seed", seed);
 signal = signal + 0.05 .* randn(randomStream, sampleCount, 1);
 end
 if valid
-    diagnostic = passDiagnostic();
+    diagnostic = wp4oracle.passDiagnostic();
 else
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "signalType", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "signalType", ...
         "The stimulus does not match its declared boundary or isolation case.");
 end
 end
@@ -368,36 +368,4 @@ end
 
 function output = isTapVector(value, lengthExpected)
 output = isvector(value) && numel(value) == lengthExpected;
-end
-
-function diagnostic = checkVersion(data)
-if ~isstruct(data) || ~isfield(data, "schemaVersion")
-    diagnostic = failDiagnostic("MISSING_FIELD", "schemaVersion", "Schema version is required.");
-elseif string(data.schemaVersion) ~= "1.0.0-draft.2"
-    diagnostic = failDiagnostic("VERSION_MISMATCH", "schemaVersion", ...
-        "Only schema 1.0.0-draft.2 is accepted.");
-else
-    diagnostic = passDiagnostic();
-end
-end
-
-function diagnostic = requireFields(data, fields)
-diagnostic = passDiagnostic();
-for index = 1:numel(fields)
-    if ~isstruct(data) || ~isfield(data, fields(index))
-        diagnostic = failDiagnostic("MISSING_FIELD", fields(index), ...
-            "A required per-PRI evidence field is missing.");
-        return
-    end
-end
-end
-
-function diagnostic = passDiagnostic()
-diagnostic = struct("accepted", true, "code", "", "path", "", "message", "", ...
-    "output", struct());
-end
-
-function diagnostic = failDiagnostic(code, path, message)
-diagnostic = struct("accepted", false, "code", string(code), "path", string(path), ...
-    "message", string(message), "output", struct());
 end
