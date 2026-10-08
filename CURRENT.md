@@ -32,9 +32,11 @@ channel oracle checks. The bounded numerical tolerance and all evidence scopes
 are recorded in the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md).
 The one-PRI teaching walkthrough is in
 [docs/examples/ddc-walkthrough.md](docs/examples/ddc-walkthrough.md); full-scan
-integration evidence remains a separate check. The MATLAB implementation is
-ready for Julio's implementation and walkthrough review. Human visual review of
-the redrawn diagrams remains unapproved. Then
+integration evidence remains a separate check. Julio approved the DDC
+walkthrough on 2026-10-08. Merge readiness is blocked by incomplete stopband
+coverage in the cascade alias metric; see the
+[merge-readiness review](docs/plans/ddc-pri-processing.md). Human visual review
+of the separate redrawn architecture diagrams remains unapproved. Then
 review the range-component boundary. Historical G2 streaming evidence remains
 continuous-state evidence only, not per-PRI acceptance evidence. Unit/oracle,
 full-scan, end-to-end, and hardware claims remain separate. See [ADR 0022](docs/adr/0022-adopt-independent-pri-ddc-processing.md)
@@ -56,9 +58,10 @@ WP4 MATLAB MCP suite completed on 2026-09-28 with 54 passed, 0 failed, and 0
 incomplete in 84.2901 seconds. Julio closed the joint DDC design discussion on
 2026-09-29. The per-PRI MATLAB implementation and independent numerical
 validation are complete. The pinned continuous-state DDC-002 replay passed, as
-did preservation of all 23 historical fixture hashes. Julio's implementation
-and walkthrough review is the next DDC step. Visual review of the redrawn
-architecture diagrams remains unapproved. Then review the range-component
+did preservation of all 23 historical fixture hashes. Julio approved the DDC
+walkthrough on 2026-10-08; implementation review and merge-readiness work
+remain ongoing. Visual review of the redrawn architecture diagrams remains
+unapproved. Then review the range-component
 boundary under step 5. Do not
 represent DDC results as full-receiver or hardware evidence. WP6e's ambiguity
 method and ordering remain open study items. Issue 3 separately tracks manifest

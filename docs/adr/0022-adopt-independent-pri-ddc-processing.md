@@ -145,7 +145,7 @@ fixture-preservation audit passed. Independent numerical validation also passed
 after the exact-zero and inactive-channel oracle checks were made explicit and
 verified. The bounded five-PRI tolerance is justified by independent numerical
 review; it is not a full-CPI, global-tick, or hardware error bound. Preserve
-DDC-002 as historical continuous-state evidence, not per-PRI acceptance. The
-implementation is ready for Julio's implementation and walkthrough review. A
-narrow evidence-schema migration is preferred to an unrelated global schema
-version change.
+DDC-002 as historical continuous-state evidence, not per-PRI acceptance.
+Julio approved the DDC walkthrough on 2026-10-08; implementation review and
+merge-readiness work remain ongoing. A narrow evidence-schema migration is
+preferred to an unrelated global schema version change.

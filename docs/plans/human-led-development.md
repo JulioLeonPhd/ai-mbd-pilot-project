@@ -37,9 +37,10 @@ and evidence migration on 2026-10-02, then explicitly authorized implementation.
 The per-PRI core and WP4 suites and full-scan walkthrough pass. Pinned DDC-002
 replay passed strict 1/1 at its historical revision, and all 23 historical
 fixture hashes remain unchanged. Independent numerical validation passed,
-including the exact-zero and inactive-channel oracle checks. The MATLAB
-implementation is ready for Julio's implementation and walkthrough review.
-Julio's visual review of the redrawn views remains unapproved; see [CURRENT.md](../../CURRENT.md).
+including the exact-zero and inactive-channel oracle checks. Julio approved
+the DDC walkthrough on 2026-10-08; implementation review and merge-readiness
+work remain ongoing. Julio's visual review of the separate
+redrawn architecture views remains unapproved; see [CURRENT.md](../../CURRENT.md).
 The repeat-component workflow remains incomplete.
 
 ## Ordered work
@@ -110,9 +111,16 @@ spectra, and timing diagrams. The walkthrough is for learning first; use what
 it reveals to decide which refactors are needed, while preserving useful
 namespaces.
 
-After the MATLAB behavior and module interfaces are clear and reviewed, build a
-behavioral Simulink version first. It should express the approved algorithms,
-interfaces, fixed dimensions, signal timing, and meaningful buffering behavior;
+After the complete MATLAB receiver/reference implementation and module
+interfaces are clear and reviewed, use the first MATLAB revision to explore
+DDC filtering and decimation optimization before Simulink work. Julio gave this
+direction on 2026-10-03; candidate filter structures remain proposals until he
+reviews their evidence. Compare candidates against the approved 0.1 dB overall
+ripple and 60 dB alias rejection budgets, preserving filtering before
+decimation. A CIC decimator followed by an FIR anti-alias filter is one
+candidate for study, not an accepted replacement. Then build a behavioral
+Simulink version first. It should express the approved algorithms, interfaces,
+fixed dimensions, signal timing, and meaningful buffering behavior;
 it need not be cycle-accurate. A separate implementation-oriented Simulink
 version may follow with more detailed hardware-oriented structure. HDL remains
 deferred. Neither stage requires a one-to-one mapping from MATLAB functions to
@@ -145,8 +153,9 @@ confirmed the sample-only API and responsibilities on 2026-10-02, and authorized
 implementation that day. Scoped core and WP4 tests, the full-scan walkthrough,
 pinned DDC-002 replay, and fixture-preservation audit passed. Independent
 numerical validation passed, including exact-zero and inactive-channel checks.
-The MATLAB implementation is ready for Julio's implementation and walkthrough
-review; the historical G2 continuous-state baseline remains separate. Future
+Julio approved the DDC walkthrough on 2026-10-08; implementation review and
+merge-readiness work remain ongoing. The historical G2 continuous-state
+baseline remains separate. Future
 Simulink models use fixed dimensions per configured model; execution choices
 remain deferred. Channel count is configurable for tests, with 64 as the default.
 
@@ -306,9 +315,10 @@ with 54 passed, 0 failed, and 0 incomplete in 84.2901 seconds. The joint design
 discussion closed on 2026-09-29; Julio confirmed the Phase 0 contract and
 authorized implementation on 2026-10-02. The per-PRI implementation, scoped
 core and WP4 suites, full-scan walkthrough, pinned DDC-002 replay, and
-independent numerical validation have passed. The
-MATLAB implementation is ready for Julio's implementation and walkthrough
-review; visual review of the redrawn diagrams remains unapproved. Then select
+independent numerical validation have passed. Julio approved the DDC
+walkthrough on 2026-10-08; implementation review and merge-readiness work
+remain ongoing. Visual review of the redrawn architecture
+diagrams remains unapproved. Then select
 the next component question under step 5.
 
 Completion: the implementation and relevant checks pass, and the guide,

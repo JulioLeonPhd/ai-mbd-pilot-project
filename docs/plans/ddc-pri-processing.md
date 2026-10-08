@@ -4,8 +4,9 @@
 Phase 0 contract. Julio explicitly authorized implementation on 2026-10-02.
 The MATLAB implementation, scoped tests, full-scan walkthrough, pinned-history
 replay, fixture-preservation audit, and independent numerical validation passed.
-The implementation is ready for Julio's implementation and walkthrough review.
-The range-processing boundary is the next component review.
+Julio approved the DDC walkthrough on 2026-10-08; implementation review and
+merge-readiness work remain ongoing. The range-processing boundary is the next
+component review.
 
 ## Phase 0: confirmed contract (2026-10-02)
 
@@ -191,7 +192,8 @@ The following approved implementation steps are complete:
    keep filter and decimator as distinct diagram blocks. Three-phase/polyphase
    mixing remains a later optimization candidate.
 6. Targeted regression, MATLAB Code Analyzer, and independent deep validation
-   passed; the MATLAB implementation is ready for Julio's review.
+   passed; Julio approved the DDC walkthrough on 2026-10-08, and implementation
+   review and merge-readiness work remain ongoing.
 
 ## Validated acceptance criteria
 
@@ -213,7 +215,58 @@ Downstream range processing owns startup, blanking, and PRI-end window validity.
 Filter passband and alias-rejection regressions passed. Unit/oracle, full-scan,
 and end-to-end detection evidence remain distinct scopes.
 
+## Merge-readiness review — 2026-10-08
+
+Root reviewed `main` at `e76eb62dbe24dd03174187f224e409fdaad3e643` through
+`10b6456794bf8f952c2ce3989791b9e3e8c8357d`. MATLAB source remained
+unchanged during these fresh checks.
+The specification review found a merge blocker: issue 6 requires cascade alias
+rejection over the approved stopband `|f| >= 6.25 MHz` through 25 MHz on a
+1 kHz grid, but `measureResponse` and `checkDdc` measure nonprincipal cascade
+branches only over output `|f| <= 5 MHz`. This omits required stopband slices,
+including 6.25–7.5 MHz. Update both metrics and add a boundary regression,
+then repeat independent validation before merge. A bounded root diagnostic
+measured 87.7679126746 dB direct principal-cascade attenuation in the
+6.25–7.5 MHz interval. The default filters pass that bounded omitted-interval
+diagnostic; the finding concerns acceptance coverage,
+not a demonstrated filter failure.
+
+Independent standards review reported three warning categories: `checkCase`
+in `checkDdcPri` and `saveBranchFigure` in `runDdcScanCheck` each have nine
+inputs against the documented six-input limit; `generateDdc` extends the design
+struct outside its creating function; and two stimulus helpers in `checkDdcPri`
+are avoidably nested. Resolve or explicitly disposition these warnings.
+Independent specification review reported the alias-metric error above. These
+independent reviews are separate from Julio's 2026-10-08 walkthrough approval,
+which does not approve merge or waive the findings.
+
+Root-run MATLAB MCP checks passed on source that remained unchanged during
+these fresh checks: `TestDdcPriProcessing`
+(32/0/0), `TestDdcWalkthrough` (1/0/0; 147 physical PRIs and 4 skipped gaps),
+`TestWp4Fixtures` (56/0/0), and Code Analyzer on all 29 existing changed
+MATLAB files with no issues. The deleted `initializeState.m` was excluded. The
+strict checker passed 56/56; provenance-format consistency, WP3 conformance
+(30 rows), Ruff, Pyright, handoff checks, and Markdown lint also passed.
+Historical fixture files were byte-identical to `main`; original manifest
+provenance was preserved and the derived test-method count is 56.
+DDC-002 historical replay was not rerun. The branch is three commits ahead of
+`main`, has nine local changes needing a reviewed commit, and has no pull
+request. Do not treat this record as merge or publication authorization.
+
 ## Deferred choices
+
+**Filter/decimation optimization study — requested 2026-10-03, deferred until
+the complete MATLAB receiver/reference implementation.** Julio requested that
+the first MATLAB revision after that implementation is complete explore more
+efficient filtering and decimation before Simulink work. Candidate exploration
+may include a CIC decimator followed by an FIR anti-alias filter; this is not
+approval to replace
+the current design. Compare the complete cascade against the 0.1 dB overall
+passband-ripple and 60 dB alias-rejection budgets at the final 12.5 MS/s complex
+output. Preserve filtering before decimation and account for the 6.25 MHz
+stage-2 stopband constraint; compensation after downsampling cannot undo
+aliasing already introduced. The current approved filter design remains the
+baseline until Julio reviews candidate evidence.
 
 Filter redesign, parallel execution demonstration, priming or prehistory
 removal, gap shortening, Simulink topology and execution mechanism, fixed-point
