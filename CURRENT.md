@@ -30,8 +30,11 @@ walkthrough, pinned DDC-002 replay, and fixture-preservation audit have passed.
 Independent numerical validation passed, including the exact-zero and inactive-
 channel oracle checks. The bounded numerical tolerance and all evidence scopes
 are recorded in the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md).
-The MATLAB implementation is ready for Julio's implementation and walkthrough
-review. Human visual review of the redrawn diagrams remains unapproved. Then
+The one-PRI teaching walkthrough is in
+[docs/examples/ddc-walkthrough.md](docs/examples/ddc-walkthrough.md); full-scan
+integration evidence remains a separate check. The MATLAB implementation is
+ready for Julio's implementation and walkthrough review. Human visual review of
+the redrawn diagrams remains unapproved. Then
 review the range-component boundary. Historical G2 streaming evidence remains
 continuous-state evidence only, not per-PRI acceptance evidence. Unit/oracle,
 full-scan, end-to-end, and hardware claims remain separate. See [ADR 0022](docs/adr/0022-adopt-independent-pri-ddc-processing.md)

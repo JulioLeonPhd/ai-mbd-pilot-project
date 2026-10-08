@@ -90,13 +90,15 @@ bounded comparison, with `1.65148e-11` margin. This is not a bound for
 full-CPI, global-tick, or hardware behavior, and remains separate from the
 pinned full-CPI DDC-002 replay.
 
-The final MATLAB walkthrough smoke completed in 8.7 seconds. It processed 147
-physical PRIs (5 priming, 142 usable), skipped four 106872-tick transition
-gaps, retained the full 10,553,388-tick contiguous `int16` timeline, processed
-10,125,900 physical input samples, and produced 843,825 output samples. The
-`cascade-peak-v1` response metrics were 0.00146437058836 dB cascade ripple,
-87.7676669047 dB stage-2 alias rejection, and 85.2548307898 dB full-cascade
-alias rejection. Independent fresh WP4 generation with strict traceability
+The full-scan integration walkthrough smoke completed in 8.7 seconds. It
+processed 147 physical PRIs (5 priming, 142 usable), skipped four 106872-tick
+transition gaps, retained the full 10,553,388-tick contiguous `int16` timeline,
+processed 10,125,900 physical input samples, and produced 843,825 output
+samples. The `cascade-peak-v1` response metrics were 0.00146437058836 dB
+cascade ripple, 87.7676669047 dB stage-2 alias rejection, and 85.2548307898 dB
+full-cascade alias rejection. This is full-scan integration evidence; it is not
+runtime evidence for the one-PRI teaching script. Independent fresh WP4
+generation with strict traceability
 passed all 56 rows, including seven new per-PRI cases. The independent WP4
 MATLAB suite passed 56/56 in 83.4439 seconds; independent direct DDC tests
 passed 32/32 in 10.6756 seconds. The tracked strict checker passed 56/56 with
@@ -109,16 +111,17 @@ manifest rows, and original global manifest metadata are preserved. These are
 bounded unit/oracle and full-scan observations, not end-to-end detection or
 hardware evidence.
 
-Reproduce the targeted MATLAB unit suite and walkthrough from the repository
-root with MATLAB available:
+Reproduce the targeted MATLAB unit suite and full-scan integration check from
+the repository root with MATLAB available. The scan runner remains separate
+from the one-PRI teaching script in `docs/examples/ddc-walkthrough.md`:
 
 ```matlab
 repoRoot = pwd;
 addpath(fullfile(repoRoot, "src"));
-addpath(fullfile(repoRoot, "examples"));
+addpath(fullfile(repoRoot, "tests", "ddc"));
 testResults = runtests(fullfile(repoRoot, "tests", "ddc"));
 assertSuccess(testResults);
-walkthrough = runDdcWalkthrough(fullfile(tempdir, "ddc-pri-walkthrough"));
+runDdcScanCheck(fullfile(tempdir, "ddc-pri-scan"));
 ```
 
 Reproduce the WP4 fresh-generation and strict-traceability check from the
@@ -166,11 +169,12 @@ The following approved implementation steps are complete:
    `src/+radardemo/+ddc/processFrame.m`. The approved implementation removes
    `initializeState.m` and the public continuation-state argument; it does not
    silently accept legacy arguments.
-3. Adapt the complete pre-generated ADC matrix in
-   `examples/runDdcWalkthrough.m` and the WP4 path by slicing and calling only
-   physical priming and usable PRIs. Preserve global timestamps and transition
-   gaps. Keep `int16` storage compact and convert each selected PRI to `double`
-   at the call boundary.
+3. Adapt the WP4 path by slicing and calling only physical priming and usable
+   PRIs. Preserve global timestamps and transition gaps. Keep `int16` storage
+   compact and convert each selected PRI to `double` at the call boundary. The
+   full-scan integration runner is `tests/ddc/runDdcScanCheck.m`; the current
+   teaching entry point `examples/runDdcWalkthrough.m` demonstrates one aligned
+   PRI.
 4. Add an independent per-PRI oracle and migrate the WP4 generator, checker,
    adapter, and test integration: `+wp4gen/generateDdc.m`,
    `+wp4gen/buildManifest.m`, `+wp4oracle/checkArtifact.m`,
@@ -180,11 +184,12 @@ The following approved implementation steps are complete:
    `ddc-pri.mat` and `ddc-response-pri.mat` witnesses. Preserve the unchanged
    historical `+wp4oracle/checkDdcStreaming.m` and `checkDdcZero.m` checkers
    and keep DDC-002 replayable at its pinned baseline.
-5. Update `examples/runDdcWalkthrough.m` and its documentation/plots. Add
-   individual `/3` and `/4` and cascade alias-response plots, a passband zoom,
-   and a per-PRI state-reset loop diagram. Prefer `gramm` where suitable; keep filter
-   and decimator as distinct diagram blocks. Three-phase/polyphase mixing
-   remains a later optimization candidate.
+5. Add individual `/3` and `/4` and cascade alias-response plots, a passband
+   zoom, and a per-PRI state-reset loop diagram for full-scan integration
+   evidence. The one-PRI teaching script provides input/output spectra,
+   startup, passband, and alias observations. Prefer `gramm` where suitable;
+   keep filter and decimator as distinct diagram blocks. Three-phase/polyphase
+   mixing remains a later optimization candidate.
 6. Targeted regression, MATLAB Code Analyzer, and independent deep validation
    passed; the MATLAB implementation is ready for Julio's review.
 

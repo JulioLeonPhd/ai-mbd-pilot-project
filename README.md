@@ -97,8 +97,9 @@ in force until Julio explicitly revises them. See the
    [requirements](docs/requirements/radar-matlab-v1.md), and [data contracts](docs/contracts/radar-v1-data-contracts.md)
    when you need their specific details.
 4. Run the [DDC learning walkthrough](docs/examples/ddc-walkthrough.md) in
-   MATLAB to inspect frequency translation, filtering, decimation, and
-   independent fresh local state for each physical PRI.
+   MATLAB to inspect one aligned PRI's frequency translation, filtering,
+   decimation, startup, and fresh local state. The plan links the separate
+   full-scan integration check.
 5. For domain vocabulary and equations, see [CONTEXT.md](CONTEXT.md) and its
    linked [radar equations reference](docs/reference/radar-equations.md).
 

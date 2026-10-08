@@ -1,72 +1,91 @@
 # DDC walkthrough
 
-These diagrams explain the per-PRI DDC contract. The algorithm view shows the
-sample path and rate changes; the state view shows the local sample loop and
-where its state is discarded. Each channel uses the same oscillator definition
-and FIR coefficients, with its own FIR delay state. No state carries between
-physical PRI calls.
+The algorithm view shows the per-PRI DDC sample path and rate changes. Each
+channel uses the same oscillator definition and FIR coefficients, with its own
+FIR delay state. No state carries between physical PRI calls.
 
 ![DDC sample flow: complex mixing, two FIR and decimation stages, and the resulting rates](assets/ddc-algorithm.svg)
 
-![Per-PRI scan loop: caller selects priming and usable PRIs, skips gaps, and discards fresh local DDC state after each call](assets/ddc-algorithm-state.svg)
-
 The algorithm view maps to [signal and state](#follow-the-signal-and-state)
 and [stimulus](#run-the-example). The approved call processes one physical PRI
-as a vectorized `[N,C]` array. The state view maps caller scan records to DDC
-calls, shows transition gaps outside those calls, and marks where each call's
-local state is discarded.
+as a vectorized `[N,C]` array.
 
-This MATLAB example follows a synthetic one-channel ADC scan through the
-floating-point digital down-converter (DDC). The live API processes one complete
-physical PRI per call:
-`[output, metadata] = radardemo.ddc.processFrame(adcPriSamples, design)`.
-Every call starts with fresh local state and a local sample index of zero; the
-caller selects and converts each PRI and owns its global identity and timing.
-The approved API and responsibilities are recorded in
-[ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md). The scan
-stimulus and output observations below document the current per-PRI example.
+This MATLAB script demonstrates one physical PRI through the floating-point
+digital down-converter (DDC). The live API processes one complete physical PRI
+per call: `[output, metadata] = radardemo.ddc.processFrame(adcPriSamples,
+design)`. Every call starts with fresh local state and a local sample index of
+zero; the caller selects and converts each PRI and owns its global identity and
+timing. The approved API and responsibilities are recorded in
+[ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md). This teaching
+example focuses on one aligned PRI and returns no metrics structure. The former
+full-scan `runDdcWalkthrough(outputDirectory)` workflow moved to
+`runDdcScanCheck`; full-scan integration coverage is separate.
 Historical continuous-state evidence remains separately pinned and is not
 acceptance evidence for this profile. The example does not verify the complete
-radar receiver or establish hardware performance. A future Simulink model will
-use fixed dimensions per configured model.
+radar receiver or establish hardware performance.
 
 ## Run the example
 
 Prerequisites are MATLAB and Signal Processing Toolbox, which provides `fir1`
 and `kaiser` for the filter coefficients. From the repository root, add the
-`examples` folder and call the function:
+`src` and `examples` folders, then run the no-argument
+[script](../../examples/runDdcWalkthrough.m):
 
 ```matlab
+addpath("src")
 addpath("examples")
-results = runDdcWalkthrough();
+run("examples/runDdcWalkthrough.m")
 ```
 
-The function runs without creating figures or files and returns a metrics
-structure. To save response plots, pass an output directory; it is created
-when needed:
+The script builds a deterministic 51 MHz desired tone plus a 70 MHz probe,
+stores ADC counts as `int16`, converts one complete aligned PRI starting at
+tick 0 to double, and calls the existing `processFrame` implementation. The
+input is `[88236,1]` ADC counts; the output is `[7353,1]` complex samples.
+Since the mixer uses 50 MHz,
+the desired tone appears at +1 MHz before filtering and decimation. Inspect the
+one-sided input spectrum in ADC counts, the two-sided complex output spectrum,
+and the startup I/Q plot. The first 62 output samples are excluded only from
+the output spectral analysis; the startup plot marks the boundary at sample
+61.5. This demonstrates frequency translation, the `/3` then `/4` rate change,
+and fresh-call startup. The script also displays the principal passband response
+and nonprincipal alias envelope. Full cascade memory spans 62 output samples,
+while nominal group delay is 31 output samples; these describe different
+behavior. The DDC retains produced samples and adds no tail. The teaching script
+displays figures without exporting files.
+
+## Full-scan integration check
+
+![Per-PRI scan loop: skip transition gaps or make one fresh-state DDC call for a physical PRI](assets/ddc-algorithm-state.svg)
+
+The scan-loop view shows how the caller skips transition gaps, invokes DDC for
+each physical PRI, and retains global timing and delay mapping. Each call uses
+fresh local state. For full-scan integration coverage, run
+[`runDdcScanCheck`](../../tests/ddc/runDdcScanCheck.m) from the repository root
+after adding `src` and `tests/ddc` to the path. Pass an optional output
+directory for response-figure export; MATLAB and `gramm` are required for that
+export:
 
 ```matlab
-results = runDdcWalkthrough(fullfile(tempdir, "ddc-walkthrough"));
+addpath("src")
+addpath("tests/ddc")
+runDdcScanCheck(fullfile(tempdir, "ddc-pri-scan"))
 ```
 
-The walkthrough creates a complete contiguous ADC `int16` scan buffer of
-shape `[10,553,388,1]` (about 21.1 MB) and reads the 151-record schedule. It
-retains the four transition intervals in the global timeline but calls the DDC
-only for 147 physical PRIs: five priming and 142 usable records. Each selected
-slice is converted to finite real double `[N,1]` at the call boundary. In this
-run those calls cover 10,125,900 input samples and return 843,825 complex output
-samples. The historical 6000-sample continuous-state walkthrough remains in
-pinned evidence; it is not a complete physical PRI.
+This check exercises the 147 physical PRIs and four transition gaps and retains
+scan-level metrics. Its observations are not measurements from the one-PRI
+teaching script. The four response figures it exports are
+[stage 1 alias response](assets/ddc-stage1-alias-response.png),
+[stage 2 alias response](assets/ddc-stage2-alias-response.png),
+[cascade alias response](assets/ddc-cascade-alias-response.png), and
+[passband zoom](assets/ddc-passband-zoom.png).
 
 ## Follow the signal and state
 
 The input shape is `[N,C]`: rows are successive ADC ticks and columns are
-channels. The scan buffer is one channel of quantized `int16` counts; each DDC
-call converts one scheduled slice to finite real double `[N,1]`. Values are
-synthetic counts, not calibrated volts. This seeded scan uses a 51 MHz tone at
-18,000 counts amplitude, a 70 MHz probe at 3,500 counts, and Gaussian noise
-with 600-count standard deviation (seed 2219). The 70 MHz probe is illustrative
-and outside the final ±5 MHz baseband. Mixing
+channels. The teaching script uses one channel of quantized `int16` ADC counts
+and passes finite real double `[88236,1]` to the DDC. Counts are synthetic and
+not calibrated volts. It includes a 51 MHz tone and a 70 MHz probe; the probe
+is illustrative and outside the final ±5 MHz baseband. Mixing
 produces complex samples at 150 MS/s. Stage 1 is a 24th-order, 25-tap FIR with
 a 25 MHz cutoff, designed as a two-sided low-pass filter around zero. It runs
 at 150 MS/s, then keeps every third output, yielding 50 MS/s. Stage 2 is a
@@ -102,7 +121,7 @@ translates; these tones do not represent a complete receiver response test.
 
 ## Figures and interpretation
 
-Passing an output directory creates four response figures:
+The full-scan integration runner can export four response figures:
 
 - [Stage 1 alias response](assets/ddc-stage1-alias-response.png) shows `/3`
   folding branches over its output Nyquist band.
@@ -113,12 +132,10 @@ Passing an output directory creates four response figures:
 to peak passband gain.
 - [Passband zoom](assets/ddc-passband-zoom.png) resolves the final passband.
 
-The saved figure fields are `stage1AliasResponse`, `stage2AliasResponse`,
-`cascadeAliasResponse`, and `passbandZoom` in `results.figures`. The approved
-response metric profile is `cascade-peak-v1`. Cascade passband
+The approved response metric profile is `cascade-peak-v1`. Cascade passband
 ripple is measured from the principal `|H1*H2|` response. Cascade alias
 rejection is referenced to the peak principal passband; stage-2 alias rejection
-remains separately referenced to its passband peak. The full-scan run measured
+remains separately referenced to its passband peak. The separate full-scan run measured
 `0.00146437058836 dB` cascade ripple, `87.7676669047 dB` stage-2 alias
 rejection, and `85.2548307898 dB` cascade alias rejection. The 32-test per-PRI
 oracle suite reported maximum input-peak-normalized error `1.12962634928e-15`
@@ -129,10 +146,10 @@ comparison. This is not a full-CPI, global-tick, or hardware error bound. The
 frozen DDC-002 full-CPI fixture remains separate historical continuous-state
 evidence; its pinned replay passed strict 1/1. The passband zoom uses
 scientific dB notation to show ripple much smaller than the `0.1 dB` limit.
-`results.recordObservations` includes each record role, PRF index, global start
-tick, input/output counts, delay-adjusted first/last output ticks, and peak
-output magnitude. These metrics show coordinate mapping and signal scale; they
-do not establish range-window validity.
+The full-scan runner reports record role, PRF index, global start tick,
+input/output counts, delay-adjusted first/last output ticks, and peak output
+magnitude. These metrics show coordinate mapping and signal scale; they do not
+establish range-window validity.
 
 These diagnostic DDC observations do not establish detection performance,
 hardware or real-time behavior, complete FIR precursor/waveform retention, or verification
