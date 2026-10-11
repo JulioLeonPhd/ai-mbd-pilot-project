@@ -100,8 +100,9 @@ in force until Julio explicitly revises them. See the
    MATLAB to inspect one aligned PRI's frequency translation, filtering,
    decimation, startup, and fresh local state. plan links separate
    full-scan integration check.
-5. For domain vocabulary and equations, see [CONTEXT.md](CONTEXT.md) and its
-   linked [radar equations reference](docs/reference/radar-equations.md).
+5. See the [domain glossary](GLOSSARY.md) for vocabulary and the
+   [radar equations reference](docs/reference/radar-equations.md) for equations
+   and technical limits.
 
 ## Repository guide
 

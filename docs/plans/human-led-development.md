@@ -65,11 +65,11 @@ definitions.
 
 ### 2. Improve the project overview and current-state references
 
-Revise `README.md`, `CONTEXT.md`, and `CURRENT.md`:
+Revise `README.md`, `GLOSSARY.md`, and `CURRENT.md`:
 
 - `README.md` explains the project purpose, learning goals, architecture
   diagram, current capability, a starting example, and human and agent roles.
-- `CONTEXT.md` remains the domain glossary, starting with radar and DSP
+- `GLOSSARY.md` contains the domain vocabulary, starting with radar and DSP
   concepts. Preserve mathematical conventions. Move workflow vocabulary to an
   appropriate workflow reference rather than mixing it into domain terms.
 - `CURRENT.md` stays concise: capabilities, limitations, and the next open
@@ -220,7 +220,7 @@ benchmark; scenario truth is never a production DUT input.
 pulses into the slow-time ensemble; corner turning changes data access order so
 1-D FFTs or Doppler banks can process per-range sequences efficiently. These
 are distinct responsibilities. Explain the relationship and terms using the
-[domain glossary](../../CONTEXT.md).
+[domain glossary](../../GLOSSARY.md).
 
 **Unresolved:** The combined module's exact name, any later migration
 compensation method, inputs, outputs, and any feedback or hypothesis

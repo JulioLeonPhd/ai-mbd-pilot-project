@@ -95,4 +95,4 @@ provide evidence and recommendations; neither grants human approval.
   responsibilities, and completion gates.
 - [Human-led development plan](../plans/human-led-development.md) — ordered
   work and step-specific acceptance criteria.
-- [Domain glossary](../../CONTEXT.md) — radar and DSP vocabulary.
+- [Domain glossary](../../GLOSSARY.md) — radar and DSP vocabulary.

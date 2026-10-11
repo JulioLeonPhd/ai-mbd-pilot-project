@@ -367,5 +367,5 @@ See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-Single-context layout: root `CONTEXT.md` and system-wide decisions in
+Single-context layout: root `GLOSSARY.md` and system-wide decisions in
 `docs/adr/`. See `docs/agents/domain.md`.
