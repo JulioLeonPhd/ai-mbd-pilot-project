@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recover a decision without recovering the whole conversation</title>
+  <link rel="stylesheet" href="../assets/teaching.css">
+</head>
+<body>
+<main>
+  <p class="label">Second brain · Lesson 01 · 5 minutes</p>
+  <h1>Recover a decision.<br>Keep its evidence attached.</h1>
+  <p class="lead">Your goal: resume this radar project knowing what was decided, what supports it, and what still needs your judgment.</p>
+  <p>A useful second brain makes saved knowledge usable in your next task. Forte’s <a href="https://fortelabs.com/blog/9-biggest-myths-and-misconceptions-about-basb/">CODE framework</a> describes capturing, organizing, distilling, and expressing information. For this lesson, “express” means a reliable session handoff.</p>
+  <aside><strong>Project-specific proposal:</strong> use the repository’s existing decisions and evidence as the foundation. A recovery note helps you find them; it does not approve a design or replace its sources.</aside>
+
+  <h2>1. See the trap</h2>
+  <p>You return after a break and find a passing DDC streaming result. Does that prove the currently approved DDC behavior?</p>
+  <p><a href="../../../adr/0022-adopt-independent-pri-ddc-processing.md">ADR 0022</a> records Julio’s approval of independent per-PRI processing. Earlier continuous-state evidence belongs to the earlier baseline. A passing result can be accurate and still answer a different question.</p>
+  <p><a href="../../../../CURRENT.md">CURRENT.md</a> points to current work and limitations. Read it before using a historical snapshot as a continuation point. Status descriptions here were inspected on 11 October 2026 at revision <code>feb5722fed7d9a9232ebdbed404c48020707275c</code>; linked working files may later change.</p>
+
+  <h2>2. Practice before revealing</h2>
+  <p>Open ADR 0022 and CURRENT.md. Say your answers aloud, then reveal feedback.</p>
+  <ol>
+    <li>What happens to DDC state at each physical PRI boundary?
+      <details><summary>Check your answer</summary><p>Mixer, FIR, and decimator state start fresh and local in each call. Repeated or reordered PRI calls must be independent. The physical ADC timeline remains continuous. Check the “Confirmed Phase 0 contract” in ADR 0022.</p></details>
+    </li>
+    <li>Can historical continuous-state G2 evidence establish per-PRI acceptance?
+      <details><summary>Check your answer</summary><p>No. Keep it labeled as historical continuous-state evidence. Follow ADR 0022 and the <a href="../../../plans/ddc-pri-processing.md">per-PRI implementation plan</a> for the applicable evidence and its scope. If you answered yes, you recovered a result but lost its baseline.</p></details>
+    </li>
+    <li>Does independent validation authorize merging?
+      <details><summary>Check your answer</summary><p>No. <a href="../../../../AGENTS.md">AGENTS.md</a> separates verification from Julio’s authority. CURRENT.md, as inspected, records unresolved standards warnings and no merge authorization. A future session must check updated sources before repeating that status.</p></details>
+    </li>
+  </ol>
+
+  <h2>3. Produce one useful handoff</h2>
+  <p>Draft four lines in your own words. Link sources rather than copying their full contents.</p>
+  <table>
+    <caption>Minimum recovery note</caption>
+    <thead><tr><th scope="col">Field</th><th scope="col">What the reader needs</th></tr></thead>
+    <tbody>
+      <tr><td>Decision</td><td>Approved behavior, who approved it, decision date, ADR link.</td></tr>
+      <tr><td>Baseline</td><td>What changed and which older claims no longer apply.</td></tr>
+      <tr><td>Evidence</td><td>Report or test link, revision, checked scope, excluded claims.</td></tr>
+      <tr><td>Next decision</td><td>What remains unresolved, its owner, and the next useful action.</td></tr>
+    </tbody>
+  </table>
+  <details><summary>Compare with a worked example</summary>
+    <p><strong>Decision:</strong> Julio approved independent per-PRI DDC on 29 September; confirmed the sample-only API and authorized implementation on 2 October. See ADR 0022.</p>
+    <p><strong>Baseline:</strong> state resets per PRI; historical continuous-state streaming evidence retains its original scope.</p>
+    <p><strong>Evidence:</strong> the per-PRI plan records scoped checks and independent numerical review. It separates unit/oracle, full-scan, and end-to-end scopes. This lesson inspected documentation; it did not rerun those checks.</p>
+    <p><strong>Next decision:</strong> inspect current implementation-review findings and follow the project’s existing merge-readiness and authorization process. CURRENT.md, as inspected, does not record merge authorization.</p>
+  </details>
+
+  <h2>4. Test whether it earns its upkeep</h2>
+  <p>For your next three sessions, time recovery of those four fields. Try a provisional two-minute target. Record wrong-baseline mistakes and the minutes spent maintaining the note. Keep this practice only if its recovery benefit justifies its upkeep. This is a proposed experiment, not a measured project improvement.</p>
+  <p>Next session, recall the four fields before reopening this lesson. Then compare with the <a href="../reference/decision-recovery.html">reference card</a>. No learning record is warranted until you demonstrate the skill.</p>
+  <p><strong>Primary reading:</strong> <a href="https://notes.andymatuschak.org/Evergreen_notes">Andy Matuschak’s Evergreen notes</a>. His evolving, linked notes offer a way to accumulate understanding across sessions. Here, apply that idea while preserving project decision authority.</p>
+  <p>Ask the agent follow-up questions, or paste your four-line handoff for feedback.</p>
+</main>
+<nav aria-label="Teaching workspace"><a href="../../../../notes/second-brain.md">Original note and elaboration</a> · <a href="../reference/decision-recovery.html">Reference card</a> · <a href="../MISSION.md">Mission</a> · <a href="../RESOURCES.md">Sources</a></nav>
+</body>
+</html>
