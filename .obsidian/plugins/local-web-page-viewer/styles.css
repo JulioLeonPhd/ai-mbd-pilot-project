@@ -1,0 +1,61 @@
+.lpv-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.lpv-frame-host {
+  flex: 1;
+  min-height: 0;
+}
+
+.lpv-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: var(--background-primary);
+}
+
+.lpv-media-modal {
+  width: 90vw;
+  max-width: 1100px;
+}
+
+.lpv-media-modal-content {
+  display: block;
+  max-width: 100%;
+  max-height: 80vh;
+  margin: 0 auto;
+}
+
+.lpv-image-zoom-wrap {
+  overflow: hidden;
+  max-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lpv-image-zoom-wrap .lpv-media-modal-content {
+  touch-action: none;
+  transform-origin: center center;
+  cursor: grab;
+  will-change: transform;
+}
+
+.lpv-bookmark-input {
+  width: 100%;
+}
+
+.lpv-modal-buttons {
+  margin-top: 12px;
+  text-align: right;
+}
+
+.lpv-bookmark-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+}

@@ -45,6 +45,17 @@ not a specialist handoff. Every `wait_agent` call uses a timeout of at least 10
 minutes; such
 calls are non-blocking and may be interrupted by a response or new user message.
 
+## Documentation style
+
+Do not enforce a fixed source width for prose. Prefer one sentence per source
+line, with blank lines between paragraphs. Preserve code blocks, tables, and
+intentional line breaks, and do not bulk-reflow existing text.
+
+Prefer tables when content can be meaningfully tabulated, especially
+comparisons, mappings, attributes, or status. Use bullets for parallel points
+when they make concepts faster to grasp, numbered lists for ordered steps, and
+prose for explanations that benefit from connected reasoning.
+
 ## Complexity triage
 
 Before routing a document, classify it as `trivial` or `complex`. Invoke
