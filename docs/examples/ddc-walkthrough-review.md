@@ -207,3 +207,21 @@ filter and decimation study remains deferred until the complete MATLAB
 receiver/reference implementation. Existing numerical and walkthrough evidence
 retains its documented scope and does not establish full-CPI, end-to-end
 detection, or hardware performance.
+
+---
+
+## Codex follow-up — issue 6 coverage evidence (2026-10-10)
+
+**Attribution:** Codex records the implementation and independent numerical
+validation completed on 2026-10-10. This follow-up does not record new Julio
+approval. The existing walkthrough approval and review dispositions above are
+unchanged.
+
+The `cascade-peak-v1` acceptance metric now covers the direct principal
+stopband term alongside the existing non-principal branch envelope. The frozen
+default remained accepted; the independent numerical review passed with no
+unresolved errors. Full results, test and strict-check evidence, and exact
+working-tree source hashes are recorded in the [issue 6 resolution entry](../plans/ddc-pri-processing.md#issue-6-coverage-resolution-2026-10-10).
+The walkthrough's earlier full-scan values remain historical and were not
+rerun as part of this correction. The separate redrawn architecture diagrams
+still await Julio's visual review, and no merge authorization is recorded.

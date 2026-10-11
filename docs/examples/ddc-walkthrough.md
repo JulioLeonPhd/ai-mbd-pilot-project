@@ -129,12 +129,20 @@ The full-scan integration runner can export four response figures:
   folding branches over its output band.
 - [Cascade alias response](assets/ddc-cascade-alias-response.png) shows the
   worst non-principal branch envelope across the complete cascade, referenced
-to peak passband gain.
+  to peak passband gain; it does not plot the direct principal stopband term
+  used for full acceptance coverage.
 - [Passband zoom](assets/ddc-passband-zoom.png) resolves the final passband.
 
 The approved response metric profile is `cascade-peak-v1`. Cascade passband
-ripple is measured from the principal `|H1*H2|` response. Cascade alias
-rejection is referenced to the peak principal passband; stage-2 alias rejection
+ripple is measured from the principal `|H1*H2|` response. Full cascade alias
+rejection uses unity input-tone reference and subtracts from the peak principal
+passband dB value the larger of two amplitude-dB maxima computed with
+`20*log10(abs(H))`: the non-principal branch envelope over output
+`|q| <= 5 MHz` and the direct principal response over input
+`6.25 <= |f| <= 25 MHz`. The latter covers the omitted `+/-6.25..7.5` and
+`+/-17.5..20 MHz` slices. The exact
+`[-25,+25] MHz` input grid at 1 kHz spacing, including endpoints, is required
+for acceptance; custom grids are diagnostic only. Stage-2 alias rejection
 remains separately referenced to its passband peak. The separate full-scan run measured
 `0.00146437058836 dB` cascade ripple, `87.7676669047 dB` stage-2 alias
 rejection, and `85.2548307898 dB` cascade alias rejection. The 32-test per-PRI
@@ -142,7 +150,9 @@ oracle suite reported maximum input-peak-normalized error `1.12962634928e-15`
 against the independent combined FIR oracle. The separate per-PRI/continuous-
 reference comparison after full memory was `3.34852e-11`,
 below the independently reviewed `5e-11` bound for this bounded five-PRI
-comparison. This is not a full-CPI, global-tick, or hardware error bound. The
+comparison. These values are historical evidence from the earlier full-scan
+run, not a fresh evaluation with the corrected full-coverage metric. This is
+not a full-CPI, global-tick, or hardware error bound. The
 frozen DDC-002 full-CPI fixture remains separate historical continuous-state
 evidence; its pinned replay passed strict 1/1. The passband zoom uses
 scientific dB notation to show ripple much smaller than the `0.1 dB` limit.

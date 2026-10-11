@@ -206,7 +206,9 @@ if any(~isfinite(data.stage2Numerator(:)))
         "Stage two contains a nonfinite coefficient.");
     return
 end
-if ~isequal(size(data.frequencyHz), [50001, 1]) || data.gridResolutionHz ~= 1000
+canonicalFrequencyHz = (-25e6:1000:25e6).';
+if ~isequal(size(data.frequencyHz), [50001, 1]) || ...
+        ~isequal(data.frequencyHz, canonicalFrequencyHz) || data.gridResolutionHz ~= 1000
     diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", "frequencyHz", ...
         "Response evidence must use the exact 1 kHz grid including endpoints.");
     return
@@ -350,13 +352,19 @@ for stage2Index = 1:4
 end
 passband = abs(frequencyHz) <= 5e6;
 stopband = abs(frequencyHz) >= data.stopbandStartHz;
-principal = stage1 .* stage2;
+digitalStopband = abs(frequencyHz) >= data.stopbandStartHz & ...
+    abs(frequencyHz) <= 25e6;
+stage2Upsampled = zeros(1, (numel(data.stage2Numerator) - 1) * 3 + 1);
+stage2Upsampled(1:3:end) = data.stage2Numerator(:).';
+cascadeNumerator = conv(data.stage1Numerator(:).', stage2Upsampled);
+principal = evaluateDtft(cascadeNumerator, frequencyHz, data.adcRateHz);
 principalPassband = abs(principal(passband));
 principalPassbandDb = 20 * log10(max(principalPassband, realmin));
 stage2PassbandDb = 20 * log10(max(abs(stage2(passband)), realmin));
 stage2StopbandDb = 20 * log10(max(abs(stage2(stopband)), realmin));
 nonPrincipal = ~(pairs(:, 1) == 0 & pairs(:, 2) == 0);
 aliasDb = 20 * log10(max(abs(cascade(passband, nonPrincipal)), realmin));
+principalStopbandDb = 20 * log10(max(abs(principal(digitalStopband)), realmin));
 principalPassbandValid = all(isfinite(principalPassband)) && ...
     max(principalPassband) > 1e-6 && ...
     abs(sum(data.stage1Numerator(:)) - 1) <= 1e-13 && ...
@@ -371,7 +379,8 @@ output = struct("frequencyHz", frequencyHz, "stage1Response", stage1, ...
     "principalPassbandValid", principalPassbandValid, ...
     "passbandRippleDb", max(principalPassbandDb) - min(principalPassbandDb), ...
     "stage2AliasRejectionDb", max(stage2PassbandDb) - max(stage2StopbandDb), ...
-    "digitalAliasRejectionDb", max(principalPassbandDb) - max(aliasDb(:)));
+    "digitalAliasRejectionDb", max(principalPassbandDb) - ...
+    max([aliasDb(:); principalStopbandDb(:)]));
 end
 
 function output = computeResponse(data)

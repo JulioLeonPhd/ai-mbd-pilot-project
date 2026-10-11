@@ -23,6 +23,15 @@ properties (TestParameter)
         "adcRate", struct("spec", struct("adcRateHz", 160e6)), ...
         "intermediateRate", struct("spec", struct("intermediateRateHz", 49e6)), ...
         "outputRate", struct("spec", struct("outputRateHz", 12e6)))
+    stopbandWitnessFrequencyHz = struct( ...
+        "nearStopband", 6.75e6, ...
+        "farStopband", 18.75e6)
+    noncanonicalGrid = struct( ...
+        "coarseSpacing", struct("gridSpec", struct("stepHz", 2000)), ...
+        "omittedNegativeEndpoint", struct("gridSpec", struct("startHz", -24.999e6)), ...
+        "omittedPositiveEndpoint", struct("gridSpec", struct("stopHz", 24.999e6)), ...
+        "passbandOnly", struct("gridSpec", struct( ...
+        "startHz", -5e6, "stopHz", 5e6)))
 end
 
 methods (TestClassSetup)
@@ -169,7 +178,64 @@ methods (Test)
         testCase.verifyLessThanOrEqual(metrics.passbandRippleDb, 0.1);
         testCase.verifyGreaterThanOrEqual(metrics.digitalAliasRejectionDb, 60);
         testCase.verifyGreaterThanOrEqual(metrics.stage2AliasRejectionDb, 60);
-        testCase.verifyEqual(metrics.digitalAliasRejectionDb, 85.2548308, AbsTol=2e-6);
+    end
+
+    function testFullStopbandReference(testCase)
+        design = radardemo.ddc.createDesign(struct());
+        metrics = radardemo.ddc.measureResponse(design, struct());
+        frequencyHz = metrics.frequencyHz;
+        combinedFirResponse = TestDdcPriProcessing.combinedFirResponse(design);
+        passband = abs(frequencyHz) <= 5e6;
+        stopband = abs(frequencyHz) >= 6.25e6 & abs(frequencyHz) <= 25e6;
+        transitionBand = ~passband & ~stopband;
+        nonPrincipal = ~(metrics.cascadeBranchPairs(:, 1) == 0 & ...
+            metrics.cascadeBranchPairs(:, 2) == 0);
+        principalPassbandDb = 20 * log10(max( ...
+            abs(combinedFirResponse(passband)), realmin));
+        nonPrincipalPassbandDb = 20 * log10(max( ...
+            abs(metrics.cascadeAliasBranches(passband, nonPrincipal)), realmin));
+        principalStopbandDb = 20 * log10(max(abs(combinedFirResponse(stopband)), realmin));
+        expectedDigitalRejectionDb = max(principalPassbandDb) - ...
+            max([nonPrincipalPassbandDb(:); principalStopbandDb(:)]);
+        endpointFrequenciesHz = [-25e6, -20e6, -17.5e6, -7.5e6, -6.25e6, ...
+            6.25e6, 7.5e6, 17.5e6, 20e6, 25e6];
+        transitionFrequenciesHz = frequencyHz(transitionBand);
+        fullGridResponseDifference = max(abs( ...
+            combinedFirResponse - metrics.principalCascadeResponse));
+
+        testCase.verifyEqual(nnz(stopband), 37502);
+        testCase.verifyEqual(frequencyHz(ismember(frequencyHz, endpointFrequenciesHz)), ...
+            endpointFrequenciesHz(:));
+        testCase.verifyEqual(transitionFrequenciesHz([1, 1249, 1250, end]), ...
+            [-6.249e6; -5.001e6; 5.001e6; 6.249e6]);
+        testCase.verifyEqual(metrics.digitalAliasRejectionDb, ...
+            expectedDigitalRejectionDb, AbsTol=1e-9);
+        testCase.verifyLessThanOrEqual(fullGridResponseDifference, 1e-10);
+    end
+
+    function testStopbandGapWitness(testCase, stopbandWitnessFrequencyHz)
+        design = radardemo.ddc.createDesign(struct());
+        sampleIndex = -120:120;
+        window = kaiser(241, 8.6).';
+        bump = 0.01 * window .* cos(2 * pi * stopbandWitnessFrequencyHz / ...
+            design.intermediateRateHz * sampleIndex) / sum(window);
+        bump(121) = bump(121) - sum(bump);
+        design.stage2Numerator = design.stage2Numerator + bump;
+        metrics = radardemo.ddc.measureResponse(design, struct());
+        oldPassbandAliasRejectionDb = ...
+            TestDdcPriProcessing.legacyPassbandAliasRejection(metrics);
+
+        testCase.verifyGreaterThanOrEqual(oldPassbandAliasRejectionDb, 60);
+        testCase.verifyLessThan(metrics.digitalAliasRejectionDb, 60);
+    end
+
+    function testNoncanonicalGridRejected(testCase, noncanonicalGrid)
+        design = radardemo.ddc.createDesign(struct());
+        metrics = radardemo.ddc.measureResponse(design, noncanonicalGrid.gridSpec);
+
+        testCase.verifyFalse(metrics.accepted);
+        testCase.verifyTrue(all(isfinite(metrics.stage1Response)));
+        testCase.verifyTrue(all(isfinite(metrics.stage2Response)));
     end
 
     function testStageOneOnlyTwelveMegahertzWitnessFails(testCase)
@@ -184,6 +250,27 @@ methods (Test)
 end
 
 methods (Static, Access=private)
+    function response = combinedFirResponse(design)
+        stage2Expanded = zeros(1, ...
+            (numel(design.stage2Numerator) - 1) * design.decimationFactors(1) + 1);
+        stage2Expanded(1:design.decimationFactors(1):end) = design.stage2Numerator;
+        cascadeNumerator = conv(design.stage1Numerator, stage2Expanded);
+        fftLength = 150000;
+        shiftedResponse = fftshift(fft(cascadeNumerator, fftLength));
+        response = shiftedResponse(50001:100001).';
+    end
+
+    function rejectionDb = legacyPassbandAliasRejection(metrics)
+        passband = abs(metrics.frequencyHz) <= 5e6;
+        nonPrincipal = ~(metrics.cascadeBranchPairs(:, 1) == 0 & ...
+            metrics.cascadeBranchPairs(:, 2) == 0);
+        principalPassbandDb = 20 * log10(max( ...
+            abs(metrics.principalCascadeResponse(passband)), realmin));
+        nonPrincipalPassbandDb = 20 * log10(max( ...
+            abs(metrics.cascadeAliasBranches(passband, nonPrincipal)), realmin));
+        rejectionDb = max(principalPassbandDb) - max(nonPrincipalPassbandDb(:));
+    end
+
     function input = makeMultitoneNoise(sampleCount, channelCount, seed)
         stream = RandStream("mt19937ar", Seed=seed);
         sampleIndex = (0:sampleCount - 1).';

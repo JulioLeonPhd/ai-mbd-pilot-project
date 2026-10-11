@@ -265,18 +265,29 @@ with absolute tolerance `1e-9 dB`.
 
 <a id="DDC.cascade-profile"></a>
 The current response profile is `cascade-peak-v1`. Its passband ripple uses the
-principal cascade response `|H1*H2|` over `[-5,+5] MHz`; cascade alias rejection
-compares non-principal cascade branches with the peak principal passband gain.
+principal cascade response `|H1*H2|` over `[-5,+5] MHz`. With unity input-tone
+reference, full digital cascade rejection is the peak principal-passband dB
+value minus the larger of two amplitude-dB maxima, each computed with
+`20*log10(abs(H))`: (1) the existing non-principal cascade-branch maximum over
+output `|q| <= 5 MHz` and (2) the direct principal `|H1(f)H2(f)|` maximum over
+input `stopbandStartHz <= |f| <= 25 MHz`. The frozen `stopbandStartHz` default
+is `6.25e6` Hz; a previously valid stricter value remains supported. At that
+default, the direct term covers the omitted `+/-6.25..7.5` and
+`+/-17.5..20 MHz` input slices. Do not apply the input stopband mask
+independently to every shifted branch: each branch has its own shifted input
+frequencies. Evaluate the full cascade metric on the exact `[-25,+25] MHz`
+grid at 1 kHz spacing, including endpoints. Custom grids are diagnostic only
+and cannot produce `accepted=true`.
 Stage-2 alias rejection remains a separate metric referenced to the peak
 stage-2 passband and measured over `|f| >= 6.25 MHz` through its 25 MHz
 pre-decimation Nyquist frequency. Acceptance limits remain ripple `<=0.1 dB`
 and both alias-rejection metrics `>=60 dB`, with absolute metric tolerance
-`1e-9 dB` and a deterministic 1 kHz grid including endpoints. Legacy fixture
-profile `legacy-stage2-v1` retains its prior stage-2-referenced ripple formula
-for historical fixture replay; it is not interchangeable with
-`cascade-peak-v1`. DDC-010 identifies the current response profile, and DDC-PRI-001
-identifies the independent per-PRI profile. Preserve both identifiers and never
-rewrite old fixture claims as current-profile evidence.
+`1e-9 dB`. Legacy fixture profile `legacy-stage2-v1` retains its prior
+stage-2-referenced ripple formula for historical fixture replay; it is not
+interchangeable with `cascade-peak-v1`. DDC-010 identifies the current response
+profile, and DDC-PRI-001 identifies the independent per-PRI profile. Preserve
+both identifiers and never rewrite old fixture claims as current-profile
+evidence.
 
 <a id="DDC.per-pri"></a>
 The current per-PRI profile accepts one complete physical PRI per call as finite

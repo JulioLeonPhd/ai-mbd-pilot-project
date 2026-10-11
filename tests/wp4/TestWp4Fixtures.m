@@ -193,6 +193,19 @@ methods (Test)
         diagnostic = wp4oracle.checkArtifact("ddc-response-pri", nonfinite);
         testCase.verifyFalse(diagnostic.accepted);
         testCase.verifyEqual(string(diagnostic.code), "NONFINITE");
+        finiteTampering = response;
+        finiteTampering.digitalAliasRejectionDb = ...
+            response.digitalAliasRejectionDb + 1e-3;
+        diagnostic = wp4oracle.checkArtifact("ddc-response-pri", finiteTampering);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NUMERICAL_MISMATCH");
+        testCase.verifyEqual(string(diagnostic.path), "digitalAliasRejectionDb");
+        noncanonicalGrid = response;
+        noncanonicalGrid.frequencyHz(1) = noncanonicalGrid.frequencyHz(1) + 1000;
+        diagnostic = wp4oracle.checkArtifact("ddc-response-pri", noncanonicalGrid);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "DIMENSION_MISMATCH");
+        testCase.verifyEqual(string(diagnostic.path), "frequencyHz");
         badPrincipal = response;
         badPrincipal.principalCascadeResponse(1) = complex(NaN, 0);
         diagnostic = wp4oracle.checkArtifact("ddc-response-pri", badPrincipal);
