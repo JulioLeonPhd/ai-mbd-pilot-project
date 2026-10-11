@@ -8,7 +8,7 @@ for the frozen WP4 evidence. Issue #3 remains open for checker hardening.
 **Contract family:** `radar-v1`
 **Contract version:** `1.0.0-draft.2`
 
-This document defines the interchange contracts for the floating-point MATLAB
+Defines the interchange contracts for the floating-point MATLAB
 reference. The five versioned envelopes are configuration, target scenario,
 MAT test vector, processing intermediate, and detection list. JSON numbers are
 finite IEEE-754
@@ -215,7 +215,8 @@ retains `prfIndex` and `prfNominalHz` for its destination PRF and uses the
 accepted `transitionGapTicks: 106872`. The unit-only shape example may omit
 these schedule fields.
 `prfIndex` is one-based and indexes the configured `prfsHz` array.
-`adcTick` is the global ADC tick epoch and records may be consumed incrementally.
+`adcTick` is the global ADC tick epoch and records may be consumed
+incrementally.
 For each record after the first, `pulseStartTick` is the actual integer ADC tick
 at which that record begins; its PRI is the difference from the preceding
 record's start tick. For non-transition, same-PRF records, this difference must
@@ -264,7 +265,7 @@ Evaluate a deterministic 1 kHz grid including endpoints. Compare each metric
 with absolute tolerance `1e-9 dB`.
 
 <a id="DDC.cascade-profile"></a>
-The current response profile is `cascade-peak-v1`. Its passband ripple uses the
+Current response profile is `cascade-peak-v1`. Its passband ripple uses the
 principal cascade response `|H1*H2|` over `[-5,+5] MHz`. With unity input-tone
 reference, full digital cascade rejection is the peak principal-passband dB
 value minus the larger of two amplitude-dB maxima, each computed with
@@ -290,7 +291,7 @@ both identifiers and never rewrite old fixture claims as current-profile
 evidence.
 
 <a id="DDC.per-pri"></a>
-The current per-PRI profile accepts one complete physical PRI per call as finite
+Current per-PRI profile accepts one complete physical PRI per call as finite
 real double `[N,C]`, with `N` divisible by 12. It returns complex `[N/12,C]`
 including all produced startup rows. It does not append zero input, flush the
 filters, or return a causal tail. Mixer index `n=0`, FIR delays, and `/3` and
@@ -308,14 +309,15 @@ rate is ADC rate divided by 3 and output rate is intermediate rate divided by 4
 within floating-point tolerance. Fixture DDC-PRI-001 identifies this distinct
 working-tree profile; it does not alter historical DDC-002 evidence. Independent
 numerical validation passed the per-PRI profile, including exact-zero and
-inactive-channel invariants. The bounded five-PRI comparison accepts the reviewed
+inactive-channel invariants. The bounded five-PRI comparison accepts the
+reviewed
 `5e-11` input-peak-normalized tolerance; see the [implementation plan](../plans/ddc-pri-processing.md)
 for the evidence scope and limits.
 
 <a id="DDC.streaming-state"></a>
-The following streaming requirement and DDC-002 evidence describe the accepted
+Following streaming requirement and DDC-002 evidence describe the accepted
 historical continuous-state implementation profile. The `shall` applies only
-to replay and interpretation of that pinned profile. The current approved
+to replay and interpretation of that pinned profile. Current approved
 interface processes one complete physical PRI per call with fresh local state,
 as recorded in [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md).
 The narrow evidence migration and new profile identifiers are tracked in the
@@ -355,12 +357,14 @@ MATLAB complex arrays in MAT files. Row-oriented stages use typed struct
 arrays. `metadata` records the fixture seed, axis names,
 and stage-specific calibration or index origin. Every fixture declares
 `fixtureScope` as one of `acceptance`, `out-of-domain`, `unit-only`, or
-`provisional`; only `acceptance` fixtures can support a V1 gate. Every fixture carries
+`provisional`; only `acceptance` fixtures can support a V1 gate. Every fixture
+carries
 `sourceId`, `sourceSchemaVersion`, and `sourceDocumentVersion`. Generated
 fixtures also carry generator revision, version, seed, and parameters; hashes
 are not required when code permits semantic replay.
 
-The supported stage seams are `ddc`, `azimuth-beamformed`, `range`, `doppler`, `angle`,
+The supported stage seams are `ddc`, `azimuth-beamformed`, `range`, `doppler`,
+`angle`,
 `candidate-list`, `ambiguity-projection`, `cfar`, `fusion`, and `cluster`.
 Projection preserves five separate PRF layers; CFAR emits one decision per
 layer, including explicit invalid/fail states, and fusion votes across those
@@ -491,7 +495,8 @@ existing configuration and scenario identifier; a detection example must
 cross-reference its test vector.
 
 Prerelease versions, including this draft, require exact schema-version
-matching. For released versions, minor-version additions may add optional fields.
+matching. For released versions, minor-version additions may add optional
+fields.
 A producer introducing a
 required field or changing type, units, sign, shape, channel map, or stage
 meaning must increment the major version and provide a migration note. A

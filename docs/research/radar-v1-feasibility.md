@@ -8,7 +8,7 @@
 
 ## Purpose and status
 
-This report records the revised WP2 candidate that passed bounded G1 under
+Records the revised WP2 candidate that passed bounded G1 under
 [ADR 0014](../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md), plus
 historical WP2 evidence retained for traceability. All results are analytic or
 idealized studies; they are not a
@@ -18,7 +18,8 @@ WP4 work. Noisy multi-target ambiguity unfolding remains a downstream risk.
 
 ## Historical baseline evidence: B250 and 625 MS/s
 
-The historical candidate used a 3 GHz carrier and a 250 MHz, 40 us LFM. Its IF was
+The historical candidate used a 3 GHz carrier and a 250 MHz, 40 us LFM. Its IF
+was
 156.25 MHz, sampled at 625 MS/s as real 16-bit data on 64 channels. DDC would
 produce complex samples at 312.5 MS/s. Each of five PRFs targets 128 usable
 returns per PRF, unverified until G2; the even ADC-sample PRI counts and
@@ -127,7 +128,7 @@ ideal fixed boresight transmit beam is about −24 dB at +45° and has nulls.
 
 ## Illustrative RF budget
 
-The following is an illustrative boresight calculation, not a hardware
+Following is an illustrative boresight calculation, not a hardware
 feasibility result: peak transmit power 10 kW, transmit and receive gains
 23 dBi each, 6 dB loss, 4 dB noise figure, 290 K temperature, 10 m² RCS, and
 100 km range. It gives monostatic received power −132.98 dBm, one-pulse SNR
@@ -201,7 +202,8 @@ review found no unresolved errors. Those historical conclusions apply to ADR
 0011's former 250 MHz waveform and rates, not to the revised candidate.
 
 The WP6e noisy multi-target unfolding study and sampled end-to-end confirmation
-of the 50 m two-target result are downstream validation risks. They belong to the
+of the 50 m two-target result are downstream validation risks. They belong to
+the
 G3/G4 gates after G2; a failure may reopen G1 or G2 through the documented gate
 process, but neither is a predecessor of G1.
 

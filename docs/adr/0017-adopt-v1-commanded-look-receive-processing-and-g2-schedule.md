@@ -22,7 +22,7 @@ azimuth estimation. Multi-beam and monopulse refinement are future work.
 
 WP4 provisionally selects and verifies equal-CPI usable pulses
 `[22,25,28,32,35]` for the five PRFs, with no separate initial steering reserve.
-The current arithmetic is 65.147760 ms usable dwell + 2.358240 ms priming +
+Current arithmetic is 65.147760 ms usable dwell + 2.358240 ms priming +
 2.849847 ms transitions = 70.355847 ms, leaving 0.297153 ms under the
 70.653 ms cap. Downstream WP6e validates noisy
 ambiguity, missed PRFs, ghosts, competing targets, and timing; it may reject

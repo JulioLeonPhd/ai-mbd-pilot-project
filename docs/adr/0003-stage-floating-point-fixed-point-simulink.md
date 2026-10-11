@@ -1,10 +1,9 @@
 ---
 status: accepted
 ---
-
 # Stage the reference from MATLAB to Simulink
 
-The project will develop a floating-point MATLAB reference first, use that
-reference to guide fixed-point design and analysis, and then represent the
-result in Simulink. This sequence keeps algorithm behavior available for
-comparison before introducing fixed-point and model-execution concerns.
+Project: develop floating-point MATLAB reference first, use reference to guide
+fixed-point design and analysis, then represent result in Simulink. Sequence
+keeps algorithm behavior available for comparison before introducing fixed-point
+and model-execution concerns.

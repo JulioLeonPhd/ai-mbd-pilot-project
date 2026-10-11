@@ -21,7 +21,7 @@ ADR 0018 owns frozen design decisions; the data contract owns field-level
 invariants. These requirements state observable obligations and do not create
 additional schedule, filter, or clustering values.
 
-This document defines observable V1 behavior for the floating-point MATLAB
+Defines observable V1 behavior for the floating-point MATLAB
 reference. It states what must be demonstrated and how it will be evidenced;
 the rationale for consequential choices remains in the ADRs. WP2's revised
 bounded analytic and ideal baseline is adopted by [ADR 0014](../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md);
@@ -70,7 +70,8 @@ radar-left, positive z is up, and positive radial velocity is receding.
 ## Traceability and gate policy
 
 WP2 owns feasibility evidence for rates, bandwidth, pulse timing, PRFs, CPI,
-and ideal processing candidates. WP6 owns independently testable processing stages,
+and ideal processing candidates. WP6 owns independently testable processing
+stages,
 including the ambiguity study and selected resolver. WP8 owns the seeded
 end-to-end and statistical report. A requirement marked pending or provisional
 cannot become an implementation parameter or V1 pass gate without a recorded

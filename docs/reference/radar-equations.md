@@ -1,11 +1,10 @@
 # Radar equations and conventions
 
-This reference preserves the project equations, mathematical conventions, and
-their limits. Domain terms are defined in [CONTEXT.md](../../CONTEXT.md).
+Project equations, conventions, and limits. Domain terms: [CONTEXT.md](../../CONTEXT.md).
 
 ## Radar equations
 
-The formulas below use the analytic-signal and Fourier convention
+Formulas use the analytic-signal and Fourier convention
 
 $$
 x(t)=A(t)e^{j\phi(t)},\qquad X(f)=\int_{-\infty}^{\infty}x(t)e^{-j2\pi ft}\,dt.
