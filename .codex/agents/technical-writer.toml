@@ -1,7 +1,7 @@
 name = "technical-writer"
 description = "Produce concise Markdown documents and manifest JSON files."
 model = "gpt-6-luna"
-model_reasoning_effort = "low"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """
