@@ -62,8 +62,7 @@ referenceAmplitude = 1;
 for caseIndex = 1:numel(data.cases)
     item = data.cases(caseIndex);
     caseDiagnostic = checkCase(item, caseIndex, casePriIndices(caseIndex), ...
-        caseChannels(caseIndex), expectedPriLengths, schedule, data.design, ...
-        data.normalizedTolerance, data.seed);
+        caseChannels(caseIndex), expectedPriLengths, data);
     if ~caseDiagnostic.accepted
         diagnostic = caseDiagnostic;
         diagnostic.path = "cases[" + (caseIndex - 1) + "]." + diagnostic.path;
@@ -124,7 +123,11 @@ end
 end
 
 function diagnostic = checkCase(item, caseIndex, expectedPriIndex, ...
-        expectedChannels, expectedPriLengths, schedule, design, tolerance, seed)
+        expectedChannels, expectedPriLengths, data)
+schedule = data.schedule;
+design = data.design;
+tolerance = data.normalizedTolerance;
+seed = data.seed;
 required = ["caseId", "priIndex", "scheduleRecordIndex", "signalType", ...
     "input", "expectedOutput", "metadata", "coordinateMap", ...
     "targetChannel"];
@@ -314,6 +317,13 @@ switch caseIndex
     otherwise
         valid = false;
 end
+if valid
+    diagnostic = wp4oracle.passDiagnostic();
+else
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "signalType", ...
+        "The stimulus does not match its declared boundary or isolation case.");
+end
+end
 
 function signal = boundaryChirp(sampleCount, sampleRateHz)
 chirpSamples = round(40e-6 * sampleRateHz);
@@ -339,13 +349,6 @@ for toneIndex = 1:numel(frequenciesHz)
 end
 randomStream = RandStream("mt19937ar", "Seed", seed);
 signal = signal + 0.05 .* randn(randomStream, sampleCount, 1);
-end
-if valid
-    diagnostic = wp4oracle.passDiagnostic();
-else
-    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "signalType", ...
-        "The stimulus does not match its declared boundary or isolation case.");
-end
 end
 
 function output = directPriConvolution(input, design)

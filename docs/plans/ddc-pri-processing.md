@@ -5,9 +5,10 @@ Phase 0 contract. Julio explicitly authorized implementation 2026-10-02.
 MATLAB implementation, scoped tests, full-scan walkthrough, pinned-history
 replay, fixture-preservation audit, and independent numerical validation passed.
 Julio approved DDC walkthrough 2026-10-08. Issue 6 cascade
-stopband-coverage blocker fixed and independently validated 2026-10-10;
-three standards-warning categories remain open; no merge authorization
-recorded. Range-processing boundary next component review.
+stopband-coverage blocker fixed and independently validated 2026-10-10; three
+standards-warning categories resolved and independently validated 2026-10-11.
+No merge authorization recorded; human implementation and diagram review remain
+pending. Range-processing boundary next component review.
 
 ## Phase 0: confirmed contract (2026-10-02)
 
@@ -318,6 +319,36 @@ unresolved errors. Three standards-warning categories above remain
 open: excessive helper inputs, extending design struct outside
 creating function, avoidably nested stimulus helpers. Merge authorization
 and Julio's visual review of redrawn architecture diagrams remain pending.
+
+## Standards-warning resolution (2026-10-11)
+
+The three standards-warning categories above were resolved and independently
+validated in the working tree. The `checkCase` and `saveBranchFigure` helpers
+now have six inputs; `generateDdc`
+constructs its response fixture locally; and the `boundaryChirp` and
+`multitoneNoise` stimulus helpers are file-local functions. No public interface,
+algorithm, state, timing, or schema changed.
+
+Independent validation passed 96/96 MATLAB tests with no failures or incomplete
+tests: `TestDdcPriProcessing` 39/39, `TestDdcWalkthrough` 1/1, and
+`TestWp4Fixtures` 56/56. Code Analyzer reported zero issues in all three changed
+files. Response/PRI MAT structures matched the pre-edit baseline, including
+1,465 recursive class, shape, and ordered-field checks; standalone scan metrics
+matched exactly; the MATLAB path and pre-existing figure handles remained
+unchanged. Tracked and fresh
+strict fixture manifests each passed 56/56 with `provenanceValid=true`; all 25
+fixture hashes remained unchanged. Validation applied to the working tree and
+does not promote committed acceptance evidence.
+
+Validated file SHA-256 values:
+
+- `contracts/wp4/+wp4oracle/checkDdcPri.m`: `37d65fb72a5c74aeeccacf5bc238fed1e9aa033a8636c1d0a78d0e593337e026`
+- `contracts/wp4/+wp4gen/generateDdc.m`: `922750df377c7f1f3af09e8f756ba79cb6aef55ae0614af5112c416c262ebee9`
+- `tests/ddc/runDdcScanCheck.m`: `d248983f6417bd2b66425fa95bfee53c01b966635a7978bbafbf4153857ee88c`
+
+Hardware, end-to-end, and historical DDC-002 replay checks were not rerun.
+Merge authorization and Julio's implementation review and visual review of the
+redrawn architecture diagrams remain pending.
 
 ## Deferred choices
 
