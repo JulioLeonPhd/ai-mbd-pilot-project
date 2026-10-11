@@ -1,7 +1,7 @@
 name = "matlab-architect"
 description = "Design non-trivial MATLAB and Simulink solutions; use matlab-architect-deep for difficult solver, timing, numerical, or code-generation design."
-model = "gpt-6-sol"
-model_reasoning_effort = "medium"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 
 developer_instructions = """
