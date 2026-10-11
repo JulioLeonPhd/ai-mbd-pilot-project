@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "notes/second-brain.md",
-                "mode": "source",
+                "file": "docs/examples/ddc-walkthrough-review.md",
+                "mode": "preview",
                 "source": true
               },
               "icon": "lucide-file",
-              "title": "second-brain"
+              "title": "ddc-walkthrough-review"
             }
           }
         ]
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "notes/second-brain.md",
+                "file": "docs/examples/ddc-walkthrough-review.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -118,7 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "notes/second-brain.md",
+                "file": "docs/examples/ddc-walkthrough-review.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -161,7 +161,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "notes/second-brain.md",
+                "file": "docs/examples/ddc-walkthrough-review.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -188,18 +188,32 @@
       "bases:Create new base": false
     }
   },
-  "active": "d8f2c9ba596f1edd",
+  "active": "45770c4034aeeb88",
   "lastOpenFiles": [
-    "CONTEXT.md",
+    "docs/learning/second-brain/reference/decision-recovery.html",
+    "docs/learning/second-brain/reference",
+    "docs/learning/second-brain/lessons/0001-recover-decisions.html",
+    "docs/learning/second-brain/lessons",
+    "docs/learning/second-brain/assets/teaching.css",
+    "docs/learning/second-brain/assets",
+    "docs/learning/second-brain/RESOURCES.md",
+    "docs/learning/second-brain/MISSION.md",
+    "docs/learning/second-brain",
+    "docs/learning",
+    "GLOSSARY.md",
+    "docs/examples/ddc-walkthrough.md",
+    "reference/decision-recovery.html",
+    "reference",
+    "lessons/0001-recover-decisions.html",
+    "docs/examples/ddc-walkthrough-review.md",
     "notes/second-brain.md",
+    "RESOURCES.md",
+    "MISSION.md",
+    "CONTEXT.md",
     "CHANGELOG.md",
     "README.md",
     "AGENTS.md",
-    "notes",
-    "docs/examples/ddc-walkthrough-review.md",
-    "docs/examples/ddc-walkthrough.md",
     "docs/plans/ddc-pri-processing.md",
-    "docs/examples/ddc-walkthrough-review.md.caveman-staged",
     "docs/adr/0022-adopt-independent-pri-ddc-processing.md",
     "docs/agents/domain.md",
     "docs/architecture.md",

@@ -46,3 +46,6 @@ docs/handoffs/**/*
 
 # Reproducible generated radar test vectors
 data/testVectors/
+
+# Personal notes folder
+notes/
