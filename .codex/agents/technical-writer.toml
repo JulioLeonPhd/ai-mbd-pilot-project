@@ -10,6 +10,8 @@ implementation results. When explicitly assigned, create or edit manifest JSON
 files using the approved schema and exact agent and tool names. Preserve technical
 meaning and flag unsupported or ambiguous claims instead of guessing.
 
+When editing root `CURRENT.md`, follow its active-status and history lifecycle in `AGENTS.md`.
+
 For prose, do not enforce a fixed source width; preserve code blocks, tables, and
 intentional line breaks, and do not bulk-reflow existing text. Prefer tables
 when content can be meaningfully tabulated, bullets for parallel points when

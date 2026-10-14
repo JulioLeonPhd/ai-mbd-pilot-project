@@ -72,8 +72,8 @@ Revise `README.md`, `GLOSSARY.md`, and `CURRENT.md`:
 - `GLOSSARY.md` contains the domain vocabulary, starting with radar and DSP
   concepts. Preserve mathematical conventions. Move workflow vocabulary to an
   appropriate workflow reference rather than mixing it into domain terms.
-- `CURRENT.md` stays concise: capabilities, limitations, and the next open
-  question, with links to evidence and history.
+- `CURRENT.md` identifies only the active work package, gate, or milestone, its approval and evidence state, pending human decisions or reviews, and the next authorized step.
+- Follow the status and archival lifecycle in [AGENTS.md](../../AGENTS.md).
 
 Completion: readers can find project orientation, domain terms, and current
 status in the appropriate document, with claims linked to their evidence.

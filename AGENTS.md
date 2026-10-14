@@ -56,6 +56,19 @@ comparisons, mappings, attributes, or status. Use bullets for parallel points
 when they make concepts faster to grasp, numbered lists for ordered steps, and
 prose for explanations that benefit from connected reasoning.
 
+## Active status and history
+
+Keep root `CURRENT.md` limited to the active work package, gate, or milestone,
+its approved decisions, verified result and evidence scope, pending human decisions or reviews, and the next authorized step.
+Write short connected prose that lets a reader returning after a week identify where work stands, what just finished, what blocks progress, and the next action.
+State explicitly when no formal work-package or gate assignment is recorded; verification never implies human approval or advances a gate.
+
+When a new work package or milestone starts, append the complete outgoing `CURRENT.md` to root `HISTORY.md` before replacing it.
+Give each full snapshot a date and the outgoing work package, gate, and milestone as recorded; preserve the outgoing content and relative links verbatim, and never overwrite earlier history.
+Routine updates within the same work package or milestone do not add a full snapshot.
+Move any historical material removed from `CURRENT.md` into an append-only history entry.
+The initial migration snapshot is dated, preserves the original file verbatim, and is explicitly identified as a migration rather than a new milestone.
+
 ## Complexity triage
 
 Before routing a document, classify it as `trivial` or `complex`. Invoke
