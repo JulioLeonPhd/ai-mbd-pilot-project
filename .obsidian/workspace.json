@@ -4,17 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "7541e76ea4db90f5",
+        "id": "75c1fc9610c2f409",
         "type": "tabs",
         "children": [
           {
-            "id": "2cd3dcba8b82ad57",
+            "id": "86416ae77d74be06",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "CURRENT.md",
+                "mode": "preview",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "CURRENT"
             }
           }
         ]
@@ -197,43 +201,44 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "45770c4034aeeb88",
+  "active": "86416ae77d74be06",
   "lastOpenFiles": [
+    "HISTORY.md",
+    ".agents/skills/diagrammer/SKILL.md",
+    ".agents/skills/commit/SKILL.md",
     "CURRENT.md",
-    "CHANGELOG.md",
+    ".codex/agents/technical-writer-validator.toml",
+    ".codex/agents/technical-writer.toml",
+    ".codex/agents/technical-writer-validator-deep.toml",
+    ".codex/agents/simulink-implementer.toml",
+    ".codex/agents/matlab-validator.toml",
+    ".codex/agents/matlab-validator-deep.toml",
+    ".codex/agents/matlab-implementer.toml",
+    ".codex/agents/matlab-architect.toml",
+    ".codex/agents/matlab-architect-deep.toml",
+    ".codex/agents",
+    "docs/standards/matlab/README.md",
+    "docs/standards/matlab/matlab-performance-optimization.md",
+    "docs/standards/matlab/matlab-coding-standards.md",
+    "docs/standards/matlab/live-script-generation.md",
     "AGENTS.md",
+    "docs/agents/human-led-workflow.md",
+    "docs/agents/domain.md",
+    "docs/adr/0021-adopt-dsp-responsibilities-and-ambiguity-baseline.md",
+    "docs/adr/0020-adopt-pilot-adc-storage-and-sample-integrity.md",
+    "docs/adr/0019-adopt-human-led-module-design-and-simulink-staging.md",
+    "docs/adr/0017-adopt-v1-commanded-look-receive-processing-and-g2-schedule.md",
+    "docs/architecture/radar-overview.md",
+    "docs/architecture/agent-orchestration-runtime.md",
+    "docs/architecture/architecture.md",
+    "docs/architecture/diagrams/context.svg",
+    "docs/contracts/radar-v1-data-contracts.md",
+    "docs/research/radar-equation-glossary-sources.md",
+    "docs/research/radar-v1-feasibility.md",
+    "CHANGELOG.md",
     "README.md",
     "GLOSSARY.md",
-    "docs/architecture/agent-orchestration-runtime.md",
     "docs/learning/second-brain/RESOURCES.md",
-    "docs/learning/second-brain/MISSION.md",
-    "docs/learning/second-brain/lessons/0001-recover-decisions.html",
-    "docs/architecture/radar-overview.md",
-    "docs/architecture/architecture.md",
-    "docs/examples/ddc-walkthrough-review.md",
-    "docs/learning/second-brain/reference/decision-recovery.html",
-    "docs/learning/second-brain/reference",
-    "docs/learning/second-brain/lessons",
-    "docs/learning/second-brain/assets/teaching.css",
-    "docs/learning/second-brain/assets",
-    "docs/learning/second-brain",
-    "docs/learning",
-    "docs/examples/ddc-walkthrough.md",
-    "reference/decision-recovery.html",
-    "reference",
-    "notes/second-brain.md",
-    "RESOURCES.md",
-    "MISSION.md",
-    "CONTEXT.md",
-    "docs/plans/ddc-pri-processing.md",
-    "docs/adr/0022-adopt-independent-pri-ddc-processing.md",
-    "docs/agents/domain.md",
-    "docs/architecture.md",
-    "docs/research/matlab-coding-standards-rules.md",
-    "docs/research/radar-v1-feasibility.md",
-    "evidence/beam-pattern-study.png",
-    "docs/adr/0020-adopt-pilot-adc-storage-and-sample-integrity.md",
-    "docs/adr/0007-adopt-3ghz-16x4-half-wave-array-baseline.md",
-    "docs/adr/0001-root-agent-orchestrated-matlab-simulink-specialists.md"
+    "evidence/beam-pattern-study.png"
   ]
 }
