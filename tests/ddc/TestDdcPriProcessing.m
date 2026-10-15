@@ -59,6 +59,44 @@ methods (Test)
         testCase.verifyLessThanOrEqual(normalizedError, 5e-11);
     end
 
+    function testRealToneAmplitudeAndImage(testCase)
+        design = radardemo.ddc.createDesign(struct());
+        sampleCount = 55560;
+        sampleIndex = (0:sampleCount - 1).';
+        offsetsHz = [-1e6, 0, 1e6];
+        amplitudes = [0.25, 0.6, 0.9];
+        phasesRad = [0.37, -0.83, 1.19];
+        input = zeros(sampleCount, numel(offsetsHz));
+        expected = complex(zeros(sampleCount / 12, numel(offsetsHz)));
+        outputIndex = (0:size(expected, 1) - 1).';
+        retainedInputIndex = 12 * outputIndex;
+        for channelIndex = 1:numel(offsetsHz)
+            offsetHz = offsetsHz(channelIndex);
+            input(:, channelIndex) = amplitudes(channelIndex) .* cos( ...
+                2 * pi * (design.mixerFrequencyHz + offsetHz) / ...
+                design.adcRateHz .* sampleIndex + phasesRad(channelIndex));
+            positiveResponse = TestDdcPriProcessing.directCascadeResponse( ...
+                design, offsetHz);
+            imageFrequencyHz = 2 * design.mixerFrequencyHz + offsetHz;
+            imageResponse = TestDdcPriProcessing.directCascadeResponse( ...
+                design, -imageFrequencyHz);
+            expected(:, channelIndex) = amplitudes(channelIndex) .* ...
+                positiveResponse .* exp(1i * (2 * pi * offsetHz .* ...
+                retainedInputIndex / design.adcRateHz + phasesRad(channelIndex))) + ...
+                amplitudes(channelIndex) .* imageResponse .* exp(-1i * ( ...
+                2 * pi * imageFrequencyHz .* retainedInputIndex / ...
+                design.adcRateHz + phasesRad(channelIndex)));
+        end
+
+        actual = radardemo.ddc.processFrame(input, design);
+        settled = retainedInputIndex >= design.stage1Order + ...
+            design.stage2Order * design.decimationFactors(1);
+        normalizedError = TestDdcPriProcessing.normalizedError( ...
+            actual(settled, :), expected(settled, :), max(abs(input), [], "all"));
+
+        testCase.verifyLessThanOrEqual(normalizedError, 5e-11);
+    end
+
     function testZeroInputAndExactOutputShape(testCase, priLength)
         design = radardemo.ddc.createDesign(struct());
         input = zeros(priLength, 1);
@@ -317,9 +355,19 @@ methods (Static, Access=private)
             convolved = ifft(fft(mixed(:, channelRange), fftLength, 1) .* ...
                 numeratorSpectrum, [], 1);
             causalOutput = convolved(1:sampleCount, :);
-            output(:, channelRange) = causalOutput( ...
+            output(:, channelRange) = 2 * causalOutput( ...
                 1:prod(design.decimationFactors):end, :);
         end
+    end
+
+    function response = directCascadeResponse(design, frequencyHz)
+        firstStageIndex = (0:numel(design.stage1Numerator) - 1).';
+        secondStageIndex = (0:numel(design.stage2Numerator) - 1).';
+        firstStageResponse = sum(design.stage1Numerator(:) .* exp( ...
+            -1i * 2 * pi * frequencyHz / design.adcRateHz .* firstStageIndex));
+        secondStageResponse = sum(design.stage2Numerator(:) .* exp( ...
+            -1i * 2 * pi * frequencyHz / (design.adcRateHz / 3) .* secondStageIndex));
+        response = firstStageResponse * secondStageResponse;
     end
 
     function errorValue = normalizedError(actual, expected, referenceAmplitude)
@@ -386,9 +434,10 @@ methods (Static, Access=private)
                 inputs{index}, state, design);
             [priOutput, ~] = radardemo.ddc.processFrame(inputs{index}, design);
             settledFirstRow = design.delayOutputSamples * 2 + 1;
+            % Compare with the unchanged historical helper's half-amplitude convention.
             normalizedErrors(index) = ...
                 TestDdcPriProcessing.normalizedError( ...
-                priOutput(settledFirstRow:end, :), ...
+                priOutput(settledFirstRow:end, :) / 2, ...
                 continuousOutput(settledFirstRow:end, :), ...
                 max(abs(inputs{index}), [], "all"));
         end

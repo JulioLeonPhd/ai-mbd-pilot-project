@@ -139,12 +139,54 @@ baseline.
 
 Phase 0 interface and migration contract confirmed. Julio explicitly
 authorized implementation on 2026-10-02. Per-PRI MATLAB implementation,
-scoped core and WP4 suites, full-scan walkthrough, pinned DDC-002 replay, and
-fixture-preservation audit passed. Independent numerical validation also passed
-after exact-zero and inactive-channel oracle checks made explicit and
-verified. Bounded five-PRI tolerance justified by independent numerical
-review; not full-CPI, global-tick, or hardware error bound. Preserve
-DDC-002 as historical continuous-state evidence, not per-PRI acceptance.
+scoped core and WP4 suites, full-scan walkthrough, and fixture-preservation audit
+passed. Independent numerical validation also passed after exact-zero and
+inactive-channel oracle checks made explicit and verified. Bounded five-PRI
+tolerance justified by independent numerical review; not full-CPI, global-tick,
+or hardware error bound. Separately, pinned DDC-002 replay passed as historical
+continuous-state evidence, not per-PRI acceptance.
 Julio approved DDC walkthrough on 2026-10-08; implementation review and
 merge-readiness work remain ongoing. Narrow evidence-schema migration
 preferred to unrelated global schema version change.
+
+## Amplitude compensation addendum — 2026-10-14
+
+Julio approved fixed factor-two compensation on the final decimated output
+after learning that a real cosine with peak amplitude `A` produces envelope
+amplitude `A/2` in the complex DDC output. This restores real-tone peak
+envelope amplitude subject to FIR gain and phase response and residual image;
+it preserves input units, doubles noise amplitude, and does not improve SNR or
+establish calibrated-volts accuracy.
+
+The change leaves FIR coefficients and response metrics, 372/31-sample group
+delay, 744/62-sample startup span, filter state, output shape, and API unchanged.
+The current per-PRI evidence profile moves from
+`independent-pri-v1` version `1.0.0` to `independent-pri-v2` version `2.0.0`;
+the schema is unchanged. Only `ddc-pri.mat` migrates. Other fixtures, including
+`ddc-response-pri.mat`, remain unchanged. The old profile remains replayable at
+the pinned baseline revision above.
+
+The prior v1 per-PRI versus continuous-helper comparison measured
+`3.34852e-11` normalized error against the unchanged helper, within its reviewed
+`5e-11` input-peak-normalized bound. The implemented v2 regression divides
+compensated PRI output by two before that helper; the current direct oracle
+includes factor two. These old comparison results remain attributed to v1.
+
+On 2026-10-15, the tracked `ddc-pri.mat` and matching manifest record migrated
+to v2 version `2.0.0`, scope `temporary-unit-evidence`, revision `working-tree`,
+SHA `af4ed1be0ffe0db230d8e6f825014b8fd7bd7aae12940a286d155b1e4c6776f4`. Of
+25 tracked fixture artifacts, only `ddc-pri.mat` changed; the other 24 remain
+unchanged, including all 23 historical artifacts and `ddc-response-pri.mat`.
+The DDC suite passed 40/40, WP4 passed 56/56, walkthrough passed 1/1, and the
+full-scan run processed 147 PRIs, skipped four transition gaps, and produced
+843,825 outputs. Fresh and tracked strict fixture checks each passed 56/56 with
+`provenanceValid=true`; Code Analyzer returned no issues for the six edited
+MATLAB files. The v1 analytic baseline failed with normalized error
+`0.500862525049793`; the live v2 analytic check passed. Independent MATLAB
+validation passed on 2026-10-15 with no unresolved errors: analytic and
+historical comparisons 2/2, WP4 per-PRI 1/1, and tracked strict fixtures 56/56
+with `provenanceValid=true`. The reviewer verified v2 profile identity and all
+24 unchanged fixture artifacts; full-suite and Code Analyzer results were
+reviewed from upstream evidence, not rerun. Validation is limited to this
+temporary-unit evidence and does not record human implementation or merge
+approval.

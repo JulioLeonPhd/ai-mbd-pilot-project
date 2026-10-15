@@ -38,7 +38,8 @@ stage1Samples = stage1Output(1:design.decimationFactors(1):end, :);
 stage2InitialConditions = zeros(design.stage2Order, channelCount);
 stage2Output = filter(design.stage2Numerator, 1, stage1Samples, ...
     stage2InitialConditions, 1);
-output = stage2Output(1:design.decimationFactors(2):end, :);
+% Restore the real-cosine envelope halved by complex mixing.
+output = 2 * stage2Output(1:design.decimationFactors(2):end, :);
 if isreal(output)
     output = complex(output);
 end

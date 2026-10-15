@@ -1128,14 +1128,14 @@
     },
     {
       "artifact": "ddc-pri.mat",
-      "profile": "independent-pri-v1",
+      "profile": "independent-pri-v2",
       "evidenceScope": "temporary-unit-evidence",
       "generatorVersion": "wp4gen-1.0.0",
       "generatorRevision": "working-tree",
-      "createdUtc": "2026-10-02T20:22:43Z",
+      "createdUtc": "2026-10-15T12:52:45Z",
       "generatorSeed": 401021,
       "sourceRevision": "working-tree",
-      "sha256": "6f7c9a8e7df41280b2b3d702dad1d107a9ba01c7113e580f204e867ef5d45207"
+      "sha256": "af4ed1be0ffe0db230d8e6f825014b8fd7bd7aae12940a286d155b1e4c6776f4"
     }
   ]
 }

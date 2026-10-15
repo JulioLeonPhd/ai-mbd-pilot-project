@@ -6,6 +6,9 @@ FIR delay state. No state carries between physical PRI calls.
 
 ![DDC sample flow: complex mixing, two FIR and decimation stages, and the resulting rates](assets/ddc-algorithm.svg)
 
+The illustration shows mixing through the final decimator; it omits the
+implemented factor-two gain applied after that decimator.
+
 algorithm view maps to [signal and state](#follow-the-signal-and-state)
 and [stimulus](#run-the-example). approved call processes one physical PRI
 as vectorized `[N,C]` array.
@@ -108,6 +111,16 @@ Returned metadata contains scalar double fields `inputSampleCount`,
 Downstream range processing owns complete-window validity, including startup,
 blanking, and PRI-end truncation.
 
+The current `independent-pri-v2` profile multiplies the final decimated output
+by two. For a real cosine with peak amplitude `A`, this restores complex output
+envelope amplitude to `A` subject to FIR gain and phase response and residual
+image. Output units remain input units; noise amplitude also doubles, so SNR
+does not improve. The synthetic ADC counts in this example are not calibrated
+volts. FIR coefficients, response metrics, filter state, timing, output shape,
+and API are unchanged. The tracked `ddc-pri.mat` now identifies v2 with scope
+`temporary-unit-evidence`, revision `working-tree`, and SHA
+`af4ed1be0ffe0db230d8e6f825014b8fd7bd7aae12940a286d155b1e4c6776f4`.
+
 Each output period spans 12 ADC periods. Cascade group delay is 372 ADC sample
 periods or 31 output sample periods (2.48 microseconds); full memory span is
 744 ADC sample periods or 62 output periods (4.96 microseconds). Group delay
@@ -145,13 +158,27 @@ passband dB value larger of two amplitude-dB maxima computed with
 for acceptance; custom grids are diagnostic only. Stage-2 alias rejection
 remains separately referenced to its passband peak. separate full-scan run measured
 `0.00146437058836 dB` cascade ripple, `87.7676669047 dB` stage-2 alias
-rejection, and `85.2548307898 dB` cascade alias rejection. The 32-test per-PRI
+rejection, and `85.2548307898 dB` cascade alias rejection. The prior
+`independent-pri-v1` 32-test per-PRI
 oracle suite reported maximum input-peak-normalized error `1.12962634928e-15`
-against independent combined FIR oracle. separate per-PRI/continuous-
-reference comparison after full memory was `3.34852e-11`,
-below independently reviewed `5e-11` bound for this bounded five-PRI
-comparison. These values are historical evidence from earlier full-scan
-run, not fresh evaluation with corrected full-coverage metric. This is
+against independent combined FIR oracle. Its direct oracle comparison did not
+include factor two. The prior v1 per-PRI/continuous-reference comparison
+measured `3.34852e-11` normalized error after full memory against the unchanged
+helper, within the independently reviewed `5e-11` bound. The implemented v2
+regression divides compensated PRI output by two before that helper; the v2
+DDC suite passed 40/40. The v2 direct oracle includes factor two. The measured
+values are historical v1 evidence from the earlier full-scan run. Current v2
+checks passed: DDC 40/40, WP4 56/56, walkthrough 1/1, and full-scan processed
+147 PRIs, skipped four transition gaps, and produced 843,825 outputs. Fresh and
+tracked strict fixture checks passed 56/56 with `provenanceValid=true`; the
+live v2 analytic check passed, while the v1 analytic baseline failed at
+`0.500862525049793`. Code Analyzer returned no issues for six edited MATLAB
+files. Independent MATLAB validation passed on 2026-10-15 with no unresolved
+errors; the reviewer independently ran analytic and historical comparisons
+2/2, WP4 per-PRI 1/1, and tracked strict fixtures 56/56 with
+`provenanceValid=true`. The full-suite and Code Analyzer results were reviewed
+from upstream evidence, not rerun. This temporary-unit evidence does not record
+human approval or merge authorization. This is
 not full-CPI, global-tick, or hardware error bound. The
 frozen DDC-002 full-CPI fixture remains separate historical continuous-state
 evidence; its pinned replay passed strict 1/1. passband zoom uses

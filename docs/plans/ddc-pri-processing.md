@@ -2,13 +2,67 @@
 
 **Status:** ADR 0022 records accepted direction and confirmed 2026-10-02
 Phase 0 contract. Julio explicitly authorized implementation 2026-10-02.
-MATLAB implementation, scoped tests, full-scan walkthrough, pinned-history
-replay, fixture-preservation audit, and independent numerical validation passed.
+The prior `independent-pri-v1` implementation, scoped tests, full-scan
+walkthrough, fixture-preservation audit, and independent numerical validation
+passed at their recorded revision. The pinned DDC-002 replay is separate
+historical continuous-state evidence.
 Julio approved DDC walkthrough 2026-10-08. Issue 6 cascade
 stopband-coverage blocker fixed and independently validated 2026-10-10; three
 standards-warning categories resolved and independently validated 2026-10-11.
 No merge authorization recorded; human implementation and diagram review remain
-pending. Range-processing boundary next component review.
+pending. On 2026-10-14 Julio approved fixed factor-two compensation on the final
+decimated output. The v2 fixture migration and MATLAB checks listed below
+passed on 2026-10-15; independent MATLAB validation passed as recorded below.
+Range-processing boundary next component review.
+
+## Approved amplitude update (2026-10-14)
+
+A real cosine with peak amplitude `A` yields complex output envelope `A/2`;
+multiply the final decimated output by two to restore peak envelope amplitude,
+subject to FIR gain and phase response and residual image. This preserves input
+units, doubles noise amplitude, does not improve SNR, and makes no calibrated-
+volts claim. FIR coefficients and response metrics, 372/31-sample group delay,
+744/62-sample startup span, state, shapes, and API remain unchanged.
+
+The approved per-PRI evidence profile changes from `independent-pri-v1`
+version `1.0.0` to `independent-pri-v2` version `2.0.0`; schema is unchanged.
+Only `ddc-pri.mat` migrates. All other fixtures, including
+`ddc-response-pri.mat`, remain unchanged. The old profile remains replayable at
+the pinned baseline revision. Prior v1 per-PRI versus continuous-helper
+comparison measured `3.34852e-11` normalized error against the unchanged helper,
+within the reviewed `5e-11` input-peak-normalized bound. The implemented v2
+regression divides compensated PRI output by two before that helper, and the
+current direct oracle includes factor two. Prior tests and evidence below remain
+attributed to the old revision; the current v2 results are recorded separately
+in the migration and verification section.
+
+## `independent-pri-v2` migration and verification (2026-10-15)
+
+Tracked `ddc-pri.mat` and its manifest record now identify
+`independent-pri-v2` version `2.0.0`, scope `temporary-unit-evidence`, revision
+`working-tree`, fixture SHA
+`af4ed1be0ffe0db230d8e6f825014b8fd7bd7aae12940a286d155b1e4c6776f4`. Of 25
+tracked fixture artifacts, only `ddc-pri.mat` changed; the other 24 remain
+unchanged, including all 23 historical artifacts and `ddc-response-pri.mat`.
+
+The DDC suite passed 40/40, the WP4 suite passed 56/56, and the walkthrough
+passed 1/1. The full-scan check processed 147 physical PRIs, skipped four
+transition gaps, and produced 843,825 output samples. Fresh and tracked strict
+fixture checks each passed 56/56 with `provenanceValid=true`; the tracked check
+used the fixture root on the corrected invocation. Code Analyzer returned no
+issues for `processFrame.m`, `TestDdcPriProcessing.m`, `TestWp4Fixtures.m`,
+`checkDdcPri.m`, `generateDdc.m`, and `buildManifest.m`. The live v2 analytic
+check passed; the uncompensated v1 analytic
+baseline failed with normalized error `0.500862525049793`, as expected. The
+historical v1 comparison result remains separate from these v2 checks.
+
+Independent MATLAB validation passed on 2026-10-15 with no unresolved errors.
+The reviewer independently ran analytic and historical comparisons 2/2, WP4
+per-PRI 1/1, and tracked strict fixtures 56/56 with `provenanceValid=true`, and
+verified v2 profile identity and all 24 unchanged fixture artifacts. Full suite
+and Code Analyzer results were reviewed from upstream evidence, not rerun.
+Validation is limited to this temporary-unit evidence; it does not establish
+human approval, end-to-end detection, hardware performance, or merge approval.
 
 ## Phase 0: confirmed contract (2026-10-02)
 
@@ -62,7 +116,8 @@ zero/impulse/chirp boundary, multitone/noise, shape, sample-metadata, caller-
 time-mapping, and call-order coverage. Keep unit/oracle, full-scan, and
 end-to-end claims distinct.
 
-Pinned fixture byte hashes: `ddc-streaming.mat`
+Pinned fixture byte hashes for the recorded prior implementation:
+`ddc-streaming.mat`
 `2979d3d0c68c1deacbe097a202b2b3a125b2d7fd6aba19ef842d76bb98d6c616` and
 `ddc-design.mat`
 `541d89c6f98d4f292a2e8ca4504537440b591cea7348859c44d04276e6ab9a0d`.
@@ -75,9 +130,9 @@ remains downstream validity limitation. 2026-10-02 explicit go authorizes
 scoped MATLAB implementation.
 Does not authorize deferred Simulink topology or execution choices.
 
-## Implementation evidence and validation
+## Historical `independent-pri-v1` implementation evidence and validation
 
-Core MATLAB MCP suite: 32 passed, 0 failed, 0 incomplete,
+Prior `independent-pri-v1` core MATLAB MCP suite: 32 passed, 0 failed, 0 incomplete,
 7.73 seconds. Covers all five PRI lengths at one and 64 channels against
 combined 745-tap FFT convolution oracle, boundary stimuli, call-order and
 caller-time behavior, metadata and shape, inconsistent-rate rejection, and
@@ -162,9 +217,9 @@ verified by six corruption probes. Per-PRI witnesses use new profile
 identifiers; do not relabel historical G2 evidence. Issue #3 provenance
 hardening remains separate.
 
-## Implementation record
+## `independent-pri-v1` implementation record
 
-Approved implementation steps complete:
+Prior implementation steps complete:
 
 1. Preserve and pin old continuous-state witness and source revision at
    `58b3d3a80170d413aa88dd4408490e2056f49379`.
@@ -197,9 +252,9 @@ Approved implementation steps complete:
    passed; Julio approved DDC walkthrough 2026-10-08; implementation
    review and merge-readiness work remain ongoing.
 
-## Validated acceptance criteria
+## Prior `independent-pri-v1` validated acceptance criteria
 
-Independent numerical review accepts unchanged `5e-11` input-peak-
+Prior `independent-pri-v1` evidence: independent numerical review accepts unchanged `5e-11` input-peak-
 normalized tolerance for bounded five-PRI comparison. Measured
 `3.34852e-11` maximum leaves `1.65148e-11` margin. Not
 full-CPI, global-tick, or hardware error bound. Validation covered all five PRI

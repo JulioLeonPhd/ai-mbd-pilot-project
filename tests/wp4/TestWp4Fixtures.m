@@ -244,6 +244,20 @@ methods (Test)
         testCase.verifyEqual(string(probe.badCoordinateCode), "VALUE_OUT_OF_RANGE");
         testCase.verifyEqual(probe.tinyOutputCodes, ...
             repmat("NUMERICAL_MISMATCH", 1, 6));
+        halvedOutput = evidence;
+        for caseIndex = [4, 5, 7]
+            halvedOutput.cases(caseIndex).expectedOutput = ...
+                halvedOutput.cases(caseIndex).expectedOutput / 2;
+        end
+        diagnostic = wp4oracle.checkDdcPri(halvedOutput);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "NUMERICAL_MISMATCH");
+        oldProfile = evidence;
+        oldProfile.processingProfile = "independent-pri-v1";
+        oldProfile.processingProfileVersion = "1.0.0";
+        diagnostic = wp4oracle.checkDdcPri(oldProfile);
+        testCase.verifyFalse(diagnostic.accepted);
+        testCase.verifyEqual(string(diagnostic.code), "VERSION_MISMATCH");
     end
     function testDdcStreamingState(testCase)
         testCase.verifyTrue(testCase.runCase("Ddc-Streaming-State"));

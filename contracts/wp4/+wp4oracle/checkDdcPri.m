@@ -11,10 +11,10 @@ diagnostic = wp4oracle.requireFields(data, required, "A required per-PRI evidenc
 if ~diagnostic.accepted
     return
 end
-if string(data.processingProfile) ~= "independent-pri-v1" || ...
-        string(data.processingProfileVersion) ~= "1.0.0"
+if string(data.processingProfile) ~= "independent-pri-v2" || ...
+        string(data.processingProfileVersion) ~= "2.0.0"
     diagnostic = wp4oracle.failDiagnostic("VERSION_MISMATCH", "processingProfile", ...
-        "Per-PRI evidence must identify independent-pri-v1 version 1.0.0.");
+        "Per-PRI evidence must identify independent-pri-v2 version 2.0.0.");
     return
 end
 if ~isa(data.normalizedTolerance, "double") || ...
@@ -189,7 +189,7 @@ if ~caseDiagnostic.accepted
     return
 end
 
-oracleOutput = directPriConvolution(item.input, design);
+oracleOutput = 2 * directPriConvolution(item.input, design);
 if caseIndex == 1 || caseIndex == 6
     if any(item.expectedOutput(:) ~= 0)
         diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", "expectedOutput", ...
