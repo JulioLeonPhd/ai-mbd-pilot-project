@@ -49,3 +49,4 @@ data/testVectors/
 
 # Personal notes folder
 notes/
+.obsidian/workspace.json
