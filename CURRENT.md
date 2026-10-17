@@ -23,21 +23,25 @@ Full suites and Code Analyzer results were reviewed from upstream evidence, not 
 This does not record human approval or merge authorization.
 The [per-PRI implementation plan](docs/plans/ddc-pri-processing.md) records the bounded tolerance and evidence scope.
 
-The one-PRI walkthrough is approved, and the issue 6 coverage blocker and three standards warnings were resolved and independently validated.
+Historical approval before the current refactor: The one-PRI walkthrough is approved, and the issue 6 coverage blocker and three standards warnings were resolved and independently validated. That approval predates the current chirp update and does not approve the current walkthrough.
 
-Before merge, refactor the executable walkthrough into a deliberately verbose human-review surface.
-Make its processing chain, units, rates, dimensions, assumptions, factor-two compensation, startup handling, expected spectral movement, decimation, and evidence boundaries explicit.
-Keep the public API as the execution boundary, but explain what each call represents and what the reader should observe instead of hiding the engineering story behind convenience calls.
-Do not duplicate private production implementation in the walkthrough.
+The initial one-PRI walkthrough refactor is complete. It explains the public API boundary, processing chain, units, rates, dimensions, factor-two compensation, startup, timing, expected spectral movement, plots, and evidence limits.
+Baseline and final `TestDdcWalkthrough` each passed 1/1. The implementation run processed 147 PRIs, skipped four transition gaps, produced 843,825 outputs, and reported 7,353 output samples with a 999.5 kHz spectral peak for one PRI. MATLAB Code Analyzer reported no issues in the edited MATLAB source.
+Independent MATLAB validation of the preceding tone-based Live Script revision passed on 2026-10-17: `TestDdcWalkthrough` 1/1, including 147 PRIs, four transition gaps, and 843,825 outputs; MATLAB Code Analyzer returned `code_issues=[]`. This validates that revision's walkthrough check and analyzed source only; it does not establish full-CPI, end-to-end detection, hardware performance, or merge approval.
+On 2026-10-17, the same-path `.m` walkthrough was converted to an R2025a+ plain-text Live Script with structured output tables, dB spectra, and docked figures. The exclusive final walkthrough check passed 1/1 and Code Analyzer returned `code_issues=[]`. MATLAB's dock container adjusted the requested `[1 1 1100 750]` figure position to `[1 1 1103 738]` on the validation host; exact dock-pane geometry is host-controlled.
+The 999.5 kHz peak above belongs to the historical tone-based walkthrough. The previous chirp revision centered at 51 MHz and swept 48.5 to 53.5 MHz with one undesired 70 MHz interferer. `TestDdcWalkthrough` passed 1/1; early and late median frequency errors measured +0.04978 kHz and +0.028628 kHz, within the 2 kHz bound. The check also covered 147 PRIs, four transition gaps, and 843,825 outputs. Code Analyzer returned `code_issues=[]` for the walkthrough and test source. The single interferer demonstrates one rejection path only; the response metric provides broader alias-rejection evidence.
+Independent MATLAB validation of the chirp revision passed 1/1 with zero failed or incomplete tests. The independent early and late median frequency errors were 49.780 Hz and 28.628 Hz; Code Analyzer reported no issues in both edited MATLAB files.
+The current chirp is centered at 50 MHz and sweeps 47.5 to 52.5 MHz, yielding −2.5 to +2.5 MHz output around DC. `TestDdcWalkthrough` passed 1/1; early and late median frequency errors were +0.044415 kHz and −0.060731 kHz. Code Analyzer reported no issues in the walkthrough or test source. These are implementation checks; root review covered the local parameter change, diff, and reported test evidence. Human walkthrough review remains in progress.
+On 2026-10-17, Julio accepted [ADR 0024](docs/adr/0024-require-plain-text-matlab-live-script-walkthroughs.md), requiring every project walkthrough to be an executable plain-text R2025a+ MATLAB Live Script `.m` file. Companion Markdown remains supplementary. Existing nonconforming walkthroughs require conversion; no repository-wide audit, migration completion, or schedule is recorded.
 
 AI-infrastructure development is frozen until radar v1 under [ADR 0023](docs/adr/0023-freeze-ai-infrastructure-until-v1.md).
 Product delivery takes priority; existing infrastructure may receive defect fixes or minimal maintenance only when needed to unblock or materially support v1.
 The [v1 delivery action plan](docs/plans/v1-delivery-action-plan.md) records the working sequence.
 
-Human implementation review, walkthrough refactor, and visual review of the redrawn architecture diagrams remain pending.
+Human implementation review and current walkthrough review are in progress. Visual review of the redrawn architecture diagrams remains pending.
 Merge authorization is not recorded.
 
-Complete the walkthrough refactor and human implementation and visual reviews before authorising merge, then review the range-component boundary under human-led development step 5.
+Complete the current walkthrough and visual reviews before authorising merge, then review the range-component boundary under human-led development step 5.
 The DDC evidence does not establish full-receiver or hardware performance, and the historical WP4 continuous-state evidence remains separate from per-PRI acceptance evidence.
 
 See [HISTORY.md](HISTORY.md) for archived status snapshots.
