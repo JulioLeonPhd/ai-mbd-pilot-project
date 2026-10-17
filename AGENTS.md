@@ -30,20 +30,19 @@ with this contract.
 The root agent is the default orchestrator and owns workflow coordination; Julio
 owns architecture decisions and approves changes at the boundary above. Every
 specialist receives a bounded task packet containing only the context needed for
-the assignment; pass the full
-conversation only when the task requires it. Specialists surface missing
-information, permissions, or tools as
-`needs-input` or `blocked`; they do not silently expand scope. Mutation and
-validation are separate stages. Validators inspect artifacts and requirements;
-they repair only when the root agent assigns a new implementation task. A tool
-invocation is evidence to collect, not proof of correctness. The root agent
-decides whether acceptance criteria are satisfied.
+the assignment; pass the full conversation only when the task requires it.
+Specialists surface missing information, permissions, or tools as `needs-input`
+or `blocked`; they do not silently expand scope. Mutation and validation are
+separate stages. Validators inspect artifacts and requirements; they repair only
+when the root agent assigns a new implementation task. A tool invocation is
+evidence to collect, not proof of correctness. The root agent decides whether
+acceptance criteria are satisfied.
 
-Specialists work independently and never spawn subagents. Mermaid work is done by
-the agent that owns the artifact using the repository `diagrammer` skill; it is
-not a specialist handoff. Every `wait_agent` call uses a timeout of at least 10
-minutes; such
-calls are non-blocking and may be interrupted by a response or new user message.
+Specialists work independently and never spawn subagents. Mermaid work is done
+by the agent that owns the artifact using the repository `diagrammer` skill; it
+is not a specialist handoff. Every `wait_agent` call uses a timeout of at least
+10 minutes; such calls are non-blocking and may be interrupted by a response or
+new user message.
 
 ## Documentation style
 
@@ -56,18 +55,55 @@ comparisons, mappings, attributes, or status. Use bullets for parallel points
 when they make concepts faster to grasp, numbered lists for ordered steps, and
 prose for explanations that benefit from connected reasoning.
 
+### Engineering walkthroughs
+
+Treat executable walkthroughs as primary human-review surfaces for non-trivial
+engineering components, not as minimal API examples.
+
+Walkthroughs should be deliberately verbose when verbosity improves engineering
+transparency. A competent engineer should be able to understand the component's
+purpose, processing chain, important design choices, units, signal shapes,
+rates, state or reset behaviour, expected transformations, limitations, and
+evidence boundaries without first reverse-engineering namespaced implementation
+code.
+
+Keep the component's public API as the execution boundary. Do not duplicate
+private production algorithms in a walkthrough merely to expose their internals,
+because parallel implementations can drift. Instead, make the engineering
+meaning around each public call explicit: show relevant configuration values,
+derive or print important rates and dimensions, state which processing stages
+the call represents, calculate transparent expectations independently where
+useful, expose meaningful observations and plots, and explain what the reader
+should see and why.
+
+Do not hide the engineering story behind convenience calls. If a public API is
+too opaque for a walkthrough to explain the component honestly, improve the
+explanatory material or reconsider the API boundary rather than reaching into
+private implementation by default.
+
+Walkthroughs complement rather than replace tests. Walkthroughs teach and
+support human architectural review; tests and independent evidence establish
+behavioural claims.
+
 ## Active status and history
 
 Keep root `CURRENT.md` limited to the active work package, gate, or milestone,
-its approved decisions, verified result and evidence scope, pending human decisions or reviews, and the next authorized step.
-Write short connected prose that lets a reader returning after a week identify where work stands, what just finished, what blocks progress, and the next action.
-State explicitly when no formal work-package or gate assignment is recorded; verification never implies human approval or advances a gate.
+its approved decisions, verified result and evidence scope, pending human
+decisions or reviews, and the next authorized step. Write short connected prose
+that lets a reader returning after a week identify where work stands, what just
+finished, what blocks progress, and the next action. State explicitly when no
+formal work-package or gate assignment is recorded; verification never implies
+human approval or advances a gate.
 
-When a new work package or milestone starts, append the complete outgoing `CURRENT.md` to root `HISTORY.md` before replacing it.
-Give each full snapshot a date and the outgoing work package, gate, and milestone as recorded; preserve the outgoing content and relative links verbatim, and never overwrite earlier history.
-Routine updates within the same work package or milestone do not add a full snapshot.
-Move any historical material removed from `CURRENT.md` into an append-only history entry.
-The initial migration snapshot is dated, preserves the original file verbatim, and is explicitly identified as a migration rather than a new milestone.
+When a new work package or milestone starts, append the complete outgoing
+`CURRENT.md` to root `HISTORY.md` before replacing it. Give each full snapshot a
+date and the outgoing work package, gate, and milestone as recorded; preserve
+the outgoing content and relative links verbatim, and never overwrite earlier
+history. Routine updates within the same work package or milestone do not add a
+full snapshot. Move any historical material removed from `CURRENT.md` into an
+append-only history entry. The initial migration snapshot is dated, preserves
+the original file verbatim, and is explicitly identified as a migration rather
+than a new milestone.
 
 ## Complexity triage
 
@@ -85,8 +121,8 @@ for a trivial document; diagram use alone does not require semantic validation.
 
 Before routing implementation results, classify MATLAB/Simulink changes as
 `trivial` or `complex`. Invoke `matlab-validator` for complex changes or when
-independent validation is explicit. A change is usually trivial when it is local,
-well understood, and has no new algorithm, interface, model topology,
+independent validation is explicit. A change is usually trivial when it is
+local, well understood, and has no new algorithm, interface, model topology,
 sample-time or solver interaction, safety implication, code-generation concern,
 or cross-file behavioral change. A behavioral, architectural, numerical,
 interface, topology, configuration, execution, safety, or code-generation change
@@ -142,22 +178,22 @@ result:
   handoff: "recommended next step for the root agent"
 ```
 
-Use `failed` when the assignment could not be completed, `blocked` when
-external state or missing authority is required, and `complete` when the work is
-done with any warnings disclosed.
+Use `failed` when the assignment could not be completed, `blocked` when external
+state or missing authority is required, and `complete` when the work is done
+with any warnings disclosed.
 
 ### Handoff economy
 
-Use the existing packet fields as a compact interface. Keep `task.id` stable
-for the task lifecycle and make `task.objective` concise and outcome-focused.
-Keep `task.context` bounded; inherit the full conversation only when that string
+Use the existing packet fields as a compact interface. Keep `task.id` stable for
+the task lifecycle and make `task.objective` concise and outcome-focused. Keep
+`task.context` bounded; inherit the full conversation only when that string
 records `inherit-full-conversation: reason=<specific missing context>`.
 
-Keep `task.inputs` as string entries. Prefer immutable revision-pinned references
-in this form: `ref: repo-relative/path @ revision-or-hash [#selector]`. A bare
-path or mutable label such as `@ working-tree` remains compatible with the current
-contract, but the result reports an explicit `integrity-unverified` warning. Put
-only assignment-specific requirements in
+Keep `task.inputs` as string entries. Prefer immutable revision-pinned
+references in this form: `ref: repo-relative/path @ revision-or-hash
+[#selector]`. A bare path or mutable label such as `@ working-tree` remains
+compatible with the current contract, but the result reports an explicit
+`integrity-unverified` warning. Put only assignment-specific requirements in
 `constraints`, `acceptance_criteria`, `allowed_mutations`, and
 `requested_checks`.
 
@@ -165,9 +201,9 @@ In a result, use the existing `status`, `summary`, `artifacts`, `changes`,
 `checks`, `findings`, `assumptions`, and `handoff` fields: identify changed
 artifacts, record evidence in `checks`, disclose findings and assumptions, and
 state the next handoff. Keep source material referenced rather than repeated;
-results contain no reasoning traces. Preserve every field name, type, and
-status meaning in the packet contract above. If the active contract includes
-additional result metadata such as `agent.id`, `agent.name`, `agent.model`, or
+results contain no reasoning traces. Preserve every field name, type, and status
+meaning in the packet contract above. If the active contract includes additional
+result metadata such as `agent.id`, `agent.name`, `agent.model`, or
 `agent.reasoning_effort`, preserve and report those fields as supplied. Use an
 unknown value when metadata is unavailable; never invent an identifier or
 execution detail.
@@ -193,11 +229,11 @@ orchestrator; there is no separate plan agent or `simulink-architect`.
 | `matlab-validator-deep` | Control, solver, safety, code generation |
 
 The four variant TOMLs are present in this repository; runtime availability is
-session-dependent. Before spawning one,
-the root confirms that it is selectable in the current session and reports a
-failure when it is unavailable. For safety or complex design, the root does not
-silently fall back to a lower-capability role. Astra is reserved for exceptional
-manual escalation and is not a configured default role.
+session-dependent. Before spawning one, the root confirms that it is selectable
+in the current session and reports a failure when it is unavailable. For safety
+or complex design, the root does not silently fall back to a lower-capability
+role. Astra is reserved for exceptional manual escalation and is not a
+configured default role.
 
 Read the matching [.codex/agents](.codex/agents/) TOML before changing or
 reviewing a specialist definition. The TOMLs preserve specialist-specific tools,
@@ -250,8 +286,8 @@ limitations.
    repository-authored Markdown file. Byte-for-byte third-party Markdown
    snapshots may be excluded by the root configuration, but must be verified
    against their pinned source hashes.
-4. When `mmdc` is needed to render a Mermaid diagram, run it outside the
-   command sandbox with Microsoft Edge as the Puppeteer executable:
+4. When `mmdc` is needed to render a Mermaid diagram, run it outside the command
+   sandbox with Microsoft Edge as the Puppeteer executable:
 
    ```sh
    EDGE_BIN='/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
@@ -266,9 +302,9 @@ limitations.
    deliverable. If Edge is unavailable or the render fails, report the check as
    unavailable or failed rather than passing it.
 5. For a complex document, route the finished artifact and source context to
-   `technical-writer-validator`, or to
-   `technical-writer-validator-deep` for safety guidance or intricate
-   architecture documentation; request revisions for unresolved error findings.
+   `technical-writer-validator`, or to `technical-writer-validator-deep` for
+   safety guidance or intricate architecture documentation; request revisions
+   for unresolved error findings.
 
 Completion requires traceable artifacts, a passing Markdown lint check, and the
 required independent review for complex documents.
@@ -296,28 +332,30 @@ The root agent may report completion when every requested artifact exists at its
 expected path or model location, the relevant specialist returned `complete`,
 required checks passed or an explicit limitation was accepted by the user, and
 all warnings, assumptions, and skipped checks are disclosed. Complex documents
-and complex
-MATLAB/Simulink changes require independent validation with no unresolved error
-findings. The final response names changed artifacts and collected evidence.
+and complex MATLAB/Simulink changes require independent validation with no
+unresolved error findings. The final response names changed artifacts and
+collected evidence.
 
 Run `uv run --frozen python scripts/check_agent_handoffs.py` after changing
-`AGENTS.md`, `.codex/agents/*.toml`, the `diagrammer` skill, or agent orchestration
-architecture documents. Completion requires every reported check to pass; an
-unavailable required checker is a disclosed limitation, not a pass.
+`AGENTS.md`, `.codex/agents/*.toml`, the `diagrammer` skill, or agent
+orchestration architecture documents. Completion requires every reported check
+to pass; an unavailable required checker is a disclosed limitation, not a pass.
 
 ## MATLAB coding standards
 
 Codex automatically loads this `AGENTS.md`; it does not discover MATLAB rules
 from arbitrary `.github/instructions` files. For any MATLAB or Simulink-
-associated MATLAB code change, open the versioned
-[MATLAB standards bundle](docs/standards/matlab/README.md), then apply the
-relevant rule file:
+associated MATLAB code change, open the versioned [MATLAB standards
+bundle](docs/standards/matlab/README.md), then apply the relevant rule file:
 
-- Open [matlab-coding-standards.md](docs/standards/matlab/matlab-coding-standards.md)
+- Open
+  [matlab-coding-standards.md](docs/standards/matlab/matlab-coding-standards.md)
   for MATLAB code and general coding decisions.
-- Open [live-script-generation.md](docs/standards/matlab/live-script-generation.md)
+- Open
+  [live-script-generation.md](docs/standards/matlab/live-script-generation.md)
   when creating or editing a plain-text Live Script.
-- Open [matlab-performance-optimization.md](docs/standards/matlab/matlab-performance-optimization.md)
+- Open
+  [matlab-performance-optimization.md](docs/standards/matlab/matlab-performance-optimization.md)
   when optimizing or investigating a performance bottleneck; profile first.
 
 The bundle records which rules are also available from the MATLAB MCP. Follow
@@ -343,16 +381,16 @@ when appropriate instead of the MATLAB default plotting functions.
 ## Python linting
 
 Ruff is the canonical linter and formatter for Python scripts. Whenever creating
-or editing a `.py` file, run `uv run --frozen ruff check <path>` and
-`uv run --frozen ruff format --check <path>` before reporting completion. Apply
-Ruff fixes with `uv run --frozen ruff check --fix <path>` and
-`uv run --frozen ruff format <path>` when appropriate, then review the diff.
+or editing a `.py` file, run `uv run --frozen ruff check <path>` and `uv run
+--frozen ruff format --check <path>` before reporting completion. Apply Ruff
+fixes with `uv run --frozen ruff check --fix <path>` and `uv run --frozen ruff
+format <path>` when appropriate, then review the diff.
 
 Pylance/Pyright provides supplementary static type checking for Python code in
 `contracts` and `scripts`. The repository-level `pyrightconfig.json` keeps this
 check at `basic` mode because Python is used for project tooling and contract
-validation rather than as the primary project language. Preserve that scope
-and mode unless the project explicitly adopts stricter Python typing. When the
+validation rather than as the primary project language. Preserve that scope and
+mode unless the project explicitly adopts stricter Python typing. When the
 dependency environment is available, run `uv run --frozen pyright contracts
 scripts` for the corresponding command-line check; report any remaining
 diagnostics rather than treating the check as passed.
@@ -377,17 +415,17 @@ push the commit and tag when the user requests publication.
 ### Issue tracker
 
 GitHub Issues for `JulioLeonPhd/ai-mbd-pilot-project`, using the `gh` CLI.
-Because GitHub API access can fail inside the command sandbox, always run
-`gh` CLI commands outside the sandbox using the execution environment's
-escalation mechanism. This outside-sandbox execution is authorized for all
-GitHub issue-tracker operations in this repository. See
-`docs/agents/issue-tracker.md` for command conventions.
+Because GitHub API access can fail inside the command sandbox, always run `gh`
+CLI commands outside the sandbox using the execution environment's escalation
+mechanism. This outside-sandbox execution is authorized for all GitHub
+issue-tracker operations in this repository. See `docs/agents/issue-tracker.md`
+for command conventions.
 
 ### Triage labels
 
 The five default canonical labels: `needs-triage`, `needs-info`,
-`ready-for-agent`, `ready-for-human`, and `wontfix`.
-See `docs/agents/triage-labels.md`.
+`ready-for-agent`, `ready-for-human`, and `wontfix`. See
+`docs/agents/triage-labels.md`.
 
 ### Domain docs
 
