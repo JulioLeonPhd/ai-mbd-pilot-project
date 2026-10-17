@@ -39,10 +39,15 @@ swept linearly from 47.5 to 52.5 MHz around 50 MHz, with 18,000-count peak
 amplitude. Its sweep duration is `N/Fs = 588.24 microseconds`; the 52.5 MHz
 endpoint is at the exclusive PRI boundary, so the last acquired sample is
 approximately 52.499943333 MHz. An undesired 70 MHz interference probe has
-3,500-count peak amplitude. The script rounds their sum to `int16`, then
-converts the PRI to `double` for the DDC. These are synthetic counts, not
-calibrated volts. The PRI begins at ADC tick zero and its length is divisible
-by the combined decimation factor 12.
+3,500-count peak amplitude. Before quantization, the script adds zero-mean
+Gaussian noise with 100 ADC-count RMS, using a local `mt19937ar` stream with
+seed 17. This is small beside the desired 18,000-count peak and makes
+runs reproducible without changing MATLAB's global random state. The script
+then rounds the sum to `int16` and converts the PRI to `double` for the DDC.
+These are synthetic counts, not calibrated volts. The noise is not a calibrated
+receiver-noise or hardware model, and the example makes no SNR estimate. The
+PRI begins at ADC tick zero and its length is divisible by the combined
+decimation factor 12.
 
 At 150 MS/s, the 50 MHz mixer translates the desired chirp's positive-frequency
 band from 47.5–52.5 MHz to −2.5–+2.5 MHz, centered at 0 MHz. Its negative-frequency band
@@ -72,9 +77,10 @@ rows. Displayed response metric tables and figures describe the filter design,
 separately from the finite-record chirp/interference spectra.
 
 The script estimates output instantaneous frequency from phase differences
-between adjacent complex samples. It compares median early- and late-PRI
+between adjacent complex samples. It compares mean early- and late-PRI
 estimates with the expected chirp frequencies at the corresponding delay-aware
-sample positions; both errors must be within 2 kHz. This checks sweep direction,
+sample positions; averaging reduces noise-driven sample-to-sample phase
+jitter. Both errors must be within 2 kHz. This checks sweep direction,
 frequency span, and timing at those two windows. It is separate from the
 broadband alias-rejection response metric.
 
@@ -105,8 +111,7 @@ leaves the desired complex envelope at `A/2`. The approved fixed factor-two
 gain restores peak envelope amplitude toward `A`, subject to FIR gain, phase
 response, and residual image. It preserves input units, doubles noise
 amplitude, and does not improve SNR. It does not calibrate ADC counts to volts.
-The deterministic chirp/interference example adds no noise stimulus. FIR
-coefficients, response metrics, state, timing, output shape, and API remain
+FIR coefficients, response metrics, state, timing, output shape, and API remain
 unchanged by this gain.
 
 ## State, startup, and timing
