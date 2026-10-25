@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
 import subprocess
@@ -51,6 +52,24 @@ MARKDOWN_PATHS = (
     "docs/adr/0018-flatten-specialist-orchestration.md",
     "docs/plans/agent-handoff-token-optimisation.md",
     "docs/architecture/agent-orchestration-runtime.md",
+    "CHANGELOG.md",
+)
+OMP_MODELS = {
+    "gpt-6-luna": "openai-codex/gpt-6-luna",
+    "gpt-6.1-sol": "openai-codex/gpt-6.1-sol",
+    "gpt-6-astra": "openai-codex/gpt-6-astra",
+}
+OMP_READ_TOOLS = {"read", "grep", "glob", "web_search"}
+OMP_WRITE_TOOLS = OMP_READ_TOOLS | {"write", "edit", "bash", "eval"}
+OMP_PROMPT_MARKERS = (
+    "Read the repository root `AGENTS.md` before acting",
+    "do not spawn subagents",
+    "`allowed_mutations`",
+    "`requested_checks`",
+    "`agent.name`, `agent.model`, `agent.reasoning_effort`",
+    "`result.status`",
+    "`integrity-unverified`",
+    "does not reproduce Codex's",
 )
 
 
@@ -103,6 +122,98 @@ def _load_agents(root: Path) -> tuple[list[dict[str, object]], list[str]]:
         data["_path"] = path
         agents.append(data)
     return agents, errors
+
+
+def _parse_omp_agent(content: str) -> dict[str, object]:
+    """Read the repository's JSON-valued YAML subset, not arbitrary OMP YAML."""
+
+    lines = content.splitlines()
+    if not lines or lines[0] != "---":
+        raise ValueError("missing opening frontmatter delimiter")
+    try:
+        end = lines.index("---", 1)
+    except ValueError as error:
+        raise ValueError("missing closing frontmatter delimiter") from error
+    data: dict[str, object] = {}
+    for line in lines[1:end]:
+        key, separator, value = line.partition(":")
+        if not separator or not key or key in data:
+            raise ValueError(f"invalid or duplicate frontmatter key: {line!r}")
+        try:
+            data[key] = json.loads(value)
+        except json.JSONDecodeError as error:
+            raise ValueError(f"{key}: expected a JSON-valued YAML field") from error
+    data["_body"] = "\n".join(lines[end + 1 :])
+    return data
+
+
+def _check_omp_agents(
+    root: Path, codex_agents: list[dict[str, object]], registry: set[str]
+) -> Check:
+    """Check native equivalents and declared controls without claiming isolation."""
+
+    errors: list[str] = []
+    names: list[str] = []
+    codex = {str(agent.get("name")): agent for agent in codex_agents}
+    for path in sorted((root / ".omp/agents").glob("*.md")):
+        label = str(path.relative_to(root))
+        try:
+            agent = _parse_omp_agent(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            errors.append(f"{label}: {error}")
+            continue
+        name = agent.get("name")
+        if not isinstance(name, str) or not name:
+            errors.append(f"{label}: invalid name")
+            continue
+        names.append(name)
+        if path.stem != name or name.lower() in {"main", "sub"}:
+            errors.append(f"{label}: invalid or mismatched filename/name")
+        source = codex.get(name)
+        if source is None:
+            errors.append(f"{label}: no matching Codex definition")
+            continue
+        expected = {
+            "description": source.get("description"),
+            "model": OMP_MODELS.get(str(source.get("model"))),
+            "thinking-level": source.get("model_reasoning_effort"),
+            "spawns": "",
+        }
+        for key, value in expected.items():
+            if key not in agent or value is None or agent[key] != value:
+                errors.append(f"{label}: incorrect {key}; expected {value!r}")
+        tools = agent.get("tools")
+        expected_tools = (
+            OMP_READ_TOOLS
+            if source.get("sandbox_mode") == "read-only"
+            else OMP_WRITE_TOOLS
+        )
+        if (
+            not isinstance(tools, list)
+            or not all(isinstance(tool, str) for tool in tools)
+            or set(tools) != expected_tools
+        ):
+            errors.append(f"{label}: incorrect built-in tool allowlist")
+        body = str(agent["_body"])
+        if str(source.get("developer_instructions", "")).strip() not in body:
+            errors.append(f"{label}: Codex role instructions differ or are missing")
+        for marker in OMP_PROMPT_MARKERS:
+            if marker not in body:
+                errors.append(f"{label}: missing operating boundary {marker!r}")
+    inventory = set(names)
+    if len(names) != len(inventory):
+        errors.append("duplicate OMP agent names")
+    if inventory != registry or inventory != set(codex):
+        errors.append(
+            f"OMP={sorted(inventory)}; registry={sorted(registry)}; "
+            f"Codex={sorted(codex)}"
+        )
+    if errors:
+        return _failed("OMP native agents", "; ".join(errors))
+    return _passed(
+        "OMP native agents",
+        f"{len(names)} aligned roles; declared tools/spawns only, not OS isolation",
+    )
 
 
 def collect_checks(
@@ -165,6 +276,8 @@ def collect_checks(
             )
         )
 
+    checks.append(_check_omp_agents(root, agents, registry))
+
     task_fields = _packet_fields(contract, "task")
     result_fields = _packet_fields(contract, "result")
     missing_task = sorted(set(TASK_FIELDS) - task_fields)
@@ -215,8 +328,12 @@ def collect_checks(
         )
 
     diagram_skill = root / ".agents/skills/diagrammer/SKILL.md"
-    diagram_agent = root / ".codex/agents/diagrammer.toml"
-    if diagram_skill.is_file() and not diagram_agent.exists():
+    diagram_agents = (
+        root / ".codex/agents/diagrammer.toml",
+        root / ".omp/agents/diagrammer.md",
+    )
+    diagram_agent_present = any(path.exists() for path in diagram_agents)
+    if diagram_skill.is_file() and not diagram_agent_present:
         checks.append(
             _passed("diagrammer boundary", "skill present; specialist absent")
         )
@@ -224,7 +341,7 @@ def collect_checks(
         checks.append(
             _failed(
                 "diagrammer boundary",
-                f"skill={diagram_skill.is_file()}, specialist={diagram_agent.exists()}",
+                f"skill={diagram_skill.is_file()}, specialist={diagram_agent_present}",
             )
         )
 
@@ -238,6 +355,9 @@ def collect_checks(
             paths = [
                 str(root / path) for path in MARKDOWN_PATHS if (root / path).is_file()
             ]
+            paths.extend(
+                str(path) for path in sorted((root / ".omp/agents").glob("*.md"))
+            )
             result = subprocess.run(
                 [executable, *paths],
                 cwd=root,

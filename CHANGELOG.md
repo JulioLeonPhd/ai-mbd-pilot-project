@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## Unreleased
+
+### Added
+
+- OMP-native project definitions for all nine specialists, preserving Codex TOMLs and role instructions.
+
+### Changed
+
+- Documented model/effort mapping and OMP sandbox limitations; extended handoff checks to cover both runtimes.
+
 ## [v0.8.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.8.0) - 2026-10-02
 
 <small>[Compare with v0.7.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.7.0...v0.8.0)</small>

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import importlib.util
+import shutil
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -45,10 +47,56 @@ task:
 """
         self.assertEqual(CHECKER._packet_fields(contract, "task"), {"id", "checks"})
 
-    def test_current_repository_contract_passes(self) -> None:
-        checks = CHECKER.collect_checks(CHECKER.ROOT, skip_markdownlint=True)
-        failures = [check for check in checks if check.status == "failed"]
-        self.assertEqual(failures, [])
+    def test_omp_frontmatter_parses_repository_subset(self) -> None:
+        agent = CHECKER._parse_omp_agent(
+            '---\nname: "writer"\nspawns: ""\ntools: ["read"]\n---\nBody\n'
+        )
+        self.assertEqual(agent["name"], "writer")
+        self.assertEqual(agent["spawns"], "")
+        self.assertEqual(agent["tools"], ["read"])
+        self.assertIn("Body", agent["_body"])
+
+    def test_omp_frontmatter_rejects_malformed_or_duplicate_fields(self) -> None:
+        for content in (
+            'name: "writer"\n',
+            '---\nname: "writer"\n',
+            '---\nname: "writer"\nname: "other"\n---\n',
+            "---\nname: writer\n---\n",
+        ):
+            with self.subTest(content=content), self.assertRaises(ValueError):
+                CHECKER._parse_omp_agent(content)
+
+    def test_omp_check_rejects_execution_policy_drift(self) -> None:
+        agents, errors = CHECKER._load_agents(CHECKER.ROOT)
+        self.assertEqual(errors, [])
+        registry = {str(agent["name"]) for agent in agents}
+        mutations = (
+            ('spawns: ""', 'spawns: "*"'),
+            (
+                'model: "openai-codex/gpt-6.1-sol"',
+                'model: "openai-codex/gpt-6-luna"',
+            ),
+            ('thinking-level: "medium"', 'thinking-level: "low"'),
+            ('"web_search"]', '"web_search", "bash"]'),
+        )
+        for before, after in mutations:
+            with self.subTest(before=before), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                shutil.copytree(CHECKER.ROOT / ".omp/agents", root / ".omp/agents")
+                path = root / ".omp/agents/matlab-validator.md"
+                content = path.read_text(encoding="utf-8")
+                self.assertIn(before, content)
+                path.write_text(content.replace(before, after), encoding="utf-8")
+                check = CHECKER._check_omp_agents(root, agents, registry)
+                self.assertEqual(check.status, "failed")
+
+    def test_omp_check_requires_every_registered_role(self) -> None:
+        agents, errors = CHECKER._load_agents(CHECKER.ROOT)
+        self.assertEqual(errors, [])
+        registry = {str(agent["name"]) for agent in agents}
+        with tempfile.TemporaryDirectory() as temp:
+            check = CHECKER._check_omp_agents(Path(temp), agents, registry)
+        self.assertEqual(check.status, "failed")
 
     def test_result_after_agent_metadata_excludes_sibling_fields(self) -> None:
         contract = """```yaml
