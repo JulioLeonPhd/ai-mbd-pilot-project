@@ -50,3 +50,12 @@ data/testVectors/
 # Personal notes folder
 notes/
 .obsidian/workspace.json
+
+# Private teaching workspace
+/MISSION.md
+/NOTES.md
+/RESOURCES.md
+/assets/
+/learning-records/
+/lessons/
+/reference/

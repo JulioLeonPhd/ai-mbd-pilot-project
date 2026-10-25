@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Expanded the DDC Live Script filter-response explanation with wideband FIR magnitude views before the passband zoom and alias envelope, two-sentence plot introductions, simplified dB labels, and ordinary decimal passband ticks.
 - Documented model/effort mapping and OMP sandbox limitations; extended handoff checks to cover both runtimes.
 - Recorded pilot evidence and limitations for parallel OMP MATLAB MCP session isolation.
 - Required OMP subagents to dispatch through the active session's `task` tool rather than separate headless processes.
