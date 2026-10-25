@@ -27,6 +27,12 @@ interfaces below. Codex uses the project-scoped `.codex/agents/*.toml` definitio
 OMP uses the equivalent native `.omp/agents/*.md` definitions.
 Keep both sets aligned with this contract and preserve their role-specific instructions.
 
+In OMP, dispatch every subagent through the active session's `task` tool so
+execution remains visible in its subagents panel. Do not launch subagents
+through a separate headless OMP process, shell command, or external agent CLI.
+If the active session's `task` tool is unavailable, report `blocked` rather than
+using another launcher.
+
 The root agent is the default orchestrator and owns workflow coordination; Julio
 owns architecture decisions and approves changes at the boundary above. Every
 specialist receives a bounded task packet containing only the context needed for
@@ -379,6 +385,30 @@ Run `uv run --frozen python scripts/check_agent_handoffs.py` after changing
 `AGENTS.md`, `.codex/agents/*.toml`, `.omp/agents/*.md`, the `diagrammer` skill, or agent
 orchestration architecture documents. Completion requires every reported check
 to pass; an unavailable required checker is a disclosed limitation, not a pass.
+
+## MATLAB MCP session selection and ownership
+
+Use the configured endpoints according to the task:
+
+| Endpoint | Preferred use | Ownership requirement |
+| --- | --- | --- |
+| `matlab-existing` | Human-guided model development, visual walkthroughs, and interactive debugging in a prepared session. | Confirm the intended shared session and coordinate one owner; protect the human's workspace, paths, open models, and unsaved changes. |
+| `matlab-disposable` | Automated checks, test execution, scratch experiments, and independent validation with explicit initialization. | Record the MATLAB version/root and working folder, initialize required project state, and preserve outputs before cleanup. |
+
+`matlab-disposable` is a configured endpoint name, not a per-call reset, sandbox, or cleanup guarantee.
+A new MATLAB process may run startup scripts and retains state across calls while alive; it can still modify the same files as the interactive session.
+`nodesktop` does not guarantee that UI commands open no windows.
+Do not rely on disconnect or crash cleanup without verifying the installed runtime's behavior.
+For `existing` mode, select/share the intended session explicitly; the most recently shared session is otherwise selected.
+Do not combine `existing` mode with MATLAB-root, initial-working-folder, or display-mode launch overrides.
+
+Before concurrent MATLAB/Simulink execution, establish separate session ownership and deterministic task-to-endpoint routing.
+Worktrees, endpoint names, `new` mode, and executable copies alone do not establish isolation.
+If isolation has not been verified, serialize calls to the shared endpoint; do not run implementation and independent validation concurrently in the same mutable MATLAB session.
+Verify distinct MATLAB PIDs, correct request/response identity, and independent scratch state under overlapping calls before claiming isolation.
+The [pilot isolation research](docs/research/omp-matlab-mcp-session-isolation-2026-10-25.md) records observed collisions and one successful copied-executable trial; that trial is not an approved or production-validated isolation architecture.
+Any proposed multi-session switch must preserve the required Simulink extension tools.
+Neither endpoint removes tool-call review, filesystem-risk controls, or applicable MathWorks license requirements.
 
 ## MATLAB coding standards
 

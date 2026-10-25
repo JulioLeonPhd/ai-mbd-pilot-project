@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Documented model/effort mapping and OMP sandbox limitations; extended handoff checks to cover both runtimes.
+- Recorded pilot evidence and limitations for parallel OMP MATLAB MCP session isolation.
+- Required OMP subagents to dispatch through the active session's `task` tool rather than separate headless processes.
+- Defined MATLAB MCP endpoint selection, session ownership, and concurrency-isolation requirements in the project contract.
 
 ## [v0.8.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.8.0) - 2026-10-02
 

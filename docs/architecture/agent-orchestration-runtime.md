@@ -205,3 +205,7 @@ This architecture does not currently:
 
 The runtime should be proposed for implementation only after its trigger,
 acceptance gates, data-retention policy, and rollback path are agreed.
+
+The pilot's observed MATLAB MCP shared-session collision and bounded evidence
+are recorded in the [parallel MCP session-isolation research note](../research/omp-matlab-mcp-session-isolation-2026-10-25.md).
+This note is an observation, not an isolation implementation or architecture approval.
