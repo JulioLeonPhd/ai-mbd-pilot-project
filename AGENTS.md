@@ -23,9 +23,10 @@ visible.
 
 The root agent owns task decomposition, sequencing, authority, conflict
 resolution, and the final response. Specialists perform bounded work through the
-interfaces below. Codex uses the project-scoped `.codex/agents/*.toml` definitions;
-OMP uses the equivalent native `.omp/agents/*.md` definitions.
-Keep both sets aligned with this contract and preserve their role-specific instructions.
+interfaces below. Codex uses the project-scoped `.codex/agents/*.toml`
+definitions; OMP uses the equivalent native `.omp/agents/*.md` definitions. Keep
+both sets aligned with this contract and preserve their role-specific
+instructions.
 
 In OMP, dispatch every subagent through the active session's `task` tool so
 execution remains visible in its subagents panel. Do not launch subagents
@@ -217,11 +218,12 @@ execution detail.
 ## Specialist registry and conditional routing
 
 Each runtime's native definition is authoritative for its execution settings:
-Codex reads TOML; OMP discovers project Markdown from `.omp/agents`, not `.codex/agents`.
-The role responsibilities remain equivalent across both sets.
-The root agent selects the role before spawning it, records the role and observable
-reason in the task packet, and checks that it is selectable in the current session.
-The root remains the planner and orchestrator; there is no separate plan agent or `simulink-architect`.
+Codex reads TOML; OMP discovers project Markdown from `.omp/agents`, not
+`.codex/agents`. The role responsibilities remain equivalent across both sets.
+The root agent selects the role before spawning it, records the role and
+observable reason in the task packet, and checks that it is selectable in the
+current session. The root remains the planner and orchestrator; there is no
+separate plan agent or `simulink-architect`.
 
 | Agent | Route when the task is... |
 | --- | --- |
@@ -235,22 +237,24 @@ The root remains the planner and orchestrator; there is no separate plan agent o
 | `matlab-validator` | Complex MATLAB/Simulink validation |
 | `matlab-validator-deep` | Control, solver, safety, code generation |
 
-All nine roles, including the three deep variants, have definitions for both runtimes;
-runtime availability is session-dependent.
-Before spawning one, the root confirms that it is selectable in the current session
-and reports a failure when it is unavailable.
-For safety or complex design, the root does not silently fall back to a lower-capability role.
-Astra is selected by the explicit deep routes, not by standard roles.
+All nine roles, including the three deep variants, have definitions for both
+runtimes; runtime availability is session-dependent. Before spawning one, the
+root confirms that it is selectable in the current session and reports a failure
+when it is unavailable. For safety or complex design, the root does not silently
+fall back to a lower-capability role. Astra is selected by the explicit deep
+routes, not by standard roles.
 
 Read both the matching [.codex/agents](.codex/agents/) TOML and
-[.omp/agents](.omp/agents/) Markdown before changing or reviewing a specialist definition.
-Keep their role instructions equivalent; their runtime-specific settings are not interchangeable.
+[.omp/agents](.omp/agents/) Markdown before changing or reviewing a specialist
+definition. Keep their role instructions equivalent; their runtime-specific
+settings are not interchangeable.
 
 ### OMP execution settings and safety limits
 
-OMP definitions use concrete available provider/model selectors so a global role's
-thinking suffix cannot override the original role-specific effort.
-They do not interpret Codex model IDs as OMP selectors or change global model settings.
+OMP definitions use concrete available provider/model selectors so a global
+role's thinking suffix cannot override the original role-specific effort. They
+do not interpret Codex model IDs as OMP selectors or change global model
+settings.
 
 | Roles | Codex model | OMP model selector | Thinking level |
 | --- | --- | --- | --- |
@@ -260,30 +264,33 @@ They do not interpret Codex model IDs as OMP selectors or change global model se
 | `matlab-architect-deep`, `matlab-validator-deep` | `gpt-6-astra` | `openai-codex/gpt-6-astra` | `high` |
 | `technical-writer-validator-deep` | `gpt-6-astra` | `openai-codex/gpt-6-astra` | `medium` |
 
-These correspond to the current `@smol` Luna, `@default` Sol, and `@slow` Astra model families,
-but deliberately do not inherit those aliases' effort suffixes.
-OMP settings or launch-time policy can override model and effort; record observed execution
-metadata in results and recheck availability after configuration changes.
+These correspond to the current `@smol` Luna, `@default` Sol, and `@slow` Astra
+model families, but deliberately do not inherit those aliases' effort suffixes.
+OMP settings or launch-time policy can override model and effort; record
+observed execution metadata in results and recheck availability after
+configuration changes.
 
 Every OMP definition denies child spawning with `spawns: ""` and instructs the
-specialist not to delegate through any other mechanism.
-Architects and validators allow only the built-in `read`, `grep`, `glob`, and `web_search` tools;
-writers and implementers additionally allow `write`, `edit`, `bash`, and `eval`.
-MCP, extension, and custom tools remain additive, so an allowlist is not a complete
-capability or filesystem boundary.
-Inspection-only roles must not use those tools to mutate artifacts; requested checks
-that need writes or unavailable tools return to the root for a separately authorized task.
-Writable roles remain limited to their task's `allowed_mutations`.
-OMP agent frontmatter has no equivalent of the TOML `sandbox_mode` setting:
-neither Codex's `read-only` nor `workspace-write` OS sandbox is reproduced.
-These instructions and built-in restrictions reduce exposure but do not enforce OS
-isolation or external-service permissions; use platform controls when those guarantees are required.
+specialist not to delegate through any other mechanism. Architects and
+validators allow only the built-in `read`, `grep`, `glob`, and `web_search`
+tools; writers and implementers additionally allow `write`, `edit`, `bash`, and
+`eval`. MCP, extension, and custom tools remain additive, so an allowlist is not
+a complete capability or filesystem boundary. Inspection-only roles must not use
+those tools to mutate artifacts; requested checks that need writes or
+unavailable tools return to the root for a separately authorized task. Writable
+roles remain limited to their task's `allowed_mutations`. OMP agent frontmatter
+has no equivalent of the TOML `sandbox_mode` setting: neither Codex's
+`read-only` nor `workspace-write` OS sandbox is reproduced. These instructions
+and built-in restrictions reduce exposure but do not enforce OS isolation or
+external-service permissions; use platform controls when those guarantees are
+required.
 
 From the worktree root, inspect `/agents` for all nine project roles and confirm
-their selected models, thinking levels, tools, and denied child spawning before dispatch.
-The repository checker below validates the committed frontmatter subset, inventory,
-role-instruction alignment, and declared restrictions; it does not prove native discovery,
-actual model routing, MCP authorization, or sandbox enforcement.
+their selected models, thinking levels, tools, and denied child spawning before
+dispatch. The repository checker below validates the committed frontmatter
+subset, inventory, role-instruction alignment, and declared restrictions; it
+does not prove native discovery, actual model routing, MCP authorization, or
+sandbox enforcement.
 
 ## Workflow sequencing
 
@@ -382,9 +389,10 @@ unresolved error findings. The final response names changed artifacts and
 collected evidence.
 
 Run `uv run --frozen python scripts/check_agent_handoffs.py` after changing
-`AGENTS.md`, `.codex/agents/*.toml`, `.omp/agents/*.md`, the `diagrammer` skill, or agent
-orchestration architecture documents. Completion requires every reported check
-to pass; an unavailable required checker is a disclosed limitation, not a pass.
+`AGENTS.md`, `.codex/agents/*.toml`, `.omp/agents/*.md`, the `diagrammer` skill,
+or agent orchestration architecture documents. Completion requires every
+reported check to pass; an unavailable required checker is a disclosed
+limitation, not a pass.
 
 ## MATLAB MCP session selection and ownership
 
@@ -446,6 +454,16 @@ that limitation; an unavailable check is not a pass.
 
 We have `gramm` available as a `ggplot2` style plotting library. Prefer using it
 when appropriate instead of the MATLAB default plotting functions.
+
+## Python usage
+
+Always activate the virtual environment `.venv` before running Python commands or installing packages. This repo uses `uv`; do not invoke pip or conda alone.
+
+Activate the `.venv` by:
+
+```bash
+source .venv/bin/activate # for Linux/macOS 
+```
 
 ## Python linting
 
