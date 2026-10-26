@@ -10,7 +10,7 @@ $$
 x(t)=A(t)e^{j\phi(t)},\qquad X(f)=\int_{-\infty}^{\infty}x(t)e^{-j2\pi ft}\,dt.
 $$
 
-The project convention is positive radial velocity $v_r>0$ for a receding
+The project convention is positive radial velocity $v_r\gt 0$ for a receding
 target. These are nominal or conditional scales, not exact separability or
 detection guarantees; waveform, window, sampling, SNR, and the selected
 criterion affect measured performance. See the [radar equation research note](../research/radar-equation-glossary-sources.md)
@@ -20,14 +20,14 @@ for derivations and sources.
 
 $$
 x(t)=A(t)\exp\!\left\{j\left[2\pi f_1t+\pi\mu t^2+\phi_0\right]\right\},\quad
-0\le t<T_p,
+0\le t\lt T_p,
 $$
 
 where $A(t)$ is the pulse envelope, $T_p$ is pulse duration,
 $\mu=(f_2-f_1)/T_p$ is signed sweep rate in hertz per second,
 $B=|f_2-f_1|$ is nonnegative swept bandwidth, and $\phi_0$ is initial
 phase. The instantaneous frequency is $f_i(t)=f_1+\mu t$; an up-chirp has
-$\mu>0$ and a down-chirp has $\mu<0$.
+$\mu\gt 0$ and a down-chirp has $\mu\lt 0$.
 
 **Matched filter**:
 
@@ -87,8 +87,8 @@ noise factor $F$, use $N=kT_0BF$; do not multiply a complete $T_{\rm sys}$
 by $F$, which double-counts receiver noise.
 
 **Maximum unambiguous radial velocity**: Uniform slow-time sampling gives
-$\lvert f_d\rvert<\mathrm{PRF}/2$, hence the nominal monostatic magnitude
-limit $\lvert v_r\rvert<\lambda\,\mathrm{PRF}/4$ (often quoted as
+$\lvert f_d\rvert\lt \mathrm{PRF}/2$, hence the nominal monostatic magnitude
+limit $\lvert v_r\rvert\lt \lambda\,\mathrm{PRF}/4$ (often quoted as
 $v_{\max}=\lambda\,\mathrm{PRF}/4$); endpoint ownership depends on the FFT
 grid convention.
 

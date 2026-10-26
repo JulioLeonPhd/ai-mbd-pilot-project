@@ -6,11 +6,13 @@ Product progress > AI infrastructure progress until v1.
 
 ## Now
 
-1. Make DDC walkthrough transparent.
-2. Complete human implementation review.
-3. Complete visual architecture review.
-4. Authorise merge.
-5. Merge DDC PRI.
+1. Work through approved range decisions 19–22 for the active range-boundary milestone.
+2. Define acceptance criteria in decision #23 next.
+3. Do not begin range implementation: no implementation authorization is recorded.
+
+Completed context: the DDC PRI baseline merged in PR #17, and Julio accepted
+the redrawn architecture diagrams on 2026-10-26; neither result grants range
+implementation authorization or settles open architecture choices.
 
 ## Then
 
