@@ -315,30 +315,13 @@ within floating-point tolerance. The approved target per-PRI evidence profile is
 `independent-pri-v2` version `2.0.0`; it supersedes `independent-pri-v1`
 version `1.0.0` with the amplitude compensation, without changing the schema.
 Only `ddc-pri.mat` migrates; other fixtures, including `ddc-response-pri.mat`,
-remain unchanged. The migrated tracked fixture and manifest identify v2,
-scope `temporary-unit-evidence`, revision `working-tree`, SHA
-`af4ed1be0ffe0db230d8e6f825014b8fd7bd7aae12940a286d155b1e4c6776f4`. Of 25
-tracked fixtures, only `ddc-pri.mat` changed; the other 24 remain unchanged,
-including all 23 historical artifacts and `ddc-response-pri.mat`. Historical
-DDC-002 and v1 evidence remain tied to their pinned revisions. The prior v1
-continuous-reference comparison measured `3.34852e-11` normalized error against
-the unchanged helper, within the reviewed `5e-11` bound. The implemented v2
-regression divides compensated PRI output by two before that helper; the v2
-direct oracle includes factor two. The DDC suite passed 40/40 and WP4 passed
-56/56; the live v2 analytic check passed, while the uncompensated v1 analytic
-baseline failed with normalized error `0.500862525049793`. Fresh and tracked
-strict fixture checks each passed 56/56 with `provenanceValid=true`, and Code
-Analyzer returned no issues for six edited MATLAB files. The walkthrough passed
-1/1; full-scan processed 147 PRIs, skipped four transition gaps, and produced
-843,825 outputs. These temporary-unit results passed independent MATLAB
-validation on 2026-10-15 with
-no unresolved errors. The reviewer independently ran analytic and historical
-comparisons 2/2, WP4 per-PRI 1/1, and tracked strict fixtures 56/56 with
-`provenanceValid=true`; full-suite and Code Analyzer results were reviewed from
-upstream evidence, not rerun. This does not record human approval or merge
-authorization.
-See the [implementation plan](../plans/ddc-pri-processing.md) for evidence
-scope and limits.
+remain unchanged. Historical DDC-002 and v1 evidence remain tied to their pinned
+revisions. The v2 regression divides compensated PRI output by two before the
+unchanged continuous-reference helper; the v2 direct oracle includes factor two.
+See the [migration and verification ledger](../plans/ddc-pri-processing.md#independent-pri-v2-migration-and-verification-2026-10-15)
+for fixture identity, measured results, independent reviewer execution scope,
+and evidence limits. These temporary-unit checks do not establish human approval,
+end-to-end detection, hardware performance, or merge authorization.
 
 <a id="DDC.streaming-state"></a>
 Following streaming requirement and DDC-002 evidence describe the accepted

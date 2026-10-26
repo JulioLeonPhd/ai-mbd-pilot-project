@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Recorded pilot evidence and limitations for parallel OMP MATLAB MCP session isolation.
 - Required OMP subagents to dispatch through the active session's `task` tool rather than separate headless processes.
 - Defined MATLAB MCP endpoint selection, session ownership, and concurrency-isolation requirements in the project contract.
+- Consolidated per-PRI DDC migration evidence in its implementation ledger and archived superseded active-status passages without changing historical snapshots.
+- Stopped tracking personal Obsidian configuration and private teaching material; ignore rules preserve them as local-only files.
+- Recorded the owner's architecture-diagram acceptance and PR merge authorization separately from incomplete code review and historical MATLAB verification.
 
 ## [v0.8.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.8.0) - 2026-10-02
 

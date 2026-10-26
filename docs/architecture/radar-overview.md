@@ -3,8 +3,10 @@
 **Review status:** Documents passed independent semantic review on
 2026-09-26. Architecture responsibilities below reflect Julio’s confirmed
 shared understanding as of that date. Internal interfaces, unresolved ordering,
-and execution details remain open; Julio's visual review of redrawn diagrams
-pending.
+and execution details remain open. Julio accepted the redrawn diagrams on
+2026-10-26 at PR #17 head `460656c8c54118d5a2d52af20dc60e7eb45d42b3`.
+This owner visual approval does not resolve open architecture choices or establish
+complete code review, MATLAB verification, or receiver implementation.
 
 ## Purpose and audience
 
@@ -71,9 +73,9 @@ physical PRI per call with fresh local state (ADR 0022). Core and WP4 suites and
 full-scan DDC walkthrough pass; historical fixture hashes preserved.
 Pinned DDC-002 replay passed at historical revision. Independent numerical
 validation passed for current per-PRI profile; all 23 historical fixture
-hashes preserved. MATLAB implementation ready for Julio's
-implementation and walkthrough review; redrawn diagrams' visual review
-remains unapproved. Range-processing boundary: next component review.
+hashes preserved. Julio accepted the redrawn diagrams on 2026-10-26;
+see [current status](../../CURRENT.md) for implementation evidence, incomplete
+code-review scope, and merge authorization. Range-processing boundary: next component review.
 Future Simulink models use fixed dimensions per configured model; do not
 support runtime-variable frame sizes. Build behavioral Simulink model first;
 later hardware-oriented implementation model may follow. HDL generation
@@ -126,8 +128,8 @@ Confirmed responsibilities recorded in [ADR 0019](../adr/0019-adopt-human-led-mo
 [ADR 0020](../adr/0020-adopt-pilot-adc-storage-and-sample-integrity.md), and
 [ADR 0021](../adr/0021-adopt-dsp-responsibilities-and-ambiguity-baseline.md).
 Independent semantic review of these ADRs and this overview passed on
-2026-09-26 with no unresolved findings. Julio's visual review of redrawn
-diagrams remains pending. Scoped
+2026-09-26 with no unresolved findings. Julio's visual review of the redrawn
+diagrams passed on 2026-10-26 at the PR head recorded above. Scoped
 WP4/G2 baseline and evidence documented in
 [`architecture.md`](architecture.md), [ADR 0017](../adr/0017-adopt-v1-commanded-look-receive-processing-and-g2-schedule.md),
 [ADR 0018](../adr/0018-freeze-wp4-g2-phase0-contract.md), and

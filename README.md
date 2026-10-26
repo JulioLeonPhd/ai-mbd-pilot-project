@@ -50,7 +50,8 @@ ADC decisions are recorded in [ADR 0019](docs/adr/0019-adopt-human-led-module-de
 [ADR 0020](docs/adr/0020-adopt-pilot-adc-storage-and-sample-integrity.md), and
 [ADR 0021](docs/adr/0021-adopt-dsp-responsibilities-and-ambiguity-baseline.md);
 independent document review passed on 2026-09-26 with no unresolved semantic
-findings. Julio's visual review of redrawn diagrams remains pending. These
+findings. Julio accepted the redrawn diagrams on 2026-10-26; see
+[current status](CURRENT.md) for the separate code-review limits. These
 decisions do not claim complete ADC-to-detection implementation exists.
 Proposed architecture changes
 require Julio's review before code is restructured.

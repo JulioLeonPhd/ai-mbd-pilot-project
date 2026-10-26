@@ -49,9 +49,11 @@ data/testVectors/
 
 # Personal notes folder
 notes/
-.obsidian/workspace.json
+/.obsidian/
 
 # Private teaching workspace
+/learning/
+/docs/learning/
 /MISSION.md
 /NOTES.md
 /RESOURCES.md

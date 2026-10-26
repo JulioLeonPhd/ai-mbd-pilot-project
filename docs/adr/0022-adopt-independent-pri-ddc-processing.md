@@ -166,27 +166,13 @@ the schema is unchanged. Only `ddc-pri.mat` migrates. Other fixtures, including
 `ddc-response-pri.mat`, remain unchanged. The old profile remains replayable at
 the pinned baseline revision above.
 
-The prior v1 per-PRI versus continuous-helper comparison measured
-`3.34852e-11` normalized error against the unchanged helper, within its reviewed
-`5e-11` input-peak-normalized bound. The implemented v2 regression divides
-compensated PRI output by two before that helper; the current direct oracle
-includes factor two. These old comparison results remain attributed to v1.
+The implemented v2 regression divides compensated PRI output by two before the
+unchanged continuous-reference helper; the current direct oracle includes factor
+two. Historical comparison results remain attributed to v1.
 
-On 2026-10-15, the tracked `ddc-pri.mat` and matching manifest record migrated
-to v2 version `2.0.0`, scope `temporary-unit-evidence`, revision `working-tree`,
-SHA `af4ed1be0ffe0db230d8e6f825014b8fd7bd7aae12940a286d155b1e4c6776f4`. Of
-25 tracked fixture artifacts, only `ddc-pri.mat` changed; the other 24 remain
-unchanged, including all 23 historical artifacts and `ddc-response-pri.mat`.
-The DDC suite passed 40/40, WP4 passed 56/56, walkthrough passed 1/1, and the
-full-scan run processed 147 PRIs, skipped four transition gaps, and produced
-843,825 outputs. Fresh and tracked strict fixture checks each passed 56/56 with
-`provenanceValid=true`; Code Analyzer returned no issues for the six edited
-MATLAB files. The v1 analytic baseline failed with normalized error
-`0.500862525049793`; the live v2 analytic check passed. Independent MATLAB
-validation passed on 2026-10-15 with no unresolved errors: analytic and
-historical comparisons 2/2, WP4 per-PRI 1/1, and tracked strict fixtures 56/56
-with `provenanceValid=true`. The reviewer verified v2 profile identity and all
-24 unchanged fixture artifacts; full-suite and Code Analyzer results were
-reviewed from upstream evidence, not rerun. Validation is limited to this
-temporary-unit evidence and does not record human implementation or merge
-approval.
+The [migration and verification ledger](../plans/ddc-pri-processing.md#independent-pri-v2-migration-and-verification-2026-10-15)
+records the 2026-10-15 fixture migration, measured results, and independent
+validation, distinguishing reviewer execution from reviewed upstream evidence.
+Validation is limited to temporary-unit evidence; it does not record human
+implementation approval, end-to-end detection, hardware performance, or merge
+authorization.

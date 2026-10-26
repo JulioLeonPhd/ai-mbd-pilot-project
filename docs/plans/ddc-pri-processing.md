@@ -9,8 +9,10 @@ historical continuous-state evidence.
 Julio approved DDC walkthrough 2026-10-08. Issue 6 cascade
 stopband-coverage blocker fixed and independently validated 2026-10-10; three
 standards-warning categories resolved and independently validated 2026-10-11.
-No merge authorization recorded; human implementation and diagram review remain
-pending. On 2026-10-14 Julio approved fixed factor-two compensation on the final
+Julio accepted the architecture diagrams and authorized PR #17 commit, push,
+and merge on 2026-10-26; see [current status](../../CURRENT.md) for the incomplete
+full-branch review scope. Dated review entries below retain their historical status.
+On 2026-10-14 Julio approved fixed factor-two compensation on the final
 decimated output. The v2 fixture migration and MATLAB checks listed below
 passed on 2026-10-15; independent MATLAB validation passed as recorded below.
 Range-processing boundary next component review.
