@@ -62,6 +62,30 @@ comparisons, mappings, attributes, or status. Use bullets for parallel points
 when they make concepts faster to grasp, numbered lists for ordered steps, and
 prose for explanations that benefit from connected reasoning.
 
+### Mathematical documentation
+
+Write mathematical relationships as rendered TeX rather than code or prose-only substitutes, preserving the approved decisions and semantics.
+Use inline `$...$` for short symbols and `$$` delimiters on separate lines for substantive display equations.
+Define symbols, indices and ranges, units, and assumptions near the equations; use tables for meaningful parameter, value, and unit mappings.
+See [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md) as a style example.
+
+Inside math, write comparisons with TeX commands such as `\lt`, `\gt`, `\le`, and `\ge`, not raw angle brackets or HTML entities.
+HTML escaping before KaTeX parsing can turn angle brackets into literal entities and cause parse errors.
+
+Verify every inline and display expression in each changed math document with the available KaTeX renderer, using `renderToString` with `throwOnError: true` and the matching `displayMode`.
+Ignore code spans and fenced code when extracting expressions.
+Repeat the check after HTML-escaping ampersands and angle brackets in the extracted TeX to catch escaping-pipeline failures.
+Markdown lint does not verify rendering.
+
+This command smoke-checks the available renderer; it does not replace checking all expressions in the actual document:
+
+```sh
+node -e 'const katex = require("katex"); katex.renderToString(String.raw`x \lt y`, {throwOnError: true}); console.log("KaTeX smoke check passed");'
+```
+
+If KaTeX is unavailable, report rendering as unavailable rather than passing it.
+Do not install a dependency just for the check or claim visual preview equivalence without an actual preview.
+
 ### Engineering walkthroughs
 
 Treat executable walkthroughs as primary human-review surfaces for non-trivial
