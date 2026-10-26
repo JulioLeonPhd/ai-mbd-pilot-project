@@ -5,14 +5,15 @@
 WP4/G2 Phase 0 is frozen by [ADR 0018](../adr/0018-freeze-wp4-g2-phase0-contract.md).
 Independent Phase 4 validation passed. Phase 5 independent document review and
 the Phase 6 root gate passed; G2 is accepted for the frozen WP4 evidence.
-Downstream WP6e may still reject the schedule and reopen G2 by recorded decision.
+Downstream WP6e may still reject the schedule and reopen G2 by recorded
+decision.
 
 <a id="architecture-wp4-topology"></a>
 This document summarizes topology only. ADR 0018 owns WP4/G2 decisions, the
 data contract owns fields and invariants, and the requirements document owns
 observable obligations.
 
-This document records the current direction for a public AI-assisted
+Records the current direction for a public AI-assisted
 model-based design reference project. The architecture is deliberately
 provisional: unresolved radar requirements must be settled before an
 implementation is treated as a reference design.
@@ -35,57 +36,57 @@ Related decisions: [ADR 0002](../adr/0002-radar-demonstrator-scope.md),
 The five-PRF and CPI decision is recorded in [ADR 0016](../adr/0016-retain-five-prfs-and-reopen-cpi-pulse-count.md).
 
 - Develop a floating-point MATLAB reference first, followed by fixed-point
-  design and analysis, and then a Simulink representation.
+ design and analysis, and then a Simulink representation.
 - Use a real 16-bit ADC for each channel.
 - Use a pulsed LFM chirp as the stimulus waveform.
 - Use the exact ADR 0015 carrier $f_c=2.99792458$ GHz, giving exact free-space
-  wavelength $\lambda=0.1$ m and half-wavelength center spacing $d=0.05$ m.
+ wavelength $\lambda=0.1$ m and half-wavelength center spacing $d=0.05$ m.
 - Use the accepted 16×4 single-panel array baseline, with 16 horizontal
-  azimuth elements and 4 vertical elements; see [ADR 0007](../adr/0007-adopt-3ghz-16x4-half-wave-array-baseline.md).
+ azimuth elements and 4 vertical elements; see [ADR 0007](../adr/0007-adopt-3ghz-16x4-half-wave-array-baseline.md).
 - Use a single coherent boresight transmit beam for the MVP. Transmit scan and
-  the method for illuminating the provisional 90° sector remain undecided.
+ the method for illuminating the provisional 90° sector remain undecided.
 - At the exact carrier and 0.05 m half-wave spacing, the horizontal
-  center-to-center aperture span is 15 × 0.05 m = 0.75 m. This is an aperture
-  span, not a claim about the physical panel width.
+ center-to-center aperture span is 15 × 0.05 m = 0.75 m. This is an aperture
+ span, not a claim about the physical panel width.
 - Assume an unobstructed free-space path for the MVP, with no terrain, line of
-  sight/occlusion, or terrestrial-clutter modeling.
+ sight/occlusion, or terrestrial-clutter modeling.
 - Keep signal generation in MATLAB. Drive it with a JSON target scenario
-  containing RCS in m², Cartesian position, and velocity; save generated test
-  vectors in MAT files.
+ containing RCS in m², Cartesian position, and velocity; save generated test
+ vectors in MAT files.
 - Include DDC and decimation, fast-time and slow-time processing, CFAR,
-  simple clustering, and conversion to a detection list in the DUT boundary.
+ simple clustering, and conversion to a detection list in the DUT boundary.
 - Use the authoritative row-major channel map: four elevation channels for
-  each azimuth element, with `k = 1..64` mapping to
-  `(floor((k-1)/4)+1, mod(k-1,4)+1)`.
+ each azimuth element, with `k = 1..64` mapping to
+ `(floor((k-1)/4)+1, mod(k-1,4)+1)`.
 - Defer HDL work.
 
 ## Accepted MVP requirements
 
 - Maximum instrumented range is 100 km; the primary case is a constant-RCS
-  10 m² target at 100 km and approximately 800 km/h radial speed.
+ 10 m² target at 100 km and approximately 800 km/h radial speed.
 - Native unambiguous radial velocity is at least ±40 m/s. Range ambiguity must
-  also be resolved, and true velocity must be reported after unfolding through
-  ±800 km/h.
+ also be resolved, and true velocity must be reported after unfolding through
+ ±800 km/h.
 - CA-CFAR over range-Doppler cells is the first detector. Monte Carlo trials
-  estimate Pd and per-cell Pfa with confidence bounds, targeting Pd ≥ 0.9 and
-  Pfa ≤ 10^-6.
+ estimate Pd and per-cell Pfa with confidence bounds, targeting Pd ≥ 0.9 and
+ Pfa ≤ 10^-6.
 - An ideal mid-range, high-input-SNR test resolves two moving equal-RCS targets
-  with shared nonzero radial velocity, separated by 50 m in range, and emits two
-  detection-list reports. Additional velocity-separated and
-  unfolded-velocity cases are required.
+ with shared nonzero radial velocity, separated by 50 m in range, and emits two
+ detection-list reports. Additional velocity-separated and
+ unfolded-velocity cases are required.
 - Commanded-look azimuth summation precedes range/Doppler processing; elevation
-  processing follows selected range-Doppler candidates and does not scan.
+ processing follows selected range-Doppler candidates and does not scan.
 - A 90° azimuth sector (±45°) and one-second sector update are provisional
-  timing/coverage goals, not established ±45° performance requirements, until
-  illumination and steering are established.
+ timing/coverage goals, not established ±45° performance requirements, until
+ illumination and steering are established.
 - A configurable near-zero-Doppler band removes static clutter. Its cutoff is
-  unresolved; stationary and near-zero-radial-speed targets are out of scope.
+ unresolved; stationary and near-zero-radial-speed targets are out of scope.
 - Radar-configuration JSON is authoritative for reproducible waveform, array,
-  RF/ADC, processing, scan, blanking, and random-seed parameters. A separate
-  target-scenario JSON contains the target list. Test vectors record exact
-  radar-configuration and target-scenario versions. The DUT output is a
-  detection list with range, radial velocity, azimuth, elevation, and a
-  documented detection statistic.
+ RF/ADC, processing, scan, blanking, and random-seed parameters. A separate
+ target-scenario JSON contains the target list. Test vectors record exact
+ radar-configuration and target-scenario versions. The DUT output is a
+ detection list with range, radial velocity, azimuth, elevation, and a
+ documented detection statistic.
 
 These decisions are recorded in [ADR 0009](../adr/0009-radar-mvp-acceptance-and-ambiguity-requirements.md),
 with the separability and waveform/rate candidates updated by [ADR 0012](../adr/0012-adopt-50m-separability-and-narrowband-ddc-candidate.md)
@@ -93,13 +94,13 @@ and [ADR 0013](../adr/0013-adopt-150msps-50mhz-if-and-direct-adc-stimulus.md).
 
 ## Provisional proposals
 
-- The current waveform/DDC candidate is a 10 MHz complex chirp spanning -5 to
-  +5 MHz, a 50 MHz IF center, and multistage decimation from 150 MS/s real ADC
-  samples through 50 MS/s complex to 12.5 MS/s complex. The nominal range
-  resolution is approximately 15 m; sampled separation, filter response, and
-  two detection reports remain WP6b/WP8 acceptance work under [ADR 0012](../adr/0012-adopt-50m-separability-and-narrowband-ddc-candidate.md).
+- Current waveform/DDC candidate is a 10 MHz complex chirp spanning -5 to
+ +5 MHz, a 50 MHz IF center, and multistage decimation from 150 MS/s real ADC
+ samples through 50 MS/s complex to 12.5 MS/s complex. The nominal range
+ resolution is approximately 15 m; sampled separation, filter response, and
+ two detection reports remain WP6b/WP8 acceptance work under [ADR 0012](../adr/0012-adopt-50m-separability-and-narrowband-ddc-candidate.md).
 - Use the following scenario assumptions: 0.05 m² drone, 2 m² helicopter,
-  5 m² small jet, and 10 m² large jet.
+ 5 m² small jet, and 10 m² large jet.
 
 These proposals describe an initial demonstrator direction. They do not define
 complete array, waveform, detection, or performance requirements.
@@ -140,20 +141,20 @@ evaluation.
 The earlier proposed data flow was:
 
 1. MATLAB generates waveform and scenario-driven test vectors, recording exact
-   configuration and scenario versions.
+ configuration and scenario versions.
 2. ADC inputs provide digitized samples for each channel.
 3. The DUT applies DDC and decimation.
 4. For each commanded azimuth look, receive beamforming coherently sums the 16
-   azimuth elements independently for each of the four elevation rows, reducing
-   64 DDC channels to four complex elevation streams. Fast-time processing then
-   produces per-pulse range data. Before coherent
-   slow-time processing, those results receive migration-aware alignment or
-   handling for the moving-target hypotheses under consideration. Slow-time
-   processing then forms Doppler data from the usable pulse ensemble for each
-   azimuth look.
+ azimuth elements independently for each of the four elevation rows, reducing
+ 64 DDC channels to four complex elevation streams. Fast-time processing then
+ produces per-pulse range data. Before coherent
+ slow-time processing, those results receive migration-aware alignment or
+ handling for the moving-target hypotheses under consideration. Slow-time
+ processing then forms Doppler data from the usable pulse ensemble for each
+ azimuth look.
 5. Ambiguity projection/unfolding preserves the five PRF layers. Per-PRF CFAR
-   decisions feed non-coherent 3-of-5 binary integration; clustering consumes
-   the fused hypotheses and the DUT emits a detection list.
+ decisions feed non-coherent 3-of-5 binary integration; clustering consumes
+ the fused hypotheses and the DUT emits a detection list.
 
 The earlier proposed signal chain and its rate boundaries are shown below for
 historical context only.
@@ -242,12 +243,20 @@ usable records. It does not claim full FIR precursor or waveform retention, or
 detection performance. Phase 5 independent document review and the Phase 6 root
 gate passed; G2 is accepted for this evidence scope.
 
-The two-stage DDC group delay is 372 ADC ticks, or 31 output samples. The
-following state contract and G2 evidence describe the historical continuous
-implementation profile. Julio accepted fresh local DDC state for each complete
-physical PRI in [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md);
-that profile is not yet implemented. Preserve the historical contract and its
-evidence for replay; future per-PRI acceptance and migration are separate.
+The two-stage DDC group delay is 372 ADC sample periods, or 31 output periods;
+the full memory span is 744 ADC periods, or 62 output periods. Following
+state contract and G2 evidence describe the historical continuous implementation
+profile. Current approved API processes one complete physical PRI per call
+with fresh local state, as recorded in
+[ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md). Core and WP4
+suites pass, all 23 historical fixture hashes are preserved, and
+pinned DDC-002 replay passed strict 1/1 at its historical revision. Independent
+numerical validation passed for the per-PRI profile, including explicit exact-
+zero and inactive-channel checks. The per-PRI MATLAB implementation is ready
+for Julio's implementation and walkthrough review. Preserve the historical
+contract and evidence for replay; DDC-002 does not accept the new profile. The
+range-processing boundary is the next component review. Simulink execution,
+fixed-point, end-to-end, and hardware claims remain outside this DDC evidence.
 Under the historical profile, mixer, FIR, and decimator state were
 zero-initialized at scan start and retained across PRIs and transitions,
 including continuous `/3` then `/4` decimator phase. Independent full-CPI
@@ -264,14 +273,14 @@ stated above as an agreed decision.
 ## Downstream items still open
 
 - Phase 4 independently verified the frozen `[22,25,28,32,35]` allocation,
-  151-record grammar, and integer-tick cap. The arithmetic is 2.849920 ms
-  transitions plus 70.355920 ms total, leaving 0.297080 ms under the 70.653 ms
-  cap. G2 accepted this schedule evidence; downstream WP6e may still reject
-  the schedule and reopen G2 through a recorded decision.
+ 151-record grammar, and integer-tick cap. The arithmetic is 2.849920 ms
+ transitions plus 70.355920 ms total, leaving 0.297080 ms under the 70.653 ms
+ cap. G2 accepted this schedule evidence; downstream WP6e may still reject
+ the schedule and reopen G2 through a recorded decision.
 - What look spacing follows from the ideal 3 dB beamwidth, and what noisy
-  angle and elevation-sector measurements should be reported?
+ angle and elevation-sector measurements should be reported?
 - What clutter cutoff and detection-statistic definition make results
-  reproducible, including Monte Carlo trial and confidence methods?
+ reproducible, including Monte Carlo trial and confidence methods?
 
 WP2's revised bounded simulation baseline passed G1 review on 2026-09-14;
 see [ADR 0014](../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md)

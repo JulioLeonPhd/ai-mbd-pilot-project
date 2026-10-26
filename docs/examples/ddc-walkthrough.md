@@ -1,151 +1,193 @@
 # DDC walkthrough
 
-These diagrams follow the current MATLAB implementation. Solid arrows in the
-algorithm view show sample flow; dashed arrows in the state view show state
-carried between `processFrame` calls.
-The algorithm view is for readers learning the implemented DDC, and the state
-view explains why splitting a frame preserves the same output stream. Each
-channel uses the same oscillator definition and FIR coefficients, with its own
-FIR delay state. State belongs to one initialized processing run.
+This walkthrough follows one complete physical pulse repetition interval (PRI)
+through the approved per-PRI digital down-converter (DDC). It explains the
+sample path, rates, units, startup behavior, amplitude convention, and limits of
+the evidence. The executable example uses the public API
+`[output, metadata] = radardemo.ddc.processFrame(adcPriSamples, design)`;
+production filter and mixer algorithms remain behind that API.
 
-![DDC sample flow: complex mixing, two FIR and decimation stages, and the resulting rates](assets/ddc-algorithm.svg)
+Each call starts with a local sample index of zero and fresh mixer, FIR, and
+decimation state. The caller selects one PRI, converts stored ADC samples to
+finite real `double`, and retains the PRI's global identity and timeline.
+Transition gaps remain on that timeline and are not DDC calls. See the accepted
+[per-PRI contract and timing decisions](../adr/0022-adopt-independent-pri-ddc-processing.md).
 
-![DDC state carried between calls: oscillator sample count, FIR delays, and decimator phases](assets/ddc-algorithm-state.svg)
+The diagram is the processing chain for one channel. Rates are samples per
+second; array dimensions are sample counts. It includes the final factor-two
+output compensation.
 
-The algorithm view maps to [signal and state](#follow-the-signal-and-state)
-and [stimulus](#run-the-example). For each real input tone, the mixer translates
-both frequency components. The positive-frequency components move as
-`51 MHz → +1 MHz` and `70 MHz → +20 MHz`; stage 2 attenuates the latter. The
-state view maps to the two-frame comparison and reset experiments in
-`runDdcWalkthrough`.
-
-This MATLAB example follows a synthetic, one-channel ADC stream through the
-existing floating-point digital down-converter (DDC). It demonstrates complex
-frequency translation, two FIR stages, decimation, and state that must persist
-across input frames. MATLAB accepts variable frame lengths and preserves state
-across calls; this is the current historical implementation baseline. Julio
-approved independent fresh-state-per-PRI processing for future DDC calls in
-[ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md), which remains
-unimplemented. A future Simulink model will use fixed dimensions per configured
-model. It teaches selected DDC behavior; it does not verify the
-complete radar receiver or establish hardware performance.
+![One-PRI DDC sample path, rate changes, and final factor-two amplitude compensation](assets/ddc-algorithm.svg)
 
 ## Run the example
 
-Prerequisites are MATLAB and Signal Processing Toolbox, which provides `fir1`
-and `kaiser` for the filter coefficients. From the repository root, add the
-`examples` folder and call the function:
+Requirements: MATLAB R2025a or newer and Signal Processing Toolbox (`fir1` and
+`kaiser`). The `.m` file uses plain-text Live Script markup and can run in the
+Live Editor or from the command line. It starts with `clc`, `close`, and
+`clear`: these clear the command window, close the current figure, and clear
+the workspace. From the repository root:
 
 ```matlab
+addpath("src")
 addpath("examples")
-results = runDdcWalkthrough();
+run("examples/runDdcWalkthrough.m")
 ```
 
-The function runs without creating figures or files and returns a metrics
-structure. To save the three PNG figures, pass an output directory; the
-function creates it when needed:
+The script creates a deterministic, real, quantized ADC record with one
+channel and 88,236 samples. The desired signal is a 5 MHz bandwidth chirp
+swept linearly from 47.5 to 52.5 MHz around 50 MHz, with 18,000-count peak
+amplitude. Its sweep duration is `N/Fs = 588.24 microseconds`; the 52.5 MHz
+endpoint is at the exclusive PRI boundary, so the last acquired sample is
+approximately 52.499943333 MHz. An undesired 70 MHz interference probe has
+3,500-count peak amplitude. Before quantization, the script adds zero-mean
+Gaussian noise with 100 ADC-count RMS, using a local `mt19937ar` stream with
+seed 17. This is small beside the desired 18,000-count peak and makes
+runs reproducible without changing MATLAB's global random state. The script
+then rounds the sum to `int16` and converts the PRI to `double` for the DDC.
+These are synthetic counts, not calibrated volts. The noise is not a calibrated
+receiver-noise or hardware model, and the example makes no SNR estimate. The
+PRI begins at ADC tick zero and its length is divisible by the combined
+decimation factor 12.
+
+At 150 MS/s, the 50 MHz mixer translates the desired chirp's positive-frequency
+band from 47.5–52.5 MHz to −2.5–+2.5 MHz, centered at 0 MHz. Its negative-frequency band
+translates to −102.5–−97.5 MHz, equivalent to +47.5–+52.5 MHz at the sampled
+150 MS/s rate. The undesired 70 MHz probe translates to +20 MHz; its negative
+component translates to −120 MHz, equivalent to +30 MHz. The first FIR
+attenuates the +30 MHz component before `/3`. The +20 MHz interferer remains
+within the first stage's transition/passband region and must be attenuated by
+the second FIR before `/4`; otherwise it aliases to −5 MHz at the 12.5 MS/s
+output rate. This probe demonstrates rejection at one interference frequency,
+not across the full undesired band. The public response API and its acceptance
+metric provide the broader filter-response evidence. Finite-record FFT plots
+show spectral locations and levels, with leakage from record boundaries; they
+are not filter-response or alias-rejection acceptance measurements.
+
+Displayed configuration and timing tables report rates, FIR taps, sample
+counts, duration, delay, and startup span without hiding them in console
+messages. Expected dimensions: `[88236,1]` real ADC samples become `[7353,1]`
+complex output samples. The script checks output shape, complex type, and
+repeat-call equality. Its output spectrum shows energy across the translated
+chirp band rather than a single-frequency peak. Inspect the input one-sided
+spectrum, output two-sided spectrum, and startup I/Q plot. Both spectra use dB
+re 1 ADC count; I/Q remains a linear signed
+sample plot. The output spectrum omits the first 62 output samples from
+analysis; the DDC output itself retains every produced row, including startup
+rows. Displayed response metric tables and figures describe the filter design,
+separately from the finite-record chirp/interference spectra.
+
+The script estimates output instantaneous frequency from phase differences
+between adjacent complex samples. It compares mean early- and late-PRI
+estimates with the expected chirp frequencies at the corresponding delay-aware
+sample positions; averaging reduces noise-driven sample-to-sample phase
+jitter. Both errors must be within 2 kHz. This checks sweep direction,
+frequency span, and timing at those two windows. It is separate from the
+broadband alias-rejection response metric.
+
+All four figure windows request `Position` `[1 1 1100 750]` before docking.
+MATLAB's dock container can adjust a docked figure's actual position and size;
+the requested rectangle does not guarantee the final pane geometry.
+
+## Processing chain and units
+
+| Stage | Operation and coefficients | Rate and signal |
+| --- | --- | --- |
+| Input | One complete physical PRI; finite real `double` `[N,C]`, in ADC-count units here | 150 MS/s, `[88236,1]` in this example |
+| Mixer | Multiply by the complex 50 MHz oscillator, using local index `n = 0` | Complex, 150 MS/s |
+| FIR 1 | 25 taps (order 24), 25 MHz low-pass cutoff | Complex, 150 MS/s |
+| Decimate 1 | Keep every third filtered sample | Complex, 50 MS/s |
+| FIR 2 | 241 taps (order 240), 5.625 MHz low-pass cutoff | Complex, 50 MS/s |
+| Decimate 2 | Keep every fourth filtered sample | Complex, 12.5 MS/s |
+| Gain compensation | Multiply final decimated samples by two | Complex `[N/12,C]`; 7,353 rows here |
+
+`N` counts successive ADC samples in rows; `C` counts independent channels in
+columns. For an input row count divisible by 12, the returned shape is
+`[N/12,C]`. The two decimation factors `/3` and `/4` produce the combined `/12`
+rate change. The first FIR protects the `/3` operation; the second FIR selects
+the approximately ±5 MHz desired baseband and protects `/4` aliasing.
+
+For a real cosine or narrowband chirp with peak amplitude `A`, complex mixing
+leaves the desired complex envelope at `A/2`. The approved fixed factor-two
+gain restores peak envelope amplitude toward `A`, subject to FIR gain, phase
+response, and residual image. It preserves input units, doubles noise
+amplitude, and does not improve SNR. It does not calibrate ADC counts to volts.
+FIR coefficients, response metrics, state, timing, output shape, and API remain
+unchanged by this gain.
+
+## State, startup, and timing
+
+Every PRI begins with a fresh mixer phase index, FIR delay state, and `/3` and
+`/4` decimation phases. State advances only within that call and is discarded
+at the PRI boundary, so repeat or reordered calls produce the same per-PRI
+result. At 150 MHz, a 50 MHz oscillator repeats every three ADC ticks; PRI
+starts aligned to 12 ADC ticks therefore preserve global phase mathematically
+when the local index resets to zero. Floating-point evaluation at large global
+indices need not be bit-identical to local-index evaluation.
+
+The cascade group delay is 372 ADC sample periods, or 31 output sample periods
+(2.48 microseconds). Its full memory span is 744 ADC sample periods, or 62
+output periods (4.96 microseconds). Delay describes nominal waveform
+displacement; memory describes how much prior input may influence an output.
+They answer different questions. The caller applies the 372-tick coordinate
+compensation exactly once. The scalar-double `metadata` fields are
+`inputSampleCount`, `outputSampleCount`, `decimationFactor`,
+`groupDelayInputSamples`, `groupDelayOutputSamples`, `startupInputSamples`,
+and `startupOutputSamples`. They describe sample-domain behavior only; they
+contain no global timestamps or range coordinates.
+
+The DDC returns produced rows only: it appends no zero input and emits no
+flushed tail. Downstream range processing owns complete-window validity for
+startup, blanking, and PRI-end truncation. Padding cannot recreate missing or
+blanked physical samples. The walkthrough's startup plot marks the boundary
+between the 62 startup samples and subsequent samples; its FFT excludes those
+rows only to make the post-startup signal easier to inspect.
+
+## Full-scan integration check
+
+![Per-PRI scan loop: skip transition gaps or make one fresh-state DDC call for each physical PRI](assets/ddc-algorithm-state.svg)
+
+The scan view shows the caller retaining global timing, skipping transition
+gaps, and making one fresh-state call for each physical PRI. From the
+repository root, run:
 
 ```matlab
-results = runDdcWalkthrough(fullfile(tempdir, "ddc-walkthrough"));
+addpath("src")
+addpath("tests/ddc")
+runDdcScanCheck(fullfile(tempdir, "ddc-pri-scan"))
 ```
 
-The input is a real double array of shape `[6000, 1]`: 6000 consecutive ADC
-samples in one channel. It sums two cosines, each present for the full record:
-a 51 MHz tone with normalized amplitude 1.0 and a 70 MHz probe with amplitude
-0.2. The sample rate is 150 MS/s. Amplitude is arbitrary and normalized for
-this experiment; it is not ADC volts or a declared ADC full-scale value. The
-DDC mixes with a negative 50 MHz complex oscillator, so the 51 MHz tone moves
-to +1 MHz complex baseband. With no factor of two in the mixer, the real
-cosine's positive-frequency component has amplitude 0.5 after translation.
-The 70 MHz probe lies outside the accepted 45–55 MHz ADC input band and is
-included only as a pedagogic out-of-band probe; it is also outside the final
-±5 MHz baseband passband.
+The optional output directory receives response figures; MATLAB and `gramm`
+are required for export. This separate integration check covers 147 physical
+PRIs and four transition gaps. Its scan metrics and figures are not outputs
+from the one-PRI teaching script.
 
-The example processes the same stream as one call and as two frames split after
-sample 1001: the first frame contains 1001 samples and the second contains
-4999. It compares both paths against each other and compares uninterrupted
-processing with a causal-convolution oracle. The oracle truncates each FIR's
-full convolution to the causal input-record length before applying that stage's
-decimation. When run, the function prints the measured maximum absolute errors
-and checks them against its `2e-12` tolerance; the exact values depend on the
-MATLAB execution and are intentionally not asserted here. This input produces
-a `[500, 1]` complex output array at 12.5 MS/s.
+The one-PRI script also plots the public response API's principal stage and
+cascade responses, plus the non-principal cascade alias envelope. The latter
+does not draw the direct principal stopband term, though the full acceptance
+metric includes that term. These plots describe designed-filter response, not
+the finite-record input/output FFTs.
+The scan check can export [stage 1 alias response](assets/ddc-stage1-alias-response.png),
+[stage 2 alias response](assets/ddc-stage2-alias-response.png),
+[cascade alias response](assets/ddc-cascade-alias-response.png), and
+[passband zoom](assets/ddc-passband-zoom.png). The frozen response profile is
+`cascade-peak-v1`: it measures principal cascade passband ripple and includes
+both the non-principal alias envelope and direct principal stopband term in
+full-cascade alias rejection. The cascade-envelope figure displays only the
+non-principal envelope, not that direct principal term. Acceptance requires
+the exact −25 to +25 MHz input grid at 1 kHz spacing, including endpoints;
+custom grids are diagnostic.
 
-The recorded MATLAB run on 2026-09-27 produced a one-shot/oracle maximum
-absolute error of `0`, a split/one-shot maximum error of `5.5531e-16`, and a
-`2e-12` tolerance. Resetting only the oscillator count produced the expected
-−120° settled phase with `1.3145e-11°` phase error and amplitude ratio `1`.
-Resetting only stage-one filter history produced a `0.3983` maximum transient
-error in the boundary window and settled to `5.5531e-16`. These values document
-one run of this deterministic example, not broad performance or requirement
-coverage.
+## Evidence and limits
 
-## Follow the signal and state
-
-The input shape is `[N, C]`: rows are successive ADC ticks and columns are
-channels. The demonstration uses `C = 1` and double-precision values. Mixing
-produces complex samples at 150 MS/s. Stage 1 is a 24th-order, 25-tap FIR with
-a 25 MHz cutoff, designed as a two-sided low-pass filter around zero. It runs
-at 150 MS/s, then keeps every third output, yielding 50 MS/s. Stage 2 is a
-240th-order, 241-tap FIR with a 5.625 MHz cutoff; it selects the desired
-approximately ±5 MHz baseband before keeping every fourth output, yielding
-12.5 MS/s. The decimation factors are `/3` and `/4`; the combined rate change
-is `/12`. Rates are samples per second, while frame lengths are counts of
-samples.
-
-`radardemo.ddc.initializeState` creates zeroed FIR filter-state buffers and
-zero-based decimation phase counters. The buffers hold the filter's internal
-delay state across calls; they are not literally a copy of the raw past input
-samples. The phase counters preserve the `/3` and `/4` selection positions
-when a frame ends between selected samples. `inputSampleCount` preserves the
-complex oscillator phase. The implementation's output coordinate starts at
-selected tick 0; the nominal group delay does not discard samples or shift that
-coordinate. Resetting only this counter at the 1001-sample
-boundary produces a persistent settled phase offset of −120° in this setup.
-Resetting only the stage-one FIR state produces a temporary boundary transient
-that settles after the cascade's memory span. The function reports the measured
-phase and transient errors when run.
-
-The live function is named `processFrame`. Some historical serialized fixture
-metadata retains the field names `chunkLengths` and `maxChunkSamples`; those
-names preserve recorded provenance and do not identify the live API. The
-symmetric FIR cascade has a
-nominal group delay of 372 ADC ticks, equal to 31 output periods because each
-output period spans 12 ADC ticks. The cascade's
-full memory span is 744 ADC ticks. Group delay describes the nominal shift of
-the filtered waveform; memory span describes how long prior filter history can
-affect outputs. They answer different timing questions. Startup filter state
-is zero, so early outputs include the causal filter's startup transient.
-
-At a 1001-sample split, the second call resumes the returned `inputSampleCount`,
-both FIR delay buffers, and the `/3` and `/4` phase counters. Frame output
-lengths depend on the frame length and incoming phase; the total output for the
-complete stream is 500 samples in this example. Each real cosine also has a
-negative-frequency component, which the mixer translates. The low-pass cascade
-attenuates components outside its baseband; the 70 MHz probe is illustrative,
-not a complete model of the
-receiver's frequency response.
-
-## Figures and interpretation
-
-Passing an output directory creates these figures:
-
-- [Frame timing](assets/ddc-timing.png) marks ADC ticks, stage-one selected
-  ticks, final output ticks, the frame boundary, and nominal group delay.
-- [Input and output spectra](assets/ddc-spectra.png) shows the complex mixer
-  output and signals after each decimating filter stage.
-- [Boundary errors](assets/ddc-boundary-errors.png) compares the normal split
-  with uninterrupted processing and shows the two intentional state-reset
-  experiments.
-
-The spectra use FFT magnitudes normalized by record length, in dB relative to
-unit amplitude. The boundary plot uses error magnitude relative to unit
-amplitude. These are diagnostic observations for this synthetic input and
-configuration. They do not establish detection performance, hardware or
-real-time behavior, complete FIR precursor/waveform retention, or verification
-of all applicable requirements. The DDC is one part of the processing path in
-[RAD-V1-002](../requirements/radar-matlab-v1.md#requirements); the sampling and
-nominal rate chain are described by
-[RAD-V1-023](../requirements/radar-matlab-v1.md#requirements). This walkthrough
-provides focused evidence about selected DDC behavior, not full verification
-of either requirement.
+The script's figures and assertions illustrate one synthetic PRI. They do not
+measure complete receiver detection, range-window validity, hardware behavior,
+or real-time performance. Existing scan, suite, fixture, and analytic results
+are separate evidence with scopes recorded in [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md)
+and the [implementation plan](../plans/ddc-pri-processing.md). In particular,
+historical `independent-pri-v1` comparisons remain v1 evidence; the current
+`independent-pri-v2` profile includes factor-two compensation. The pinned
+DDC-002 replay remains historical continuous-state evidence, not per-PRI
+acceptance evidence. None of these checks establishes a full-CPI, global-tick,
+or hardware error bound, or full verification of
+[RAD-V1-002](../requirements/radar-matlab-v1.md#requirements) or
+[RAD-V1-023](../requirements/radar-matlab-v1.md#requirements).

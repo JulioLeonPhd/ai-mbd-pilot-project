@@ -13,9 +13,6 @@ undo receiver gain. All 64 channels use the same ideal receiver gain and
 conversion scale; channel-mismatch estimation, correction, and calibration
 algorithms are outside pilot scope. The same raw vectors may be used by a
 future Simulink path, without prescribing its arithmetic data type.
-Retaining quantized capture lets MATLAB and a future Simulink path use the same
-source data; a declared scale gives it physical meaning without silently
-applying or undoing modeled receiver gain.
 
 For the pilot, ADC samples form a correctly sampled, contiguous timeline.
 Producers and readers must reject missing or discontinuous ticks without
@@ -28,9 +25,6 @@ continuous-stream DDC baseline. For the accepted per-PRI DDC execution boundary,
 see [ADR 0022](0022-adopt-independent-pri-ddc-processing.md): raw ADC timeline
 continuity and global timestamps remain intact, while each DUT call begins with
 fresh local DDC state.
-Rejecting gaps preserves elapsed-time and DDC-state meaning instead of
-fabricating samples. Broader ordered or windowed slab storage remains useful
-outside the stricter pilot stream rule.
 
 The future generator clips or saturates samples at representable ADC limits,
 reports clipped sample counts per channel, and never rescales a scenario to

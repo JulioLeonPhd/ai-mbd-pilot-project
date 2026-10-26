@@ -1,23 +1,23 @@
 function diagnostic = checkDdcStreaming(data)
 %CHECKDDCSTREAMING Check chunk continuity with independent combined-FIR oracles.
-diagnostic = checkVersion(data);
+diagnostic = wp4oracle.checkVersion(data);
 if ~diagnostic.accepted
     return
 end
 required = ["input", "chunkLengths", "expectedOutput", "expectedLength", ...
     "boundaryEvidence"];
-diagnostic = requireFields(data, required);
+diagnostic = wp4oracle.requireFields(data, required, "A required streaming evidence field is missing.");
 if ~diagnostic.accepted
     return
 end
 if ~isreal(data.input) || ~isa(data.input, "double") || any(~isfinite(data.input(:)))
-    diagnostic = failDiagnostic("TYPE_MISMATCH", "input", ...
+    diagnostic = wp4oracle.failDiagnostic("TYPE_MISMATCH", "input", ...
         "Short-stream input must be finite real double samples.");
     return
 end
 if ~isvector(data.chunkLengths) || numel(data.chunkLengths) < 2 || ...
         any(data.chunkLengths <= 0) || sum(data.chunkLengths) ~= numel(data.input)
-    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "chunkLengths", ...
+    diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", "chunkLengths", ...
         "Short-stream chunks must cover the finite input.");
     return
 end
@@ -28,7 +28,7 @@ if numel(shortExpected) ~= data.expectedLength || ...
         numel(data.expectedOutput) ~= data.expectedLength || ...
         any(~isfinite(data.expectedOutput(:))) || ...
         max(abs(shortExpected(:) - data.expectedOutput(:))) > 5e-11
-    diagnostic = failDiagnostic("NUMERICAL_MISMATCH", "expectedOutput", ...
+    diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", "expectedOutput", ...
         "Short-stream output differs from independent combined-FIR convolution.");
     return
 end
@@ -40,7 +40,7 @@ required = ["schedule", "stimulus", "inputSampleCount", "channelCount", ...
     "maxChunkSamples", "chunkLengths", "checkpoints", "boundaryTicks", ...
     "windowRadiusTicks", "outputTicks", "outputSamples", ...
     "expectedOutputCount", "tolerance"];
-diagnostic = requireFields(evidence, required);
+diagnostic = wp4oracle.requireFields(evidence, required, "A required streaming evidence field is missing.");
 if ~diagnostic.accepted
     diagnostic.path = "boundaryEvidence." + diagnostic.path;
     return
@@ -61,7 +61,7 @@ if numel(boundaries) ~= 150 || ...
         double(evidence.windowRadiusTicks) ~= 768 || ...
         double(evidence.expectedOutputCount) ~= ceil(totalTicks / 12) || ...
         double(evidence.tolerance) ~= 5e-11
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "boundaryEvidence.boundaryTicks", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "boundaryEvidence.boundaryTicks", ...
         "Boundary evidence must cover the frozen single-channel scan and output lattice.");
     return
 end
@@ -69,7 +69,7 @@ stimulus = evidence.stimulus;
 stimulusFields = ["frequenciesHz", "amplitudes", "phasesRad", ...
     "sampleRateHz", "mixerFrequencyHz"];
 if ~isstruct(stimulus) || any(~isfield(stimulus, stimulusFields))
-    diagnostic = failDiagnostic("MISSING_FIELD", "boundaryEvidence.stimulus", ...
+    diagnostic = wp4oracle.failDiagnostic("MISSING_FIELD", "boundaryEvidence.stimulus", ...
         "The fixed multitone waveform and mixer parameters are required.");
     return
 end
@@ -78,7 +78,7 @@ if ~isequal(double(stimulus.frequenciesHz(:).'), [49e6, 49.6e6, 50.4e6, 51e6]) |
         ~isequal(double(stimulus.phasesRad(:).'), [0.17, 0.73, 1.19, 2.07]) || ...
         double(stimulus.sampleRateHz) ~= 150e6 || ...
         double(stimulus.mixerFrequencyHz) ~= 50e6
-    diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", "boundaryEvidence.stimulus", ...
+    diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", "boundaryEvidence.stimulus", ...
         "The boundary stream stimulus differs from the frozen multitone witness.");
     return
 end
@@ -90,7 +90,7 @@ expectedChunkLengths = diff(expectedCuts);
 if ~isvector(evidence.chunkLengths) || ...
         ~isequal(double(evidence.chunkLengths(:)), expectedChunkLengths) || ...
         any(expectedChunkLengths <= 0) || any(expectedChunkLengths > 8192)
-    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "boundaryEvidence.chunkLengths", ...
+    diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", "boundaryEvidence.chunkLengths", ...
         "Chunks must include each off-lattice cut and cover the scan in at most 8192 samples.");
     return
 end
@@ -100,7 +100,7 @@ expectedCheckpoints = [cumulativeInputs, mod(cumulativeInputs, 3), ...
     mod(firstStageCounts, 4), ceil(cumulativeInputs / 12)];
 if ~isequal(size(evidence.checkpoints), size(expectedCheckpoints)) || ...
         any(double(evidence.checkpoints(:)) ~= expectedCheckpoints(:))
-    diagnostic = failDiagnostic("TICK_DISCONTINUITY", "boundaryEvidence.checkpoints", ...
+    diagnostic = wp4oracle.failDiagnostic("TICK_DISCONTINUITY", "boundaryEvidence.checkpoints", ...
         "Input counts and decimator phases must continue across every chunk.");
     return
 end
@@ -108,17 +108,17 @@ expectedTicks = observationTicks(boundaries, totalTicks, 768);
 if ~isequal(double(evidence.outputTicks(:)), expectedTicks) || ...
         numel(evidence.outputSamples) ~= numel(expectedTicks) || ...
         any(~isfinite(evidence.outputSamples(:)))
-    diagnostic = failDiagnostic("DIMENSION_MISMATCH", "boundaryEvidence.outputTicks", ...
+    diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", "boundaryEvidence.outputTicks", ...
         "Observed complex output windows must cover startup, end, and all schedule boundaries.");
     return
 end
 recomputed = directToneConvolution(stimulus, expectedTicks, taps, totalTicks);
 maximumError = max(abs(recomputed(:) - evidence.outputSamples(:)));
 if maximumError > double(evidence.tolerance)
-    diagnostic = failDiagnostic("NUMERICAL_MISMATCH", "boundaryEvidence.outputSamples", ...
+    diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", "boundaryEvidence.outputSamples", ...
         "Continuous DDC samples differ from the independent combined-FIR oracle.");
 else
-    diagnostic = passDiagnostic();
+    diagnostic = wp4oracle.passDiagnostic();
 end
 diagnostic.output.maxAbsoluteError = maximumError;
 end
@@ -172,36 +172,4 @@ startup = 0:12:min(lastOutputTick, radius);
 ending = (lastOutputTick - radius):12:lastOutputTick;
 ticks = unique([startup(:); ending(:); boundaryWindows]);
 ticks = ticks(ticks >= 0 & ticks <= lastOutputTick & mod(ticks, 12) == 0);
-end
-
-function diagnostic = checkVersion(data)
-if ~isstruct(data) || ~isfield(data, "schemaVersion")
-    diagnostic = failDiagnostic("MISSING_FIELD", "schemaVersion", "Schema version is required.");
-elseif string(data.schemaVersion) ~= "1.0.0-draft.2"
-    diagnostic = failDiagnostic("VERSION_MISMATCH", "schemaVersion", ...
-        "Only schema 1.0.0-draft.2 is accepted.");
-else
-    diagnostic = passDiagnostic();
-end
-end
-
-function diagnostic = requireFields(data, fields)
-diagnostic = passDiagnostic();
-for index = 1:numel(fields)
-    if ~isstruct(data) || ~isfield(data, fields(index))
-        diagnostic = failDiagnostic("MISSING_FIELD", fields(index), ...
-            "A required streaming evidence field is missing.");
-        return
-    end
-end
-end
-
-function diagnostic = passDiagnostic()
-diagnostic = struct("accepted", true, "code", "", "path", "", "message", "", ...
-    "output", struct());
-end
-
-function diagnostic = failDiagnostic(code, path, message)
-diagnostic = struct("accepted", false, "code", string(code), "path", string(path), ...
-    "message", string(message), "output", struct());
 end

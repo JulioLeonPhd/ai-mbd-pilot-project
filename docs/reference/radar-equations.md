@@ -1,11 +1,10 @@
 # Radar equations and conventions
 
-This reference preserves the project equations, mathematical conventions, and
-their limits. Domain terms are defined in [CONTEXT.md](../../CONTEXT.md).
+Project equations, conventions, and limits. Domain terms: [GLOSSARY.md](../../GLOSSARY.md).
 
 ## Radar equations
 
-The formulas below use the analytic-signal and Fourier convention
+Formulas use the analytic-signal and Fourier convention
 
 $$
 x(t)=A(t)e^{j\phi(t)},\qquad X(f)=\int_{-\infty}^{\infty}x(t)e^{-j2\pi ft}\,dt.
@@ -102,3 +101,58 @@ $$
 
 Thus receding is negative Doppler and approaching is positive; use
 $\lvert f_d\rvert=2\lvert v_r\rvert/\lambda$ when only magnitude is meant.
+
+## Array and beam timing relations
+
+For a continuously scanning beam, cell time has the conditional estimate
+
+$$
+T_{\rm cell}\approx\frac{\theta_{3\mathrm{dB}}}{\omega_{\rm scan}},
+$$
+
+where $\theta_{3\mathrm{dB}}$ is the half-power beamwidth and
+$\omega_{\rm scan}$ is angular scan rate in consistent units. Cell time
+influences azimuth sampling/look count and limits available pulses and CPI,
+which in turn limits Doppler resolution; it does not determine the number of
+range cells, set by receive-window range extent and range-bin spacing. FFT
+sizing and other processing choices also determine Doppler-bin count.
+
+For a normalized $N$-element uniform linear array (ULA) of isotropic point
+elements with spacing $d$, the complex field/voltage array factor is
+
+$$
+AF_N(\theta)=\frac{1}{N}\sum_{n=0}^{N-1}e^{jn\psi}
+=e^{j(N-1)\psi/2}\frac{\sin(N\psi/2)}{N\sin(\psi/2)},\qquad
+\psi=k d(\sin\theta-\sin\theta_0),\quad k=\frac{2\pi}{\lambda}.
+$$
+
+Here $\theta$ is observation angle, $\theta_0$ steering angle, and $\lambda$
+wavelength. The normalized power pattern is $|AF_N(\theta)|^2$; this is an
+array factor, not energy. A continuous uniform-aperture approximation is
+
+$$
+AF(\theta)\approx e^{j\phi(\theta)}\operatorname{sinc}
+\!\left(\frac{L\,\Delta u}{\lambda}\right),\qquad
+\operatorname{sinc}(x)=\frac{\sin(\pi x)}{\pi x},\qquad
+\Delta u=\sin\theta-\sin\theta_0.
+$$
+
+For the discrete point-element ULA, use effective $L=Nd$ when matching
+main-lobe nulls; the first-to-last element-center span is $D=(N-1)d$.
+Neither quantity necessarily equals physical panel width. Element pattern,
+tapering, coupling, and finite-array effects alter the complete pattern.
+
+For the uniform-aperture approximation, the exact sine-space half-power
+condition is $|\operatorname{sinc}(L\Delta u/\lambda)|^2=1/2$. A useful
+narrow-beam approximation in radians is
+
+$$
+\Delta\theta_{3\mathrm{dB}}\approx
+\frac{0.886\,\lambda}{L\cos\theta_0},
+$$
+
+which reduces at broadside ($\theta_0=0$) to
+$\Delta\theta_{3\mathrm{dB}}\approx0.886\lambda/L$. This approximation is
+not exact or universally valid, especially away from broadside or for arrays
+with nonuniform element patterns, tapering, coupling, or finite-aperture
+effects.

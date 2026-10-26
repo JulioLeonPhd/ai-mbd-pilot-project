@@ -1,6 +1,6 @@
 ---
 name: commit
-description: "Create one scoped Git commit by delegating staging and commit execution to a gpt-5.6-luna subagent after the root agent has analyzed the change and supplied commit context."
+description: Create one scoped Git commit by delegating staging and commit execution to a low-cost subagent after the root agent has analyzed the change and supplied commit context.
 ---
 
 # Delegated commit finalization
@@ -69,7 +69,7 @@ commit executor; the root agent must not perform the commit itself. Call
 task_name: commit-worker
 message: <bounded task packet>
 fork_turns: none
-model: gpt-5.6-luna
+model: gpt-6-luna
 reasoning_effort: low
 ```
 

@@ -1,66 +1,33 @@
-# Current project status
+# Current work
 
-## Capability
+Per-PRI DDC processing is the active milestone within human-led development step 4.
+No formal work-package or gate assignment is recorded.
 
-The bounded analytic and ideal simulation baseline passed revised G1. WP3 data
-contracts and WP4 DSP/timing evidence passed the G2 root gate. Partial
-production-like floating-point modules, fixture generation, an independent
-oracle, and adapters are present; the complete ADC-to-detection floating-point
-reference is not complete. Fixed-point design and a Simulink representation
-remain incomplete. The demonstrator has no verified hardware or real-time
-performance claim.
+Julio approved independent per-PRI processing, the sample-only API and responsibilities, and implementation.
+On 2026-10-14, he approved fixed factor-two compensation on the final decimated output to restore real-cosine peak envelope amplitude, subject to FIR gain and phase response and residual image.
+It keeps input units, doubles noise amplitude, and does not improve SNR or claim calibrated volts.
+FIR coefficients and response metrics, delay, startup span, state, shapes, and API remain unchanged.
 
-## Limitations
+The compensated `independent-pri-v2` implementation and its temporary-unit evidence passed the recorded implementation checks and independent numerical validation.
+The [migration and verification ledger](docs/plans/ddc-pri-processing.md#independent-pri-v2-migration-and-verification-2026-10-15) records fixture identity, measured results, reviewer execution scope, and limitations.
+Historical `independent-pri-v1` and pinned DDC-002 continuous-state evidence remain separate.
 
-WP4 evidence verifies the 151-record schedule, priming and timing margins,
-post-CFAR 3-of-5 fusion, and one-channel full-CPI DDC streaming against an
-independent direct-convolution comparison over sampled observation windows. It
-does not establish complete FIR precursor/waveform retention or detection
-performance. WP6e may reject the schedule and reopen G2. The 128-pulse setting,
-noisy multi-target ambiguity method, sampled end-to-end 50 m separation, noisy
-angle accuracy, and detection performance remain open or downstream study
-items. The ±45° sector and one-second update remain provisional.
+The current walkthrough demonstrates a noisy chirp through the public per-PRI API, including units, rates, amplitude compensation, startup, and caller-owned timing.
+Its recorded walkthrough check passed 1/1 and Code Analyzer reported no issues; these are implementation checks, not end-to-end receiver evidence.
+Earlier walkthrough results and superseded review wording are preserved in [history](HISTORY.md#2026-10-26--ddc-status-evidence-consolidation).
+Julio confirmed the architecture diagrams look good on 2026-10-26 and authorized committing, pushing, and accepting PR #17.
+The reviewed diagrams are those at PR head `460656c8c54118d5a2d52af20dc60e7eb45d42b3`; this closes owner visual review, not the incomplete full-branch Standards and Spec assessments.
+MATLAB source review remains blocked by Graphify's missing MATLAB extractor; no fresh MATLAB execution is claimed.
 
-## Next open question
+[ADR 0024](docs/adr/0024-require-plain-text-matlab-live-script-walkthroughs.md) requires executable R2025a+ plain-text MATLAB Live Script `.m` walkthroughs; companion Markdown is supplementary.
+No repository-wide walkthrough migration completion is recorded.
 
-On 2026-09-29 Julio approved independent per-PRI DDC processing; on 2026-10-02
-he confirmed the sample-only API, retained no-tail output, caller timing and
-alignment responsibilities, downstream range-window validity ownership, and
-narrow evidence migration. Implementation and independent verification remain
-pending Julio's separate explicit go. Current DDC code and G2 streaming evidence
-still describe the historical continuous-state baseline. See [ADR 0022](docs/adr/0022-adopt-independent-pri-ddc-processing.md),
-the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md), and the
-[joint walkthrough review](docs/examples/ddc-walkthrough-review.md).
+AI-infrastructure development is frozen until radar v1 under [ADR 0023](docs/adr/0023-freeze-ai-infrastructure-until-v1.md).
+Product delivery takes priority; existing infrastructure may receive defect fixes or minimal maintenance only when needed to unblock or materially support v1.
+The [v1 delivery action plan](docs/plans/v1-delivery-action-plan.md) records the working sequence.
 
-Julio confirmed the architecture interview summary on 2026-09-26. Independent
-review of [ADR 0019](docs/adr/0019-adopt-human-led-module-design-and-simulink-staging.md),
-[ADR 0020](docs/adr/0020-adopt-pilot-adc-storage-and-sample-integrity.md), and
-[ADR 0021](docs/adr/0021-adopt-dsp-responsibilities-and-ambiguity-baseline.md)
-passed on 2026-09-26 with no unresolved semantic findings. The redrawn diagrams
-still await Julio's visual review; this walkthrough does not record or imply
-that review. On 2026-09-27 Julio confirmed proceeding to step 4 of the human-led
-development plan. Julio approved renaming the live DDC entry point to
-`processFrame` on 2026-09-28. Historical fixture provenance and serialized
-`chunkLengths`/`maxChunkSamples` fields remain unchanged; no runtime alias is
-required. The rename, five-file Code Analyzer run, focused walkthrough oracle,
-streaming-equivalence, and state-reset checks passed on 2026-09-28. The full
-WP4 MATLAB MCP suite completed on 2026-09-28 with 54 passed, 0 failed, and 0
-incomplete in 84.2901 seconds. Julio closed the joint DDC design discussion on
-2026-09-29. The per-PRI Phase 0 contract was confirmed 2026-10-02. Its
-implementation and verification remain pending Julio's separate explicit go;
-the current walkthrough documents the historical continuous-state
-implementation. Then select the next component question under step 5. WP6e's ambiguity
-method and ordering remain open study items. Issue 3 separately tracks manifest
-revision-provenance hardening.
+Owner visual review and merge authorization are recorded; full-branch code review remains incomplete.
+Complete the authorized PR publication and merge, retaining that limitation in the PR record, then review the range-component boundary under human-led development step 5.
+The DDC evidence does not establish full-receiver or hardware performance, and the historical WP4 continuous-state evidence remains separate from per-PRI acceptance evidence.
 
-## Evidence and history
-
-- [WP4/G2 recovery plan](docs/plans/wp4-g2-recovery-plan-2026-09-21.md) — durable
-  implementation and validation ledger.
-- [Dated evidence handoff](docs/reference/current-evidence-2026-09-25.md) — prior
-  verified results, issue context, replay procedure, pinned revisions, and
-  detailed metrics.
-- [Radar requirements](docs/requirements/radar-matlab-v1.md) and
-  [V1 work-package plan](docs/plans/radar-matlab-v1.md) — normative scope and
-  gates.
-- [Evidence directory](evidence) — quantitative study sources and results.
+See [HISTORY.md](HISTORY.md) for archived status snapshots.

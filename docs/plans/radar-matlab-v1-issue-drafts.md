@@ -2,23 +2,23 @@
 
 <!-- markdownlint-disable MD013 -->
 
-These drafts correspond to the work packages in the V1 plan. They are prepared
+These drafts correspond to work packages in V1 plan. They are prepared
 for GitHub Issues but have not been published. Authenticated `gh` access was
-verified outside the sandbox on 2026-09-14. The labels below are proposed
+verified outside sandbox on 2026-09-14. labels below are proposed
 tracker labels, not published issue state.
 
 ## WP0 — Baseline and tracking
 
 **Status:** Completed; GitHub publication pending.
 
-**Deliverable:** Establish the plan, `CURRENT.md`, package issue drafts, and
+**Deliverable:** Establish plan, `CURRENT.md`, package issue drafts, and
 gate/status conventions.
 
 **Acceptance criteria:**
 
-- The saved V1 plan and `CURRENT.md` exist and cross-reference each other.
-- Every package has an issue-ready draft with predecessor edges.
-- G0 status and the next ready work are recorded in `CURRENT.md`.
+- saved V1 plan and `CURRENT.md` exist and cross-reference each other.
+- Every package has issue-ready draft with predecessor edges.
+- G0 status and next ready work are recorded in `CURRENT.md`.
 
 ## WP1 — Requirements
 
@@ -31,7 +31,7 @@ Pd/Pfa decision record.
 
 - Requirements have stable IDs and link to planned verification evidence.
 - Accepted requirements are separated from provisional goals.
-- The ADR 0009 V1 Pd/Pfa clarification is recorded without changing other
+- ADR 0009 V1 Pd/Pfa clarification is recorded without changing other
   accepted requirements.
 
 **Proposed label:** `ready-for-agent`
@@ -48,7 +48,7 @@ PRF ambiguity, beam/angle, and timing.
 - Each study records assumptions, units, inputs, outputs, and reproducible
   evidence.
 - Feasible baseline parameters and unavailable-toolbox dependencies are listed.
-- WP1 receives a documented G1 decision or an explicit unresolved decision.
+- WP1 receives documented G1 decision or explicit unresolved decision.
 
 **Proposed label:** `ready-for-agent`
 
@@ -64,7 +64,7 @@ intermediate-processing, and detection-list contracts with examples.
 - Contracts define dimensions, units, coordinate/sign conventions, versions, and
   invalid-input behavior.
 - Examples validate against each contract.
-- Every WP6 stage has a fixture-compatible intermediate contract.
+- Every WP6 stage has fixture-compatible intermediate contract.
 
 **Proposed label:** `needs-triage`
 
@@ -77,7 +77,7 @@ verification seams, and required diagrams.
 
 **Acceptance criteria:**
 
-- Architecture covers the DUT boundary and every processing stage.
+- Architecture covers DUT boundary and every processing stage.
 - Mermaid diagrams show data flow and timing/PRF/blanking relationships.
 - Independent review finds no unresolved contract or topology errors at G2.
 
@@ -90,14 +90,14 @@ verification seams, and required diagrams.
 **Deliverable:** Seeded JSON-driven generator and reproducible MAT fixtures for
 primary and edge cases.
 
-The MVP generator emits 64 real int16 ADC channels at 150 MS/s with a 50 MHz
-IF directly. It retains coherent delay, Doppler, and array phase from the exact
+MVP generator emits 64 real int16 ADC channels at 150 MS/s with a 50 MHz
+IF directly. It retains coherent delay, Doppler, and array phase from exact
 ADR 0015 RF parameter without sampling RF or modeling analog downconversion.
 
 **Acceptance criteria:**
 
-- Re-running a seed reproduces identical fixture content.
-- Fixtures conform to the versioned contracts.
+- Re-running seed reproduces identical fixture content.
+- Fixtures conform to versioned contracts.
 - Primary, two-target, folded, and invalid-input cases are represented.
 
 **Proposed label:** `needs-triage`
@@ -114,7 +114,7 @@ selected ambiguity-resolution method.
 - Every subpackage passes its focused unit-test gate and reports analyzer
   evidence.
 - Stage outputs conform to intermediate contracts.
-- WP6f integrates the selected method documented by WP6e.
+- WP6f integrates selected method documented by WP6e.
 
 **Proposed label:** `needs-triage`
 
@@ -124,16 +124,16 @@ selected ambiguity-resolution method.
 
 **Deliverable:** DDC and decimation implementation with unit tests.
 
-The current candidate is 150 MS/s real through 50 MS/s complex (/3) to 12.5 MS/s
+current candidate is 150 MS/s real through 50 MS/s complex (/3) to 12.5 MS/s
 complex (/4) at 50 MHz IF. Evaluate multistage filtering and a three-phase
 complex mixer or polyphase equivalent; decimation alone is not IQ demodulation,
-and a real-only /3 followed by IQ recovery is invalid.
+and real-only /3 followed by IQ recovery is invalid.
 
 **Acceptance criteria:**
 
 - Known tones meet agreed output rate, frequency, amplitude, and phase checks.
-- Dimensions and complex/real conventions match the contract.
-- Anti-alias behavior is covered by a focused test.
+- Dimensions and complex/real conventions match contract.
+- Anti-alias behavior is covered by focused test.
 
 **Proposed label:** `needs-triage`
 
@@ -145,9 +145,9 @@ and a real-only /3 followed by IQ recovery is invalid.
 
 **Acceptance criteria:**
 
-- Known LFM echoes map to the expected range bins.
-- An ideal and sampled high-SNR fixture preserves two peaks separated by 50 m.
-- Output dimensions and calibration metadata conform to the contract.
+- Known LFM echoes map to expected range bins.
+- ideal and sampled high-SNR fixture preserves two peaks separated by 50 m.
+- Output dimensions and calibration metadata conform to contract.
 
 **Proposed label:** `needs-triage`
 
@@ -177,7 +177,7 @@ tests.
 
 - Synthetic 16×4 data returns correct boresight.
 - Specified off-axis azimuth/elevation signs are verified.
-- Output dimensions and angle conventions conform to the contract.
+- Output dimensions and angle conventions conform to contract.
 
 **Proposed label:** `needs-triage`
 
@@ -193,11 +193,11 @@ decision record documenting successes and failed candidates.
 - Folded cases through ±800 km/h, range aliases, competing targets, and
   inconsistent measurements are evaluated.
 - Candidate assumptions and failure evidence are reproducible.
-- One candidate passes the selection cases. If none passes, dependent work
-  stops; the root records failed-candidate evidence in the report and
-  `CURRENT.md`, reopens the affected G1/G2 gate, routes WP2/WP4/contract or ADR
-  revision as needed, reruns the corresponding independent review, and resumes
-  only after the gate passes.
+- One candidate passes selection cases. If none passes, dependent work
+  stops; root records failed-candidate evidence in report and
+  `CURRENT.md`, reopens affected G1/G2 gate, routes WP2/WP4/contract or ADR
+  revision as needed, reruns corresponding independent review, and resumes
+  only after gate passes.
 
 **Proposed label:** `needs-triage`
 
@@ -205,14 +205,14 @@ decision record documenting successes and failed candidates.
 
 **Blocked by:** WP6e selection gate
 
-**Deliverable:** Implementation of the selected ambiguity-resolution method with
+**Deliverable:** Implementation of selected ambiguity-resolution method with
   unit tests.
 
 **Acceptance criteria:**
 
 - Synthetic per-PRF candidate lists resolve agreed folded cases.
 - Alias boundaries and ambiguous-input behavior are tested and documented.
-- Output conforms to the intermediate and detection contracts.
+- Output conforms to intermediate and detection contracts.
 
 **Proposed label:** `needs-triage`
 
@@ -227,7 +227,7 @@ report formatting.
 
 - Synthetic fixtures verify detections, misses, clutter-band handling, and
   clustering.
-- Detection-list fields, units, and signs conform to the contract.
+- Detection-list fields, units, and signs conform to contract.
 - Focused tests pass independently of WP6 implementation.
 
 **Proposed label:** `needs-triage`
@@ -240,8 +240,8 @@ report formatting.
 
 **Acceptance criteria:**
 
-- The primary fixture uses a 10 m² target at 100 km at the common scan midpoint
-  approximately 800 km/h, with motion and range migration across the CPI; 50 m
+- primary fixture uses a 10 m² target at 100 km at common scan midpoint
+  approximately 800 km/h, with motion and range migration across CPI; 50 m
   two-target, velocity-separated, and unfolded cases run reproducibly.
 - Contract, sign, invalid-input, and detection-list checks pass.
 - Monte Carlo Pd/Pfa estimates include seeds, trials, method, estimates, and

@@ -46,3 +46,18 @@ docs/handoffs/**/*
 
 # Reproducible generated radar test vectors
 data/testVectors/
+
+# Personal notes folder
+notes/
+/.obsidian/
+
+# Private teaching workspace
+/learning/
+/docs/learning/
+/MISSION.md
+/NOTES.md
+/RESOURCES.md
+/assets/
+/learning-records/
+/lessons/
+/reference/

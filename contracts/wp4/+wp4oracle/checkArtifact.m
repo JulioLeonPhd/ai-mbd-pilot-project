@@ -19,6 +19,10 @@ switch domain
         diagnostic = wp4oracle.checkTiming(data);
     case "ddc"
         diagnostic = wp4oracle.checkDdc(data);
+    case "ddc-response-pri"
+        diagnostic = wp4oracle.checkDdc(data, "cascade-peak-v1");
+    case "ddc-pri"
+        diagnostic = wp4oracle.checkDdcPri(data);
     case "ddc-streaming"
         diagnostic = wp4oracle.checkDdcStreaming(data);
     case "ddc-zero"
@@ -30,14 +34,9 @@ switch domain
     case "clustering"
         diagnostic = wp4oracle.checkClustering(data);
     otherwise
-        diagnostic = failDiagnostic("TYPE_MISMATCH", "domain", ...
+        diagnostic = wp4oracle.failDiagnostic("TYPE_MISMATCH", "domain", ...
             "Unknown WP4 fixture domain.");
 end
-end
-
-function diagnostic = failDiagnostic(code, path, message)
-diagnostic = struct("accepted", false, "code", string(code), "path", string(path), ...
-    "message", string(message), "output", struct());
 end
 
 function diagnostic = checkFusionCase(data, caseId)

@@ -1,8 +1,9 @@
 function metrics = measureResponse(design, gridSpec)
 %MEASURERESPONSE Measure the staged DDC response on an exact frequency grid.
 %   METRICS = RADARDEMO.DDC.MEASURERESPONSE(DESIGN, GRIDSPEC) evaluates
-%   direct DTFTs for both FIR stages. Each final-output alias branch uses
-%   its own stage-2 input coordinate and corresponding stage-1 preimage.
+%   direct DTFTs for both FIR stages. Passband ripple uses the principal
+%   cascade response, while digital alias rejection is referenced to its
+%   peak passband amplitude. Each alias branch uses its own input coordinate.
 
 arguments
     design struct
@@ -56,14 +57,20 @@ end
 
 passband = abs(frequencyHz) <= abs(design.passbandHz(2));
 stopband = abs(frequencyHz) >= design.stopbandStartHz;
+digitalStopband = abs(frequencyHz) >= design.stopbandStartHz & ...
+    abs(frequencyHz) <= 25e6;
 principalCascadeResponse = stage1Response .* stage2Response;
 principalPassband = abs(principalCascadeResponse(passband));
 passbandMagnitude = abs(stage2Response(passband));
-passbandDb = 20 * log10(max(passbandMagnitude, realmin));
+principalPassbandDb = 20 * log10(max(principalPassband, realmin));
+stage2PassbandDb = 20 * log10(max(passbandMagnitude, realmin));
 stage2StopbandDb = 20 * log10(max(abs(stage2Response(stopband)), realmin));
 nonPrincipal = ~(branchPairs(:, 1) == 0 & branchPairs(:, 2) == 0);
-cascadeAliasDb = 20 * log10(max(abs(cascadeBranches(passband, nonPrincipal)), realmin));
+nonPrincipalPassbandDb = 20 * log10(max( ...
+    abs(cascadeBranches(passband, nonPrincipal)), realmin));
+principalStopbandDb = 20 * log10(max(abs(principalCascadeResponse(digitalStopband)), realmin));
 metrics = struct();
+metrics.responseMetricProfile = "cascade-peak-v1";
 metrics.frequencyHz = frequencyHz;
 metrics.stage1Response = stage1Response;
 metrics.stage2Response = stage2Response;
@@ -79,15 +86,15 @@ metrics.principalPassbandValid = all(isfinite(principalPassband)) && ...
     abs(sum(design.stage2Numerator(:)) - 1) <= 1e-13 && ...
     max(abs(design.stage1Numerator(:) - flipud(design.stage1Numerator(:)))) <= 1e-13 && ...
     max(abs(design.stage2Numerator(:) - flipud(design.stage2Numerator(:)))) <= 1e-13;
-metrics.passbandRippleDb = max(passbandDb) - min(passbandDb);
-metrics.stage2AliasRejectionDb = max(passbandDb) - max(stage2StopbandDb);
-% FIRs are DC-normalized, so the full-cascade attenuation is reported
-% against the normalized maximum passband amplitude (0 dB). This keeps the
-% branch metric independent of the small passband-ripple peak.
-metrics.digitalAliasRejectionDb = -max(cascadeAliasDb(:));
+metrics.passbandRippleDb = max(principalPassbandDb) - min(principalPassbandDb);
+metrics.stage2AliasRejectionDb = max(stage2PassbandDb) - max(stage2StopbandDb);
+metrics.digitalAliasRejectionDb = max(principalPassbandDb) - ...
+    max([nonPrincipalPassbandDb(:); principalStopbandDb(:)]);
 metrics.gridResolutionHz = gridSpec.stepHz;
 metrics.metricToleranceDb = design.metricToleranceDb;
-metrics.accepted = metrics.passbandRippleDb <= 0.1 + design.metricToleranceDb && ...
+metrics.accepted = isequal(frequencyHz, (-25e6:1000:25e6).') && ...
+    gridSpec.stepHz == 1000 && ...
+    metrics.passbandRippleDb <= 0.1 + design.metricToleranceDb && ...
     metrics.stage2AliasRejectionDb >= 60 - design.metricToleranceDb && ...
     metrics.digitalAliasRejectionDb >= 60 - design.metricToleranceDb && ...
     metrics.principalPassbandValid && ...

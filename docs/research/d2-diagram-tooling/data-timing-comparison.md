@@ -12,31 +12,31 @@ D2 v0.9.0, rendered with TALA:
 
 ## Fidelity and design
 
-The D2 view preserves the batch data shapes and order, candidate rate, DDC
+D2 view preserves batch data shapes and order, candidate rate, DDC
 group delay and state behavior, frame-size distinction, slow-time preparation
-caveat, timing schedule counts and tick cap, and the limit that schedule
+caveat, timing schedule counts and tick cap, and limit that schedule
 evidence does not establish end-to-end detection performance. It also preserves
-the fixed-dimension Simulink model constraint, behavioral and later
+fixed-dimension Simulink model constraint, behavioral and later
 hardware-oriented model distinction, deferred HDL generation, and all open
-execution-boundary questions. The batch tensors are explicitly presented as
+execution-boundary questions. batch tensors are explicitly presented as
 illustrative organization rather than settled streaming interfaces.
 
-The colors retain the source status meanings: green is bounded implementation
-evidence, yellow is a confirmed responsibility or contract with an incomplete
-path, and red is an open method, ordering, or execution question. The diagram
+colors retain source status meanings: green is bounded implementation
+evidence, yellow is confirmed responsibility or contract with incomplete
+path, and red is open method, ordering, or execution question. diagram
 does not imply that streaming topology or HDL readiness has been approved.
 
-D2 uses a two-row, three-column grid for the batch stages, nested panels for
-future Simulink representations and the status key, and reusable classes for
-the evidence states. The range-axis interpretation card explains the pulse-axis
-caveat for the range tensor. The grid placement is explicitly a page layout;
+D2 uses a two-row, three-column grid for batch stages, nested panels for
+future Simulink representations and status key, and reusable classes for
+evidence states. range-axis interpretation card explains pulse-axis
+caveat for range tensor. grid placement is explicitly page layout;
 it does not define streaming modules. TALA routes from range data down to the
-accumulation stage, then back across to Doppler data. The overall render is
+accumulation stage, then back across to Doppler data. overall render is
 slightly taller than it is wide.
 
 ## Rendering and previewing
 
-The standalone SVG was rendered with D2 v0.9.0 using this exact command:
+standalone SVG was rendered with D2 v0.9.0 using this exact command:
 
 ```sh
 env -u DEBUG /opt/homebrew/bin/d2 --layout=tala --theme=0 --pad 24 \
@@ -44,12 +44,12 @@ env -u DEBUG /opt/homebrew/bin/d2 --layout=tala --theme=0 --pad 24 \
   docs/research/d2-diagram-tooling/data-timing.svg
 ```
 
-The source embeds the same TALA layout and neutral theme 0. Markdown Preview
+source embeds the same TALA layout and neutral theme 0. Markdown Preview
 Enhanced has its own `d2Layout`, `d2Theme`, and `d2Path` settings; set them to
-match the standalone render before comparing its native D2 preview. Its
-explicit layout setting controls the extension render, so the embedded
-`layout-engine` value alone may not select TALA in the preview. For this render,
-the matching VS Code settings are:
+match standalone render before comparing its native D2 preview. Its
+explicit layout setting controls extension render, so embedded
+`layout-engine` value alone may not select TALA in preview. For this render,
+matching VS Code settings are:
 
 ```json
 {
@@ -59,10 +59,10 @@ the matching VS Code settings are:
 }
 ```
 
-The native D2 fence below is included so the extension preview can be checked
-against the adjacent standalone SVG. Open this Markdown file in Markdown
-Preview Enhanced after applying the settings above and compare the fenced
-render with the SVG. The extension preview itself has not been tested as part
+native D2 fence below is included so extension preview can be checked
+against adjacent standalone SVG. Open this Markdown file in Markdown
+Preview Enhanced after applying settings above and compare fenced
+render with SVG. extension preview itself has not been tested as part
 of this comparison.
 
 <!-- markdownlint-disable MD013 -->

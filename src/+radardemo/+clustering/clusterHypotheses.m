@@ -76,15 +76,14 @@ end
 function members = orderMembers(members)
 keys = strings(numel(members), 1);
 for index = 1:numel(members)
-    sourceIds = sort(stringList(members(index).sourceCellIds));
-    keys(index) = strjoin([sourceIds; string(members(index).hypothesisId)], "|");
+    keys(index) = memberKey(members(index));
 end
 [~, order] = sort(keys);
 members = members(order);
 end
 
 function key = memberKey(member)
-sourceIds = sort(stringList(member.sourceCellIds));
+sourceIds = sort(string(member.sourceCellIds));
 key = strjoin([sourceIds; string(member.hypothesisId)], "|");
 end
 
@@ -101,8 +100,4 @@ for index = 1:numel(members)
     end
     output = output | logical(mask(:).');
 end
-end
-
-function output = stringList(value)
-output = string(value);
 end

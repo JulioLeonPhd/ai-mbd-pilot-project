@@ -8,7 +8,7 @@ for the frozen WP4 evidence. Issue #3 remains open for checker hardening.
 **Contract family:** `radar-v1`
 **Contract version:** `1.0.0-draft.2`
 
-This document defines the interchange contracts for the floating-point MATLAB
+Defines the interchange contracts for the floating-point MATLAB
 reference. The five versioned envelopes are configuration, target scenario,
 MAT test vector, processing intermediate, and detection list. JSON numbers are
 finite IEEE-754
@@ -215,7 +215,8 @@ retains `prfIndex` and `prfNominalHz` for its destination PRF and uses the
 accepted `transitionGapTicks: 106872`. The unit-only shape example may omit
 these schedule fields.
 `prfIndex` is one-based and indexes the configured `prfsHz` array.
-`adcTick` is the global ADC tick epoch and records may be consumed incrementally.
+`adcTick` is the global ADC tick epoch and records may be consumed
+incrementally.
 For each record after the first, `pulseStartTick` is the actual integer ADC tick
 at which that record begins; its PRI is the difference from the preceding
 record's start tick. For non-transition, same-PRF records, this difference must
@@ -260,17 +261,77 @@ Passband is `[-5,+5] MHz`; stage-2 stopband is `|f| >= 6.25 MHz` in the 50 MHz
 pre-decimation input domain through 25 MHz. Stage-1 folding is into
 `[-25,25] MHz` after `/3`; stage 2 folds that 50 MHz input before `/4`.
 The cascade reference includes mixer, both filters, and both decimators.
-Evaluate a deterministic 1 kHz grid including endpoints. Cascade digital alias
-rejection is the minimum stopband attenuation relative to maximum passband
-amplitude. Compare each metric with absolute tolerance `1e-9 dB`.
+Evaluate a deterministic 1 kHz grid including endpoints. Compare each metric
+with absolute tolerance `1e-9 dB`.
+
+<a id="DDC.cascade-profile"></a>
+Current response profile is `cascade-peak-v1`. Its passband ripple uses the
+principal cascade response `|H1*H2|` over `[-5,+5] MHz`. With unity input-tone
+reference, full digital cascade rejection is the peak principal-passband dB
+value minus the larger of two amplitude-dB maxima, each computed with
+`20*log10(abs(H))`: (1) the existing non-principal cascade-branch maximum over
+output `|q| <= 5 MHz` and (2) the direct principal `|H1(f)H2(f)|` maximum over
+input `stopbandStartHz <= |f| <= 25 MHz`. The frozen `stopbandStartHz` default
+is `6.25e6` Hz; a previously valid stricter value remains supported. At that
+default, the direct term covers the omitted `+/-6.25..7.5` and
+`+/-17.5..20 MHz` input slices. Do not apply the input stopband mask
+independently to every shifted branch: each branch has its own shifted input
+frequencies. Evaluate the full cascade metric on the exact `[-25,+25] MHz`
+grid at 1 kHz spacing, including endpoints. Custom grids are diagnostic only
+and cannot produce `accepted=true`.
+Stage-2 alias rejection remains a separate metric referenced to the peak
+stage-2 passband and measured over `|f| >= 6.25 MHz` through its 25 MHz
+pre-decimation Nyquist frequency. Acceptance limits remain ripple `<=0.1 dB`
+and both alias-rejection metrics `>=60 dB`, with absolute metric tolerance
+`1e-9 dB`. Legacy fixture profile `legacy-stage2-v1` retains its prior
+stage-2-referenced ripple formula for historical fixture replay; it is not
+interchangeable with `cascade-peak-v1`. DDC-010 identifies the current response
+profile, and DDC-PRI-001 identifies the independent per-PRI profile. Preserve
+both identifiers and never rewrite old fixture claims as current-profile
+evidence.
+
+<a id="DDC.per-pri"></a>
+Current per-PRI profile accepts one complete physical PRI per call as finite
+real double `[N,C]`, with `N` divisible by 12. It returns complex `[N/12,C]`
+including all produced startup rows, multiplied by a fixed factor of two after
+the final decimator. For a real cosine with peak amplitude `A`, this restores
+the complex output envelope to `A` subject to FIR gain and phase response and
+residual image. Units remain those of the input; noise amplitude also doubles,
+so SNR does not improve, and this is not a calibrated-volts claim. It does not
+append zero input, flush the filters, or return a causal tail. Mixer index
+`n=0`, FIR delays, and `/3` and
+`/4` phases start fresh on every call; no state carries between PRIs. Calls are
+independent of their order. Scalar double metadata fields are
+`inputSampleCount`, `outputSampleCount`, `decimationFactor`,
+`groupDelayInputSamples`, `groupDelayOutputSamples`, `startupInputSamples`, and
+`startupOutputSamples`. Their frozen values are 372/31 samples for group delay
+and 744/62 samples for full startup memory. The caller owns physical PRI
+selection, sample alignment, identity and global time, transition gaps, and
+one-time group-delay coordinate mapping. Downstream range processing owns
+complete-window validity through startup, blanking, and PRI-end truncation.
+Inconsistent finite positive rate chains are rejected unless the intermediate
+rate is ADC rate divided by 3 and output rate is intermediate rate divided by 4
+within floating-point tolerance. The approved target per-PRI evidence profile is
+`independent-pri-v2` version `2.0.0`; it supersedes `independent-pri-v1`
+version `1.0.0` with the amplitude compensation, without changing the schema.
+Only `ddc-pri.mat` migrates; other fixtures, including `ddc-response-pri.mat`,
+remain unchanged. Historical DDC-002 and v1 evidence remain tied to their pinned
+revisions. The v2 regression divides compensated PRI output by two before the
+unchanged continuous-reference helper; the v2 direct oracle includes factor two.
+See the [migration and verification ledger](../plans/ddc-pri-processing.md#independent-pri-v2-migration-and-verification-2026-10-15)
+for fixture identity, measured results, independent reviewer execution scope,
+and evidence limits. These temporary-unit checks do not establish human approval,
+end-to-end detection, hardware performance, or merge authorization.
 
 <a id="DDC.streaming-state"></a>
-The following streaming requirement and DDC-002 evidence describe the accepted
+Following streaming requirement and DDC-002 evidence describe the accepted
 historical continuous-state implementation profile. The `shall` applies only
-to replay and interpretation of that pinned profile. [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md)
-records the accepted per-PRI direction; its confirmed interface and evidence
-migration are in the [per-PRI plan](../plans/ddc-pri-processing.md). Preserve
-the historical numbers and schema below.
+to replay and interpretation of that pinned profile. Current approved
+interface processes one complete physical PRI per call with fresh local state,
+as recorded in [ADR 0022](../adr/0022-adopt-independent-pri-ddc-processing.md).
+The narrow evidence migration and new profile identifiers are tracked in the
+[per-PRI plan](../plans/ddc-pri-processing.md). Preserve the historical numbers
+and schema below; DDC-002 is not per-PRI acceptance evidence.
 
 For the historical profile, streaming DDC validation processes real mixer
 input in unequal chunks while preserving mixer, FIR, and decimator state
@@ -305,12 +366,14 @@ MATLAB complex arrays in MAT files. Row-oriented stages use typed struct
 arrays. `metadata` records the fixture seed, axis names,
 and stage-specific calibration or index origin. Every fixture declares
 `fixtureScope` as one of `acceptance`, `out-of-domain`, `unit-only`, or
-`provisional`; only `acceptance` fixtures can support a V1 gate. Every fixture carries
+`provisional`; only `acceptance` fixtures can support a V1 gate. Every fixture
+carries
 `sourceId`, `sourceSchemaVersion`, and `sourceDocumentVersion`. Generated
 fixtures also carry generator revision, version, seed, and parameters; hashes
 are not required when code permits semantic replay.
 
-The supported stage seams are `ddc`, `azimuth-beamformed`, `range`, `doppler`, `angle`,
+The supported stage seams are `ddc`, `azimuth-beamformed`, `range`, `doppler`,
+`angle`,
 `candidate-list`, `ambiguity-projection`, `cfar`, `fusion`, and `cluster`.
 Projection preserves five separate PRF layers; CFAR emits one decision per
 layer, including explicit invalid/fail states, and fusion votes across those
@@ -441,7 +504,8 @@ existing configuration and scenario identifier; a detection example must
 cross-reference its test vector.
 
 Prerelease versions, including this draft, require exact schema-version
-matching. For released versions, minor-version additions may add optional fields.
+matching. For released versions, minor-version additions may add optional
+fields.
 A producer introducing a
 required field or changing type, units, sign, shape, channel map, or stage
 meaning must increment the major version and provide a migration note. A

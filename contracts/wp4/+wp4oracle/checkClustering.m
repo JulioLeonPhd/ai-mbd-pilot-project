@@ -1,21 +1,21 @@
 function diagnostic = checkClustering(data)
 %CHECKCLUSTERING Independently recompute canonical Chebyshev aggregates.
 
-diagnostic = checkVersion(data);
+diagnostic = wp4oracle.checkVersion(data);
 if ~diagnostic.accepted
     return
 end
 if ~isfield(data, "hypotheses") || ~isfield(data, "clusters")
-    diagnostic = failDiagnostic("MISSING_FIELD", "clusters", ...
+    diagnostic = wp4oracle.failDiagnostic("MISSING_FIELD", "clusters", ...
         "Clustering fixture must include hypotheses and complete aggregates.");
     return
 end
 hypotheses = data.hypotheses;
 if isempty(hypotheses)
     if isempty(data.clusters)
-        diagnostic = passDiagnostic();
+        diagnostic = wp4oracle.passDiagnostic();
     else
-        diagnostic = failDiagnostic("NUMERICAL_MISMATCH", "clusters", ...
+        diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", "clusters", ...
             "An empty hypothesis set must have no clusters.");
     end
     return
@@ -26,7 +26,7 @@ requiredHypothesis = ["hypothesisId", "clusterEligible", "azimuthLookIndex", ...
 for hypothesisIndex = 1:numel(hypotheses)
     missing = requiredHypothesis(~isfield(hypotheses(hypothesisIndex), requiredHypothesis));
     if ~isempty(missing)
-        diagnostic = failDiagnostic("MISSING_FIELD", ...
+        diagnostic = wp4oracle.failDiagnostic("MISSING_FIELD", ...
             "hypotheses[" + string(hypothesisIndex - 1) + "]." + missing(1), ...
             "Hypothesis fields are required for independent aggregation.");
         return
@@ -34,7 +34,7 @@ for hypothesisIndex = 1:numel(hypotheses)
     if any([numel(hypotheses(hypothesisIndex).validityMask), ...
             numel(hypotheses(hypothesisIndex).supportMask), ...
             numel(hypotheses(hypothesisIndex).passMask)] ~= 5)
-        diagnostic = failDiagnostic("DIMENSION_MISMATCH", ...
+        diagnostic = wp4oracle.failDiagnostic("DIMENSION_MISMATCH", ...
             "hypotheses[" + string(hypothesisIndex - 1) + "].validityMask", ...
             "Hypothesis masks must have length five.");
         return
@@ -42,7 +42,7 @@ for hypothesisIndex = 1:numel(hypotheses)
 end
 expected = recomputeAggregates(hypotheses);
 if numel(data.clusters) ~= numel(expected)
-    diagnostic = failDiagnostic("NUMERICAL_MISMATCH", "clusters", ...
+    diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", "clusters", ...
         "Stored aggregate count differs from recomputation.");
     return
 end
@@ -54,7 +54,7 @@ for clusterIndex = 1:numel(expected)
         "passMask", "sourceCellIds"];
     missing = requiredCluster(~isfield(stored, requiredCluster));
     if ~isempty(missing)
-        diagnostic = failDiagnostic("MISSING_FIELD", ...
+        diagnostic = wp4oracle.failDiagnostic("MISSING_FIELD", ...
             "clusters[" + string(clusterIndex - 1) + "]." + missing(1), ...
             "Complete aggregate fields are required.");
         return
@@ -62,7 +62,7 @@ for clusterIndex = 1:numel(expected)
     storedIds = string(stored.hypothesisIds(:));
     if any(~ismember(storedIds, allIds))
         unknownIndex = find(~ismember(storedIds, allIds), 1);
-        diagnostic = failDiagnostic("VALUE_OUT_OF_RANGE", ...
+        diagnostic = wp4oracle.failDiagnostic("VALUE_OUT_OF_RANGE", ...
             "clusters[" + string(clusterIndex - 1) + "].hypothesisIds[" + ...
             string(unknownIndex - 1) + "]", "Aggregate references an unknown hypothesis.");
         return
@@ -70,7 +70,7 @@ for clusterIndex = 1:numel(expected)
     expectedIds = string(expected(clusterIndex).hypothesisIds(:));
     if stored.clusterId ~= expected(clusterIndex).clusterId || ...
             ~isequal(storedIds, expectedIds)
-        diagnostic = failDiagnostic("NUMERICAL_MISMATCH", ...
+        diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", ...
             "clusters[" + string(clusterIndex - 1) + "].clusterId", ...
             "Aggregate identifier or canonical member order differs.");
         return
@@ -80,7 +80,7 @@ for clusterIndex = 1:numel(expected)
     if abs(stored.rangeM - expected(clusterIndex).rangeM) > rangeTolerance || ...
             abs(stored.radialVelocityMps - expected(clusterIndex).radialVelocityMps) > velocityTolerance || ...
             stored.statistic ~= expected(clusterIndex).statistic
-        diagnostic = failDiagnostic("NUMERICAL_MISMATCH", ...
+        diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", ...
             "clusters[" + string(clusterIndex - 1) + "].rangeM", ...
             "Aggregate means or maximum statistic differ from canonical arithmetic.");
         return
@@ -88,7 +88,7 @@ for clusterIndex = 1:numel(expected)
     if ~isequal(logical(stored.validityMask(:).'), expected(clusterIndex).validityMask) || ...
             ~isequal(logical(stored.supportMask(:).'), expected(clusterIndex).supportMask) || ...
             ~isequal(logical(stored.passMask(:).'), expected(clusterIndex).passMask)
-        diagnostic = failDiagnostic("NUMERICAL_MISMATCH", ...
+        diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", ...
             "clusters[" + string(clusterIndex - 1) + "].validityMask", ...
             "Aggregate masks differ from member OR masks.");
         return
@@ -96,13 +96,13 @@ for clusterIndex = 1:numel(expected)
     storedSourceIds = sort(string(stored.sourceCellIds(:)));
     expectedSourceIds = sort(string(expected(clusterIndex).sourceCellIds(:)));
     if ~isequal(storedSourceIds, expectedSourceIds)
-        diagnostic = failDiagnostic("NUMERICAL_MISMATCH", ...
+        diagnostic = wp4oracle.failDiagnostic("NUMERICAL_MISMATCH", ...
             "clusters[" + string(clusterIndex - 1) + "].sourceCellIds", ...
             "Aggregate source-cell provenance differs from member provenance.");
         return
     end
 end
-diagnostic = passDiagnostic();
+diagnostic = wp4oracle.passDiagnostic();
 end
 
 function aggregates = recomputeAggregates(hypotheses)
@@ -193,25 +193,4 @@ mask = false(1, 5);
 for index = 1:numel(members)
     mask = mask | logical(members(index).(fieldName)(:).');
 end
-end
-
-function diagnostic = checkVersion(data)
-if ~isstruct(data) || ~isfield(data, "schemaVersion")
-    diagnostic = failDiagnostic("MISSING_FIELD", "schemaVersion", "Schema version is required.");
-elseif string(data.schemaVersion) ~= "1.0.0-draft.2"
-    diagnostic = failDiagnostic("VERSION_MISMATCH", "schemaVersion", ...
-        "Only schema 1.0.0-draft.2 is accepted.");
-else
-    diagnostic = passDiagnostic();
-end
-end
-
-function diagnostic = passDiagnostic()
-diagnostic = struct("accepted", true, "code", "", "path", "", "message", "", ...
-    "output", struct());
-end
-
-function diagnostic = failDiagnostic(code, path, message)
-diagnostic = struct("accepted", false, "code", string(code), "path", string(path), ...
-    "message", string(message), "output", struct());
 end

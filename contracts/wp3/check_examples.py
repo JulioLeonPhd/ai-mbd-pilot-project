@@ -2406,15 +2406,6 @@ def read_json_artifact(name: str) -> Any:
         )
 
 
-def read_example(name: str) -> dict[str, Any]:
-    """Backward-compatible loader for the original checker seam."""
-
-    value = read_json_artifact(name)
-    if not isinstance(value, dict):
-        raise ValueError(f"{name}: root must be an object")
-    return value
-
-
 def finite_number(value: object) -> TypeGuard[int | float]:
     """Return whether a JSON-compatible value is a finite scalar number."""
 

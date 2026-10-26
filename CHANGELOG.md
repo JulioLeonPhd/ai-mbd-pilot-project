@@ -8,6 +8,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## Unreleased
+
+### Added
+
+- OMP-native project definitions for all nine specialists, preserving Codex TOMLs and role instructions.
+
+### Changed
+
+- Expanded the DDC Live Script filter-response explanation with wideband FIR magnitude views before the passband zoom and alias envelope, two-sentence plot introductions, simplified dB labels, and ordinary decimal passband ticks.
+- Documented model/effort mapping and OMP sandbox limitations; extended handoff checks to cover both runtimes.
+- Recorded pilot evidence and limitations for parallel OMP MATLAB MCP session isolation.
+- Required OMP subagents to dispatch through the active session's `task` tool rather than separate headless processes.
+- Defined MATLAB MCP endpoint selection, session ownership, and concurrency-isolation requirements in the project contract.
+- Consolidated per-PRI DDC migration evidence in its implementation ledger and archived superseded active-status passages without changing historical snapshots.
+- Stopped tracking personal Obsidian configuration and private teaching material; ignore rules preserve them as local-only files.
+- Recorded the owner's architecture-diagram acceptance and PR merge authorization separately from incomplete code review and historical MATLAB verification.
+
 ## [v0.8.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.8.0) - 2026-10-02
 
 <small>[Compare with v0.7.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.7.0...v0.8.0)</small>
