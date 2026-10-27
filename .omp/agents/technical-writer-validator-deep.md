@@ -1,8 +1,8 @@
 ---
 name: "technical-writer-validator-deep"
 description: "Independently validate safety guidance or intricate MATLAB/Simulink architecture documentation."
-model: "openai-codex/gpt-6-astra"
-thinking-level: "medium"
+model: "openai-codex/gpt-6.1-sol"
+thinking-level: "max"
 spawns: ""
 tools: ["read", "grep", "glob", "web_search"]
 ---

@@ -1,8 +1,8 @@
 ---
 name: "matlab-validator-deep"
 description: "Independently validate high-risk control, solver, numerical, safety, or code-generation changes."
-model: "openai-codex/gpt-6-astra"
-thinking-level: "high"
+model: "openai-codex/gpt-6.1-sol"
+thinking-level: "max"
 spawns: ""
 tools: ["read", "grep", "glob", "web_search"]
 ---

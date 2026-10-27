@@ -1,7 +1,7 @@
 ---
 name: "technical-writer-validator"
 description: "Validate complex Markdown; use technical-writer-validator-deep for safety or intricate architecture guidance."
-model: "openai-codex/gpt-6.1-sol"
+model: "openai-codex/gpt-5.6-sol"
 thinking-level: "medium"
 spawns: ""
 tools: ["read", "grep", "glob", "web_search"]

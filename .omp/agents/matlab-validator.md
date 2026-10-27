@@ -1,7 +1,7 @@
 ---
 name: "matlab-validator"
 description: "Validate complex MATLAB and Simulink changes; use matlab-validator-deep for control, solver, numerical, safety, or code-generation risk."
-model: "openai-codex/gpt-6.1-sol"
+model: "openai-codex/gpt-5.6-sol"
 thinking-level: "medium"
 spawns: ""
 tools: ["read", "grep", "glob", "web_search"]
