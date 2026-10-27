@@ -6,9 +6,9 @@ Product progress > AI infrastructure progress until v1.
 
 ## Now
 
-1. Work through approved range decisions 19–22 for the active range-boundary milestone.
-2. Define acceptance criteria in decision #23 next.
-3. Do not begin range implementation: no implementation authorization is recorded.
+1. Keep issue #23 open while carrying the approved range-acceptance choices into the WP6b plan; physical one-bin association and the 3 dB power-valley criterion are approved, while numerical tolerances and RCS remain pending.
+2. In a future session only, prepare and execute the authorized bounded reference-only study described in the [WP6b range-acceptance plan](radar-matlab-v1.md#wp6b-range-acceptance-planning), then present proposed numerical tolerances for Julio's review.
+3. Do not execute the study in this session or begin production implementation; neither study results nor implementation authorization exist.
 
 Completed context: the DDC PRI baseline merged in PR #17, and Julio accepted
 the redrawn architecture diagrams on 2026-10-26; neither result grants range

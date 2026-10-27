@@ -2,7 +2,7 @@
 
 Range-component boundary review is the active milestone within human-led development step 5, on `component/range-processor`.
 Julio authorized the status transition and range-processing brief review on 2026-10-26 after reporting PR #17 merged.
-WP6b is the roadmap mapping; no formal work-package or gate assignment, or range implementation authorization, is recorded. Range design decisions have now been approved in #19 through #22. The next planning step is #23 for acceptance criteria.
+WP6b is the roadmap mapping; no formal work-package or gate assignment is recorded, and range implementation remains unauthorized. Range design decisions #19–#22 are approved; #23 remains open for acceptance-criteria resolution.
 
 The merged DDC baseline is independent per-PRI processing with the sample-only API and fixed factor-two final-output compensation.
 Its recorded implementation checks and independent numerical validation passed; see the [DDC evidence ledger](docs/plans/ddc-pri-processing.md#independent-pri-v2-migration-and-verification-2026-10-15).
@@ -21,8 +21,18 @@ Invalid bins contain complex zero with false mask entries, as [approved by Julio
 Julio approved an explicit caller-supplied Boolean input-validity mask aligned with the input samples; see the [#21 final resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/21#issuecomment-6425272561). The caller marks blanked, DDC-startup-invalid, and unavailable supplied samples invalid. Entire correlation windows must exist within the supplied PRI and contain only valid samples; FFT padding cannot create validity. Issue #21 is closed.
 Julio approved per-stream Boolean masks in [#22](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/22#issuecomment-6425321892): input `[sample,4]` and output `[rangeBin,4]`, matching their complex sample arrays. Complete-window eligibility applies independently per stream.
 Julio confirmed the complete public API after the grilling interview; see the [#22 final resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/22#issuecomment-6425810353). Issue #22 is closed. The approved entry point is `radardemo.rangeCompression.processPri(inputSamples, inputValid, cfg)`, returning complex samples and metadata containing only `valid` and `rangeBinCentersM`.
-Proceed to #23 for measurable acceptance criteria and justified tolerances, aligned with the existing cross-component tolerance-policy decision. No numerical tolerance, filter implementation, compensation algorithm, or ambiguity method is approved by this review. These planning decisions do not authorize implementation or settle Simulink Boolean ports, boundary conversion, or scheduling. The accepted numerical, coordinate, validity, and API contracts are consolidated in [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md) and [ADR 0026](docs/adr/0026-adopt-per-pri-range-compression-api.md); implementation remains unauthorized.
-After those choices are approved, prepare the executable plain-text MATLAB Live Script walkthrough and implementation/evidence work under the component workflow.
+
+Julio approved the #23 acceptance choices on 2026-10-27; see the [WP6b range-acceptance plan](docs/plans/radar-matlab-v1.md#wp6b-range-acceptance-planning).
+One-bin peak association and a 3 dB power valley are approved; numerical correlation, coordinate, and complex gain/phase tolerances and the common RCS remain pending.
+Issue #23 remains open, aligned with the cross-component tolerance discussion in #13.
+The existing high-input-SNR requirement wording still needs traceable reconciliation with the approved at-least-30 dB estimated post-compression SNR reference.
+
+Julio authorized a bounded reference-only numerical design study for a future session and explicitly prohibited running it in this session; it was not run.
+The next authorized step is that future-session study, followed by Julio's review of the proposed numerical tolerances.
+This is not production implementation authorization, production acceptance evidence, or gate advancement.
+The approved contracts in [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md) and [ADR 0026](docs/adr/0026-adopt-per-pri-range-compression-api.md) remain the baseline.
+Simulink Boolean ports, boundary conversion, scheduling, and downstream ambiguity choices remain outside this approval.
+Executable walkthrough and implementation/evidence work remain subject to the component workflow and separate authorization.
 
 AI-infrastructure development remains frozen until radar v1 under [ADR 0023](docs/adr/0023-freeze-ai-infrastructure-until-v1.md).
 [ADR 0024](docs/adr/0024-require-plain-text-matlab-live-script-walkthroughs.md) requires executable R2025a+ plain-text `.m` walkthroughs; no repository-wide migration completion is recorded.

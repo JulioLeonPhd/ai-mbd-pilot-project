@@ -79,3 +79,47 @@ Reordering pulse-by-range data so that each range cell's slow-time sequence is
 available for Doppler processing. It describes data access order, not a
 required physical matrix copy.
 See TI's [transpose-write/read technique](https://www.ti.com/lit/an/swra564/swra564.pdf).
+
+### Range response
+
+**Effective receive gain**:
+The directional receive gain of the evaluated beamformed aperture, including its receive beamforming contribution, rather than the gain of an individual element; this does not imply that multiple elevation streams are combined.
+
+**Range-stage input SNR**:
+The ratio of an individual target's mean complex echo power over pulse support to the mean complex noise power at the range-stage input, stated per stream. It describes each target separately, not the power of a coherent sum of target echoes.
+
+**Post-compression SNR**:
+The ratio of an isolated target's compressed-response peak power to the mean noise-only output power at the same range bin; it is distinct from input SNR and coherent multi-target peak power.
+
+**Stationary receiver noise**:
+Receiver noise is stationary over a stated observation interval when its mean and mean power do not vary with time, and its correlation depends on time separation rather than absolute time. Its samples still fluctuate; stationarity does not mean a constant sequence.
+
+**Radar cross section (RCS)**:
+A measure of a target's scattering strength under stated observation conditions, distinct from the received echo amplitude.
+
+**Equal-RCS targets**:
+Targets with the same radar cross section under the stated observation conditions; their received echo amplitudes may differ because propagation depends on range.
+
+**Link budget**:
+A radar link budget accounts for transmitted power, antenna gains, two-way propagation, target scattering, and system losses to characterize received echo power. Together with receiver noise, it relates that power to SNR at a stated reference plane; any processing gain is identified separately rather than folded into the power accounting.
+
+**Range calibration**:
+The correspondence between known echo delays and physical range coordinates. Correct range coordinates are distinct from accurate localization of targets between those coordinates.
+
+**Complex gain**:
+The complex amplitude ratio of an output response to a reference response or input echo under stated matching and alignment conditions, with magnitude and phase as distinct aspects. The ratio need not be unity for mismatched or off-grid echoes.
+
+**Phase preservation**:
+Retention of an echo's complex phase relative to a defined reference, apart from explicitly modeled phase shifts.
+
+**Nominal range-resolution scale**:
+A bandwidth-derived characteristic range scale associated with two-way propagation. It is distinct from the measured width of a compressed response and from demonstrated separability of two targets.
+
+**Compressed-response power FWHM**:
+The full width of an isolated compressed-response mainlobe between its half-maximum-power crossings, expressed in time or range; it is distinct from the nominal range-resolution scale and two-target separability.
+
+**Range separability**:
+The ability to distinguish range-response peaks from two targets, which does not necessarily imply two downstream detections or reports.
+
+**Complete-window validity**:
+Validity of a range response when every sample needed to form it exists and is valid; a zero response alone does not indicate invalidity.
