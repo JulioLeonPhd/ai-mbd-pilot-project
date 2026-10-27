@@ -265,8 +265,8 @@ All nine roles, including the three deep variants, have definitions for both
 runtimes; runtime availability is session-dependent. Before spawning one, the
 root confirms that it is selectable in the current session and reports a failure
 when it is unavailable. For safety or complex design, the root does not silently
-fall back to a lower-capability role. Astra is selected by the explicit deep
-routes, not by standard roles.
+fall back to a lower-capability role. Deep routes remain explicit specialist
+selections, not fallback roles.
 
 Read both the matching [.codex/agents](.codex/agents/) TOML and
 [.omp/agents](.omp/agents/) Markdown before changing or reviewing a specialist
@@ -282,14 +282,15 @@ settings.
 
 | Roles | Codex model | OMP model selector | Thinking level |
 | --- | --- | --- | --- |
-| `technical-writer`, `matlab-implementer` | `gpt-6-luna` | `openai-codex/gpt-6-luna` | `high` |
-| `matlab-architect` | `gpt-6.1-sol` | `openai-codex/gpt-6.1-sol` | `high` |
-| `technical-writer-validator`, `simulink-implementer`, `matlab-validator` | `gpt-6.1-sol` | `openai-codex/gpt-6.1-sol` | `medium` |
-| `matlab-architect-deep`, `matlab-validator-deep` | `gpt-6-astra` | `openai-codex/gpt-6-astra` | `high` |
-| `technical-writer-validator-deep` | `gpt-6-astra` | `openai-codex/gpt-6-astra` | `medium` |
+| `technical-writer` | `gpt-6-luna` | `openai-codex/gpt-6-luna` | `high` |
+| `matlab-implementer` | `gpt-6-luna` | `openai-codex/gpt-6-luna` | `xhigh` |
+| `matlab-architect` | `gpt-5.6-sol` | `openai-codex/gpt-5.6-sol` | `high` |
+| `technical-writer-validator`, `matlab-validator` | `gpt-5.6-sol` | `openai-codex/gpt-5.6-sol` | `medium` |
+| `simulink-implementer` | `gpt-6.1-sol` | `openai-codex/gpt-6.1-sol` | `medium` |
+| `matlab-architect-deep`, `matlab-validator-deep`, `technical-writer-validator-deep` | `gpt-6.1-sol` | `openai-codex/gpt-6.1-sol` | `max` |
 
-These correspond to the current `@smol` Luna, `@default` Sol, and `@slow` Astra
-model families, but deliberately do not inherit those aliases' effort suffixes.
+Each project role has explicit model and effort settings; they do not inherit effort
+from global aliases.
 OMP settings or launch-time policy can override model and effort; record
 observed execution metadata in results and recheck availability after
 configuration changes.

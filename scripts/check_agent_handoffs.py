@@ -56,6 +56,7 @@ MARKDOWN_PATHS = (
 )
 OMP_MODELS = {
     "gpt-6-luna": "openai-codex/gpt-6-luna",
+    "gpt-5.6-sol": "openai-codex/gpt-5.6-sol",
     "gpt-6.1-sol": "openai-codex/gpt-6.1-sol",
     "gpt-6-astra": "openai-codex/gpt-6-astra",
 }

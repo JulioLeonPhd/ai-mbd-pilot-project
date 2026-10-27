@@ -70,11 +70,15 @@ task:
         agents, errors = CHECKER._load_agents(CHECKER.ROOT)
         self.assertEqual(errors, [])
         registry = {str(agent["name"]) for agent in agents}
+        validator = next(
+            agent for agent in agents if agent["name"] == "matlab-validator"
+        )
+        expected_model = CHECKER.OMP_MODELS[validator["model"]]
         mutations = (
             ('spawns: ""', 'spawns: "*"'),
             (
-                'model: "openai-codex/gpt-6.1-sol"',
-                'model: "openai-codex/gpt-6-luna"',
+                f'model: "{expected_model}"',
+                'model: "openai-codex/not-the-configured-model"',
             ),
             ('thinking-level: "medium"', 'thinking-level: "low"'),
             ('"web_search"]', '"web_search", "bash"]'),
