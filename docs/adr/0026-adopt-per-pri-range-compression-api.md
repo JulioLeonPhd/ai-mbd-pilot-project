@@ -74,7 +74,7 @@ These stable identifiers are contractual; exact message text is not.
 MATLAB logical validity does not settle Simulink Boolean ports, boundary conversions, or execution scheduling.
 Acquisition timing remains outside this API seam, not abolished system-wide.
 The API includes no fixed waveform metadata or configurable waveform options, custom reference, weighting, timestamps, or PRF.
-Acceptance criteria, including numerical tolerances and 50 m separation, remain for issue #23.
+Approved separation and fixture choices are recorded in [ADR 0027](0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md); final numerical tolerances and study evidence remain pending for [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23).
 No production implementation, acceptance result, performance result, or hardware claim is authorized or established by this ADR.
 
 ## Rationale

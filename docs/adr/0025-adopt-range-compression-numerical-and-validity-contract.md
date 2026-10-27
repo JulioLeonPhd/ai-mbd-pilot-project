@@ -107,8 +107,8 @@ Short inputs, all-false masks, and internal gaps are ordinary data conditions, n
 ### Decision boundary
 
 These decisions fix the numerical reference, lag convention, coordinate mapping, delay ownership, and validity semantics only.
-The per-PRI public API is specified in [ADR 0026](0026-adopt-per-pri-range-compression-api.md).
-Acceptance criteria, including numerical tolerances and the 50 m separation requirement, remain for issue #23.
+The per-PRI public API is specified in [ADR 0026](0026-adopt-per-pri-range-compression-api.md); approved separation and fixture choices are recorded in [ADR 0027](0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md).
+Final numerical tolerances and numerical-study evidence remain pending for [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23).
 The accepted decisions do not authorize production implementation, establish acceptance or performance results, or make hardware claims.
 
 ## Rationale

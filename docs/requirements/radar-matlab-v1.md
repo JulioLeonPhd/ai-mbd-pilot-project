@@ -39,6 +39,8 @@ radar-left, positive z is up, and positive radial velocity is receding.
 ## Requirements
 
 <!-- markdownlint-disable MD013 -->
+<a id="RAD-V1-006"></a>
+
 | ID | Requirement | Status | Evidence |
 | --- | --- | --- | --- |
 | RAD-V1-001 | The reference shall process real 16-bit samples for the accepted 16×4 array channel baseline. | accepted | Contract test and end-to-end run |
@@ -46,7 +48,7 @@ radar-left, positive z is up, and positive radial velocity is receding.
 | <a id="RAD-V1-003"></a>RAD-V1-003 | The V1 maximum instrumented range shall be 100 km. The primary case shall contain a constant-RCS 10 m² target whose reported range is 100 km at the common five-PRF scan midpoint and whose radial speed is approximately 800 km/h. The frozen WP4 schedule and fixture matrix are independently validated; the target-report performance claim remains an end-to-end requirement and is not established by Phase 4 timing/DDC evidence. WP6e may reopen G2 through a recorded decision. | Phase 4 schedule/fixture validation and Phase 5/6 root gate passed; G2 accepted for frozen WP4 evidence; target-report performance remains an end-to-end limitation | Seeded primary fixture; ADR 0018 and WP4 manifest |
 | RAD-V1-004 | Native unambiguous radial velocity shall be at least ±40 m/s. | accepted, G1 analytic feasibility passed | WP2 study and Doppler unit test |
 | RAD-V1-005 | Range ambiguity shall be resolved and true velocity shall be reported for test cases through ±800 km/h. | accepted, feasibility pending | WP6e study, WP6f tests, integration cases |
-| RAD-V1-006 | An ideal mid-range, high-input-SNR fixture shall resolve two equal-RCS moving targets with shared nonzero radial velocity and 50 m range separation, producing two reports. | accepted, waveform/rate validation pending | Ideal and sampled range/end-to-end fixture |
+| RAD-V1-006 | An ideal mid-range, high-SNR fixture shall resolve two equal-RCS moving targets with shared nonzero radial velocity and 50 m range separation. The range-stage fixture reference is at least 30 dB estimated post-compression SNR for the weaker target in each evaluated stream; report input SNR separately. This fixture condition does not alone establish two detection reports, which remain a WP8 end-to-end obligation. | accepted, waveform/rate validation pending | WP6b range-stage fixture and WP8 end-to-end report evidence; [ADR 0012](../adr/0012-adopt-50m-separability-and-narrowband-ddc-candidate.md), [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md) |
 | RAD-V1-007 | The verification set shall include velocity-separated and unfolded-velocity cases. | accepted | Named seeded fixtures |
 | <a id="RAD-V1-008"></a>RAD-V1-008 | For each commanded azimuth look, receive beamforming shall coherently sum the 16 azimuth elements independently for each of the 4 elevation rows before range/Doppler processing, yielding 4 complex elevation streams. Elevation shall not scan; V1 azimuth is the commanded-look assignment, not sub-beam azimuth estimation. Boresight shall be the first angle-accuracy case. The G1 ideal-array study supports a ≤0.1° per-axis WP6d unit tolerance only for noiseless, matched-manifold fixtures within its tested grid. Noisy angular accuracy and operational sector coverage are reported measurements, not V1 gates. Multi-beam or monopulse refinement is out of V1. | accepted; measurement pending | WP2 ideal angle study, WP6d unit tests, and integration measurement report |
 | RAD-V1-009 | A configurable near-zero-Doppler band shall suppress an abstract, injected stationary-interference component used only for processing-unit testing. This fixture does not model terrain, terrestrial propagation, or clutter physics. Stationary and near-zero-radial-speed targets are outside V1 acceptance cases. The cutoff and suppression tolerance shall be recorded after WP2/WP4 decisions. | accepted, cutoff/tolerance pending | Configuration contract and static-interference processing test |
@@ -80,3 +82,9 @@ unchanged requirements, with the V1 Pd/Pfa gate clarification in [ADR 0010](../a
 and the separability and waveform updates in [ADR 0012](../adr/0012-adopt-50m-separability-and-narrowband-ddc-candidate.md),
 with current ADC/IF/DDC rates in [ADR 0013](../adr/0013-adopt-150msps-50mhz-if-and-direct-adc-stimulus.md)
 and revised G1 acceptance in [ADR 0014](../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md).
+
+<!-- markdownlint-disable MD013 -->
+
+ [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md) records the approved range-stage separation criteria, fixture definitions, and evidence boundary. Its estimated post-compression SNR reference does not replace the separate WP8 two-report obligation; unresolved numerical tolerances and study evidence remain pending for [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23).
+
+<!-- markdownlint-enable MD013 -->

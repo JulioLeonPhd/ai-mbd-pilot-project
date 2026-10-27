@@ -6,9 +6,9 @@ Product progress > AI infrastructure progress until v1.
 
 ## Now
 
-1. Keep issue #23 open while carrying the approved range-acceptance choices into the WP6b plan; physical one-bin association and the 3 dB power-valley criterion are approved, while numerical tolerances and RCS remain pending.
-2. In a future session only, prepare and execute the authorized bounded reference-only study described in the [WP6b range-acceptance plan](radar-matlab-v1.md#wp6b-range-acceptance-planning), then present proposed numerical tolerances for Julio's review.
-3. Do not execute the study in this session or begin production implementation; neither study results nor implementation authorization exist.
+1. Keep [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) open: approved acceptance definitions and fixture choices are recorded in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md), while final numerical tolerances, common RCS, and study evidence remain pending.
+2. In a future session only, prepare and execute the authorized bounded reference-only study in [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24), then present proposed tolerances for Julio's review and approval.
+3. Only after that review, record the resolution comment and align the requirement and status references before the acceptance decision can close. Study completion does not authorize production implementation or gate advancement.
 
 Completed context: the DDC PRI baseline merged in PR #17, and Julio accepted
 the redrawn architecture diagrams on 2026-10-26; neither result grants range

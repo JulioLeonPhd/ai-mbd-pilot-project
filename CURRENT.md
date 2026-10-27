@@ -22,17 +22,11 @@ Julio approved an explicit caller-supplied Boolean input-validity mask aligned w
 Julio approved per-stream Boolean masks in [#22](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/22#issuecomment-6425321892): input `[sample,4]` and output `[rangeBin,4]`, matching their complex sample arrays. Complete-window eligibility applies independently per stream.
 Julio confirmed the complete public API after the grilling interview; see the [#22 final resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/22#issuecomment-6425810353). Issue #22 is closed. The approved entry point is `radardemo.rangeCompression.processPri(inputSamples, inputValid, cfg)`, returning complex samples and metadata containing only `valid` and `rangeBinCentersM`.
 
-Julio approved the #23 acceptance choices on 2026-10-27; see the [WP6b range-acceptance plan](docs/plans/radar-matlab-v1.md#wp6b-range-acceptance-planning).
-One-bin peak association and a 3 dB power valley are approved; numerical correlation, coordinate, and complex gain/phase tolerances and the common RCS remain pending.
-Issue #23 remains open, aligned with the cross-component tolerance discussion in #13.
-The existing high-input-SNR requirement wording still needs traceable reconciliation with the approved at-least-30 dB estimated post-compression SNR reference.
+Julio approved the range-acceptance definitions now recorded in [ADR 0027](docs/adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md). The independent mandatory gates, fixed unweighted reference, four-stream/per-PRI contracts, one-bin peak association, 3 dB valley, approved fixture matrix, and estimated post-compression SNR reference are settled; final correlation, coordinate, and complex gain/phase tolerances, common RCS, and numerical-study evidence remain pending. The high-input-SNR wording is reconciled in [RAD-V1-006](docs/requirements/radar-matlab-v1.md#RAD-V1-006): report input SNR separately, while the range-fixture criterion is at least 30 dB estimated post-compression SNR for the weaker target in each evaluated stream. This is not by itself proof of the WP8 two-report obligation.
 
-Julio authorized a bounded reference-only numerical design study for a future session and explicitly prohibited running it in this session; it was not run.
-The next authorized step is that future-session study, followed by Julio's review of the proposed numerical tolerances.
-This is not production implementation authorization, production acceptance evidence, or gate advancement.
-The approved contracts in [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md) and [ADR 0026](docs/adr/0026-adopt-per-pri-range-compression-api.md) remain the baseline.
-Simulink Boolean ports, boundary conversion, scheduling, and downstream ambiguity choices remain outside this approval.
-Executable walkthrough and implementation/evidence work remain subject to the component workflow and separate authorization.
+The [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) decision remains open. The future-session study in [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) is its prerequisite, not blanket production authorization. No study, simulation, production implementation, or acceptance evidence was produced in this session. After the study, Julio must review and approve remaining tolerances, then record a resolution comment before the decision can close; study completion alone does not advance a gate.
+
+The approved contracts in [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md) and [ADR 0026](docs/adr/0026-adopt-per-pri-range-compression-api.md) remain the baseline. Simulink Boolean ports, boundary conversion, scheduling, and downstream ambiguity choices remain outside this approval. Executable walkthrough and implementation/evidence work remain subject to the component workflow and separate authorization.
 
 AI-infrastructure development remains frozen until radar v1 under [ADR 0023](docs/adr/0023-freeze-ai-infrastructure-until-v1.md).
 [ADR 0024](docs/adr/0024-require-plain-text-matlab-live-script-walkthroughs.md) requires executable R2025a+ plain-text `.m` walkthroughs; no repository-wide migration completion is recorded.
