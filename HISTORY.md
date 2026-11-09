@@ -161,3 +161,18 @@ The DDC evidence does not establish full-receiver or hardware performance, and t
 See [HISTORY.md](HISTORY.md) for archived status snapshots.
 <!-- END verbatim CURRENT.md snapshot -->
 <!-- markdownlint-enable MD025 -->
+
+## 2026-10-28 — Range-study active status update
+
+Routine within-milestone update; no new formal work package or gate assignment.
+The following outgoing active-status passages are preserved verbatim because the range-review focus changed after authorization of the study.
+
+Range-component boundary review is the active milestone within human-led development step 5, on `component/range-processor`.
+Julio authorized the status transition and range-processing brief review on 2026-10-26 after reporting PR #17 merged.
+WP6b is the roadmap mapping; no formal work-package or gate assignment is recorded, and range implementation remains unauthorized. Range design decisions #19–#22 are approved; #23 remains open for acceptance-criteria resolution.
+
+The following additional outgoing study-planning paragraphs are preserved verbatim before replacing them with the completed evidence status:
+
+Julio approved the range-acceptance definitions now recorded in [ADR 0027](docs/adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md). The independent mandatory gates, fixed unweighted reference, four-stream/per-PRI contracts, one-bin peak association, 3 dB valley, approved fixture matrix, and estimated post-compression SNR reference are settled; final correlation, coordinate, and complex gain/phase tolerances, common RCS, and numerical-study evidence remain pending. The high-input-SNR wording is reconciled in [RAD-V1-006](docs/requirements/radar-matlab-v1.md#RAD-V1-006): report input SNR separately, while the range-fixture criterion is at least 30 dB estimated post-compression SNR for the weaker target in each evaluated stream. This is not by itself proof of the WP8 two-report obligation.
+
+The [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) decision remains open. The future-session study in [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) is its prerequisite, not blanket production authorization. No study, simulation, production implementation, or acceptance evidence was produced in this session. After the study, Julio must review and approve remaining tolerances, then record a resolution comment before the decision can close; study completion alone does not advance a gate.

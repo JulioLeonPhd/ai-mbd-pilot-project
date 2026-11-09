@@ -9,9 +9,31 @@ accepted: 2026-10-27
 
 [ADR 0025](0025-adopt-range-compression-numerical-and-validity-contract.md) fixes the unweighted 500-sample reference, correlation and coordinate conventions, and complete-window validity semantics. [ADR 0026](0026-adopt-per-pri-range-compression-api.md) fixes the independent per-PRI public contract, including four complex elevation streams and per-stream masks. Those decisions do not by themselves define range-acceptance criteria.
 
-Julio approved the criteria and fixture choices below on 2026-10-27. They define the bounded reference study requested by [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24), a prerequisite to [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23). This ADR records settled definitions only; the final numerical tolerance values and study evidence remain pending.
+Julio approved the criteria and fixture choices below on 2026-10-27. They define the bounded reference study requested by [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24), a prerequisite to [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23). This ADR records settled definitions; the completed study observations are linked below, while final numerical tolerance values and approval of derived study values remain pending.
 
 ## Decision
+
+### Human-approved fixture conventions (2026-10-28)
+
+Julio approved the following fixture-only conventions in the [range-study approval record](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6474237580); they supplement, and do not revise, the physical acceptance criteria approved on 2026-10-27.
+
+Use one receiver-input-equivalent watt reference, $P_r$, per effective elevation row; apply the 6 dB lumped signal-path loss once.
+
+For Boltzmann's constant $k_B$ in joules per kelvin, noise figure $4$ dB, reference temperature $290$ K, and bandwidth $B=10$ MHz, define the one-sided noise power spectral density $N_0$ and total real-noise variance $N$ as
+
+$$
+N_0 = k_B(290\,\mathrm{K})10^{4/10}, \qquad N = N_0 B.
+$$
+
+The real ADC-rate noise has two-sided power spectral density $N_0/2$ in each of the positive 45–55 MHz band and its negative-frequency mirror; together they give total variance $N$, not $2N$.
+
+For a fixed ADC-count scale $g=32/\sqrt{N}$ counts per $\sqrt{\mathrm{W}}$, map a real signal of mean physical power $P_r$ to amplitude $g\sqrt{2P_r}$ counts.
+
+Use an ideal signed 16-bit uniform quantizer with one-count steps, round-to-nearest with ties away from zero, and no dither; its representable codes are $[-32768,32767]$.
+
+Hold $g$ fixed across cases, streams, and paths; any evaluated clipping or saturation fails the fixture and must not trigger retuning.
+
+These conventions define a simulation fixture, not ADC volts, impedance, hardware calibration, ENOB, or jitter; keep DDC compensation as already accepted and do not repeat its existing final factor-of-two envelope correction.
 
 ### Independent acceptance gates
 
@@ -25,7 +47,7 @@ Treat range calibration, complex gain/phase fidelity, two-target separation, and
 
 Evaluate both the ideal-reference and sampled-DDC paths, with all four elevation streams, near the midpoint of the configured detection interval. Keep both complete echo windows valid and away from blanking, startup, and end truncation. Use equal-RCS targets with shared nonzero radial velocity, preserving physical range-dependent received amplitude and exactly 50 m physical stimulus separation. Do not independently snap the farther target to a range bin.
 
-For each path, cross nearer-target fractional-bin offsets of 0, 1/4, 1/2, and 3/4 with relative range-input echo phases of 0, 90, 180, and 270 degrees: 16 combinations per path. Use shared 20 m/s radial velocity for range-compressor fixtures. Document velocity sign, phase epoch, and fractional-delay conventions in the study; exact phase-epoch implementation remains to be established before execution. A denser phase sweep is deferred to V1 integration verification and is not implied by these cases.
+For each path, cross nearer-target fractional-bin offsets of 0, 1/4, 1/2, and 3/4 with relative range-input echo phases of 0, 90, 180, and 270 degrees: 16 combinations per path. Use shared 20 m/s radial velocity for range-compressor fixtures. Use a common range-input epoch for the relative phases and document velocity sign and fractional-delay conventions in the study. A denser phase sweep is deferred to V1 integration verification and is not implied by these cases.
 
 Each target must produce a distinct magnitude local maximum within one output range bin (approximately 12 m) of its true range. The selected peaks and intervening valley must be valid, with the valley at least 3 dB in power below the smaller peak. The physical stimulus spacing is exactly 50 m; measured peak spacing need not be exactly 50 m. Invalid zeros do not count as valley evidence. Use three fixed, documented noise seeds; every required case must pass, with no case replacement or retry/reseeding until pass. This sparse seed set is not a probability-of-detection claim or exhaustive statistical evidence.
 
@@ -38,6 +60,8 @@ Use at least 30 dB **estimated post-compression SNR** for the weaker target in e
 Assume stationary receiver noise and estimate output-noise power from one fixed-seed noise-only record per path, using the mean over a declared stationary, complete-window-valid interior region. Reuse that estimate across cases only while chain and noise settings are unchanged. This simplified estimate has no statistical lower-bound guarantee. The noise-only record seed is distinct in purpose from the three separation seeds. No covariance model, large per-bin ensemble, confidence-bound calculation, or separate numerical ensemble is an acceptance requirement.
 
 For the sampled path, represent receiver noise as seeded zero-mean real Gaussian noise in the ADC-rate stimulus, bandlimited to 45–55 MHz and its negative-frequency mirror, before quantization and DDC. Preserve downstream noise shaping; baseband noise need not be white. Use one physical-power-to-ADC-counts scale across the matrix, with no clipping in evaluated realizations, and report quantization effects and headroom. This is a fixture assumption, not a calibrated full analog receiver or hardware calibration. The scale, quantizer conventions, and exact seeds remain to be documented before execution.
+
+The 2026-10-28 approval above supersedes the preceding sentence's open scale and quantizer conventions; exact seeds were also frozen before execution and are recorded in the linked study evidence.
 
 Derive one common RCS for both targets and all cases, streams, and paths from explicit radar-equation assumptions to meet the weaker-target SNR reference at the farthest tested placement and verify the least favorable processing response. The illustrative assumptions are 10 kW peak power, 23 dBi transmit and receive gain, 6 dB loss, 4 dB noise figure, and 290 K, together with the configured carrier and waveform and an explicit noise reference. The 23 dBi receive gain is the effective gain of one beamformed elevation-row aperture, with azimuth-array receive gain included. Do not add another 16-element gain, combine four rows for an SNR bonus, add slow-time gain, or double-count range-compression gain. These are simulation assumptions, not hardware claims; surface missing or inconsistent assumptions rather than inventing them or independently normalizing targets, streams, cases, or paths.
 
@@ -57,4 +81,9 @@ Independent gates prevent a successful separation plot from concealing coordinat
 
 The authorized next step is the future-session reference-only numerical study in [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24). It may calculate independent reference evidence and propose numerical budgets for Julio's review; it is not a draft public API, production implementation, production acceptance, or final component walkthrough. Any missing fixture conventions must be explicit before execution, and fixed physical criteria must not be tuned to make cases pass. The eventual component walkthrough must call the actual public per-PRI API.
 
-[Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) remains open for the study, Julio's review and approval of remaining tolerances, and a resolution comment. Study completion alone does not resolve that decision, authorize production implementation, or advance a gate. No study result or empirical pass claim is established by this ADR.
+[Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) remains open for Julio's review and approval of remaining decisions and a final resolution comment. Study completion alone does not resolve that decision, authorize production implementation, or advance a gate; the linked evidence, not this decision record, establishes the observed numerical results.
+The future-session wording above describes the authorization before execution; the study has now run, as recorded below.
+
+The authorized study subsequently ran under Julio's approval; its [evidence report](../research/range-acceptance-evidence.md) and [machine-readable results](../../evidence/range_acceptance_results.json) record the observations and limits.
+Independent numerical revalidation completed with no unresolved implementation or evidence errors in its assigned scope; validation does not approve proposed numerical budgets, revise accepted definitions, or imply human tolerance/RCS approval.
+The next authorized action is Julio's step-5 review; [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) remain open, with no resolution comment, issue closure, production authorization, or gate advancement recorded.

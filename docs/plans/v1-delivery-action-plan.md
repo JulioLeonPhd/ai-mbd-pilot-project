@@ -6,9 +6,9 @@ Product progress > AI infrastructure progress until v1.
 
 ## Now
 
-1. Keep [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) open: approved acceptance definitions and fixture choices are recorded in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md), while final numerical tolerances, common RCS, and study evidence remain pending.
-2. In a future session only, prepare and execute the authorized bounded reference-only study in [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24), then present proposed tolerances for Julio's review and approval.
-3. Only after that review, record the resolution comment and align the requirement and status references before the acceptance decision can close. Study completion does not authorize production implementation or gate advancement.
+1. Keep [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) open: accepted definitions and fixture choices remain recorded in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md), while numerical budgets await Julio's step-5 review.
+2. Review the completed authorized reference-only study in [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24); its [report](../research/range-acceptance-evidence.md) records results, limits, and completed independent numerical validation without human acceptance.
+3. Only after Julio's review and approval of remaining decisions, record a resolution comment and align requirement/status references before the acceptance decision can close; study completion does not authorize production implementation or gate advancement.
 
 Completed context: the DDC PRI baseline merged in PR #17, and Julio accepted
 the redrawn architecture diagrams on 2026-10-26; neither result grants range

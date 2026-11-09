@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - OMP-native project definitions for all nine specialists, preserving Codex TOMLs and role instructions.
+- Added the executable range-acceptance study, reproducible results, and evidence report; independent numerical validation is complete within its recorded scope, with Julio's step-5 review pending.
 
 ### Changed
 

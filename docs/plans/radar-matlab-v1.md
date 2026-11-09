@@ -74,17 +74,16 @@ The correlation, coordinate, validity, and public API contracts in ADRs 0025 and
 | Fixture matrix | Ideal-reference and sampled-DDC paths, all four streams, equal RCS and physical range-dependent amplitudes near the configured detection-interval midpoint; four fractional-bin offsets crossed with four relative phases and three fixed separation-noise seeds, with shared 20 m/s radial velocity. |
 | SNR and noise | At least 30 dB estimated post-compression SNR for the weaker target in every evaluated stream, with input SNR reported separately; one stationary noise-only record per path estimates mean noise power over a valid interior region without a statistical lower-bound guarantee. |
 | Physical assumptions | Derive one common RCS from the explicit illustrative radar-equation budget, with 23 dBi receive gain already including the evaluated row's azimuth beamforming; use the approved ADC-band noise and one documented counts scale without clipping in evaluated realizations. |
-| Numerical evidence | Compare reference FFT results against independent direct correlation without shared production FFT or lag-alignment helpers; report sampled power FWHM as a diagnostic, not another gate. Final numerical tolerances, common RCS, and explicit remaining fixture conventions await evidence and approval. |
+| Numerical evidence | The completed reference-only results are in [the study report](../research/range-acceptance-evidence.md) and [JSON evidence](../../evidence/range_acceptance_results.json); numerical budgets remain proposals pending Julio's step-5 review. |
 
 RAD-V1-006 now references the approved range-stage SNR condition in ADR 0027 rather than requiring an unspecified high input SNR.
 Its two-report obligation remains with WP8; range-stage peaks or estimated SNR alone do not establish end-to-end detection acceptance.
 
-The next authorized step is [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24), a bounded reference-only MATLAB study in a future session.
-No study, simulation, acceptance suite, or production implementation is to run in the current planning session, and no study result is established here.
-The study may evaluate the approved fixtures and fixed criteria, derive RCS, report SNR and ADC headroom/quantization, measure localization, valley and FWHM, and propose justified numerical tolerances without retuning failed cases.
-Missing fixture conventions must be explicit before execution, and the applicable AWGN skill's explicit-power conventions must not let instantaneous signal power retune receiver noise by case.
-
-Study completion does not close [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23): Julio must approve the remaining decisions, followed by a resolution comment and aligned records before closure.
+The authorized reference-only study in [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) has run under Julio's approval; see the linked evidence report and machine-readable results.
+The run reports 192/192 passing stream evaluations on each path, and independent numerical revalidation completed with no unresolved implementation or evidence errors in its assigned scope.
+Its common RCS and numerical budgets are study results or unapproved proposals, not accepted hardware or tolerance thresholds; no physical criteria were changed to make cases pass.
+The next authorized action is Julio's step-5 review of the results and proposed budgets; no formal WP or gate assignment is recorded.
+Issues [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) remain open because this task stops before that review and decision.
 The study is not a draft public API, production implementation, production acceptance evidence, final component walkthrough, or gate advancement.
 The eventual executable component walkthrough must call the actual public API; scenarios and explanatory material may be reused, but a second processing implementation must not stand in for the component.
 <!-- markdownlint-enable MD013 -->
