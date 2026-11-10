@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - OMP-native project definitions for all nine specialists, preserving Codex TOMLs and role instructions.
-- Added the executable range-acceptance study, reproducible results, and evidence report; independent numerical validation is complete within its recorded scope, with Julio's step-5 review pending.
+- Added the executable range-acceptance study, reproducible results, and evidence report; independent numerical validation is complete within its recorded scope. The later fixture-scoped budget approval is recorded separately; durable candidate replay and final step-5/evidence disposition remain open.
+- Recorded Julio's fixture-scoped numerical budget approval for the 200 m², 20 km range candidate and updated current-facing status and evidence boundaries; durable replay and final step-5/evidence disposition remain open.
 
 ### Changed
 

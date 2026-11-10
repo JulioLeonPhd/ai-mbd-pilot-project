@@ -74,18 +74,17 @@ The correlation, coordinate, validity, and public API contracts in ADRs 0025 and
 | Fixture matrix | Ideal-reference and sampled-DDC paths, all four streams, equal RCS and physical range-dependent amplitudes near the configured detection-interval midpoint; four fractional-bin offsets crossed with four relative phases and three fixed separation-noise seeds, with shared 20 m/s radial velocity. |
 | SNR and noise | At least 30 dB estimated post-compression SNR for the weaker target in every evaluated stream, with input SNR reported separately; one stationary noise-only record per path estimates mean noise power over a valid interior region without a statistical lower-bound guarantee. |
 | Physical assumptions | Derive one common RCS from the explicit illustrative radar-equation budget, with 23 dBi receive gain already including the evaluated row's azimuth beamforming; use the approved ADC-band noise and one documented counts scale without clipping in evaluated realizations. |
-| Numerical evidence | The completed reference-only results are in [the study report](../research/range-acceptance-evidence.md) and [JSON evidence](../../evidence/range_acceptance_results.json); numerical budgets remain proposals pending Julio's step-5 review. |
+| Numerical evidence | Original reference-only results are in [the study report](../research/range-acceptance-evidence.md) and [JSON evidence](../../evidence/range_acceptance_results.json); Julio's 2026-11-09 fixture-scoped numerical budget approval for the separate 200 m², 20 km candidate is recorded in ADR 0027. |
 
 RAD-V1-006 now references the approved range-stage SNR condition in ADR 0027 rather than requiring an unspecified high input SNR.
 Its two-report obligation remains with WP8; range-stage peaks or estimated SNR alone do not establish end-to-end detection acceptance.
 
-The authorized reference-only study in [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) has run under Julio's approval; see the linked evidence report and machine-readable results.
-The run reports 192/192 passing stream evaluations on each path, and independent numerical revalidation completed with no unresolved implementation or evidence errors in its assigned scope.
-Its common RCS and numerical budgets are study results or unapproved proposals, not accepted hardware or tolerance thresholds; no physical criteria were changed to make cases pass.
-The next authorized action is Julio's step-5 review of the results and proposed budgets; no formal WP or gate assignment is recorded.
-Issues [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) remain open because this task stops before that review and decision.
-The study is not a draft public API, production implementation, production acceptance evidence, final component walkthrough, or gate advancement.
-The eventual executable component walkthrough must call the actual public API; scenarios and explanatory material may be reused, but a second processing implementation must not stand in for the component.
+The original authorized reference-only study and its independent numerical review are complete within their recorded scopes.
+The 2026-11-09 candidate run reports 192/192 passing stream evaluations on each path; Julio approved its fixture-scoped numerical budgets, not universal error bounds or hardware acceptance.
+The historical common RCS and historical report/JSON labels remain unchanged and are not retroactively approved.
+The next actions are a durable candidate replay artifact and final step-5/evidence issue disposition; issues [#23](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [#24](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) remain open.
+Only after that disposition may implementation authorization be considered separately; no formal work-package or gate assignment, issue closure, or gate advancement is recorded.
+The candidate is fixture feasibility evidence, not full configured-range proof, hardware validation, WP8 acceptance, production evidence, or a production API. The eventual walkthrough must call the actual public API.
 <!-- markdownlint-enable MD013 -->
 
 WP7 may use synthetic resolved candidates, while WP6f may use synthetic

@@ -108,8 +108,7 @@ Short inputs, all-false masks, and internal gaps are ordinary data conditions, n
 
 These decisions fix the numerical reference, lag convention, coordinate mapping, delay ownership, and validity semantics only.
 The per-PRI public API is specified in [ADR 0026](0026-adopt-per-pri-range-compression-api.md); approved separation and fixture choices are recorded in [ADR 0027](0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md).
-Final numerical tolerances and numerical-study evidence remain pending for [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23).
-The accepted decisions do not authorize production implementation, establish acceptance or performance results, or make hardware claims.
+Final numerical budgets for the selected fixture are recorded as approved by Julio in [ADR 0027](0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md#width-numerical-budgets-and-evidence-ownership). They are fixture-scoped engineering criteria, not proved universal bounds; they do not authorize production implementation, establish hardware acceptance, resolve issues, or advance a gate.
 
 ## Rationale
 
@@ -121,4 +120,4 @@ An explicit per-stream mask preserves the distinction between a valid zero and a
 
 Implementations must keep the full linear-correlation lag convention and return only the fixed nonnegative public lag grid defined by the API decision.
 Callers must provide the correctly delay-adjusted range origin and validity mask.
-No weighted waveform, ambiguity-unfolding behavior, missing-sample recovery, acceptance tolerance, or implementation authorization follows from this ADR.
+No weighted waveform, ambiguity-unfolding behavior, or missing-sample recovery follows from this ADR. Fixture-scoped numerical budgets are separately recorded in ADR 0027; neither ADR authorizes production implementation.

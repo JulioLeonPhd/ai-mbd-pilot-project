@@ -85,6 +85,6 @@ and revised G1 acceptance in [ADR 0014](../adr/0014-adopt-revised-v1-analytic-si
 
 <!-- markdownlint-disable MD013 -->
 
- [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md) records the approved range-stage separation criteria, fixture definitions, and evidence boundary. Its estimated post-compression SNR reference does not replace the separate WP8 two-report obligation. The [reference-only study evidence](../research/range-acceptance-evidence.md) and independent numerical validation are complete within their recorded scope; human review and approval of remaining numerical decisions are pending for [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23).
+ [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md) records the approved range-stage separation criteria, fixture definitions, and evidence boundary. Julio's 2026-11-09 numerical budget approval applies only to the 200 m² point-target candidate at the 20 km midpoint; the study report retains historical observations and labels. Durable replay and final step-5/evidence issue disposition remain before any separate implementation authorization. The estimated post-compression SNR reference does not replace WP8's two-report obligation.
 
 <!-- markdownlint-enable MD013 -->

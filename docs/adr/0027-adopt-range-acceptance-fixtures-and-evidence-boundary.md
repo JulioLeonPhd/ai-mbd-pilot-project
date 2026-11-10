@@ -9,7 +9,7 @@ accepted: 2026-10-27
 
 [ADR 0025](0025-adopt-range-compression-numerical-and-validity-contract.md) fixes the unweighted 500-sample reference, correlation and coordinate conventions, and complete-window validity semantics. [ADR 0026](0026-adopt-per-pri-range-compression-api.md) fixes the independent per-PRI public contract, including four complex elevation streams and per-stream masks. Those decisions do not by themselves define range-acceptance criteria.
 
-Julio approved the criteria and fixture choices below on 2026-10-27. They define the bounded reference study requested by [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24), a prerequisite to [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23). This ADR records settled definitions; the completed study observations are linked below, while final numerical tolerance values and approval of derived study values remain pending.
+Julio approved the criteria and fixture choices below on 2026-10-27. They define the bounded reference study requested by [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24), a prerequisite to [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23). This ADR records those settled definitions and the completed study observations. The original study's numerical proposals and derived common RCS retain their historical status; the separate fixture-scoped numerical budget approval for the 200 m², 20 km candidate is recorded below.
 
 ## Decision
 
@@ -69,7 +69,36 @@ Derive one common RCS for both targets and all cases, streams, and paths from ex
 
 Distinguish nominal bandwidth-derived range-resolution scale from measured mainlobe width and separability. Isolated compressed-response power FWHM is the distance between half-peak-power crossings, approximately −3 dB, with linear interpolation between sampled crossings; report it as a sampled-response diagnostic only, not an additional pass gate.
 
-The one-bin peak association and 3 dB valley are accepted physical criteria. Numerical budgets for FFT/direct floating-point comparison, coordinate arithmetic, physical peak localization, and complex response remain to be justified and approved. In particular, correlation, coordinate, and complex gain/phase tolerances are not established here; do not borrow an unrelated DDC tolerance or substitute an arbitrary shared epsilon.
+On 2026-11-09, Julio approved the following numerical budgets solely as fixture-scoped engineering criteria for the 200 m² ideal point-target candidate at the 20 km midpoint. This approval is not a proof of universal floating-point bounds, hardware acceptance, production authorization, issue closure, or gate advancement. The existing physical gates—including one-bin peak association, a valid valley at least 3 dB below the smaller peak, and at least 30 dB estimated post-compression SNR—are unchanged. Exact masks, dimensions, and invalid-zero behavior remain discrete contract assertions; physical Doppler, off-grid placement, and sampled-DDC gain/phase effects are diagnostics, not floating-point errors.
+
+For binary64 calculations, let $u=\mathrm{eps}(\mathrm{double})/2$, $M=500$, and let $L$ be the FFT length. Define
+
+$$
+\gamma(n)=\frac{nu}{1-nu},\qquad
+q[k]=\frac{1}{M}\sum_{m=0}^{M-1}|x[k+m]||s[m]|,\qquad
+F=\frac{\lVert x\rVert_2}{\sqrt{M}},
+\qquad
+b[k]=\gamma(8M)q[k]+128u(\log_2L+1)F.
+$$
+
+Here $x$ is the input record and $s$ is the fixed unweighted reference. For every valid lag, the FFT/direct complex correlation comparison passes when $|y[k]-d[k]|\le b[k]$, where $y$ is the FFT result and $d$ is an independently computed direct correlation.
+For phase comparison, include only values satisfying $|d[k]|\ge\sqrt{u}F$ and $|d[k]|\gt b[k]$; the allowed wrapped phase error is $\operatorname{atan2}(b[k],|d[k]|-b[k])$. Near nulls remain governed by the absolute complex-error gate, not an unstable phase comparison.
+
+For independent aligned known-amplitude calibration, require the exact integer peak lag and $|y[d]-a|\le b[d]$ for the known echo $x[d+m]=a\,s[m]$. No additional arbitrary scalar gain or phase epsilon is authorized.
+For coordinates, require
+
+$$
+\left|(R_0+k\Delta R)-\frac{c(k-D)}{2F_s}\right|
+\le 32u\left(|R_0|+|k\Delta R|+\Delta R\right).
+$$
+
+Here $R_0$ remains caller supplied, $\Delta R=c/(2F_s)$, and $D$ is the study's output-sample coordinate delay: ideal origin $R_0=0,D=0$, or sampled origin $R_0=-D\Delta R,D=31$. These fixture origins do not impose a universal DDC origin on the generic API.
+
+The candidate evidence records maximum absolute complex residuals of $7.1408661178799732\times10^{-14}$ counts (ideal) and $5.7285786768791163\times10^{-14}$ counts (sampled), maximum coordinate residual $1.4551915228366852\times10^{-11}$ m, and maximum guarded phase residuals of $7.2168355526165674\times10^{-13}$ rad (ideal) and $4.0357825468636982\times10^{-10}$ rad (sampled). Maximum candidate combined noisy localization error was 6.96056702 m on both paths; maximum isolated localization error was 5.99584916 m on both paths. These observations are not universal guarantees or replacements for the fixed physical gates.
+
+As a separate root-side JS binary64 check, 7,353 coordinates per path had maximum residual/budget ratios 0.062455592152661873 (ideal) and 0.06176666066598693 (sampled), with zero violations. This was not a MATLAB rerun or stored pointwise MATLAB proof. The candidate runner remains a scratch artifact; durable replay evidence is still outstanding.
+
+Earlier reports and historical JSON retain the values and labels recorded when produced. This later approval does not rewrite those snapshots, retroactively approve the historical derived 48,639.35 m² RCS, or broaden approval beyond the selected fixture.
 
 The 30 dB estimated post-compression reference applies to range-stage fixtures and does not by itself prove two detection reports. The existing two-report requirement remains an end-to-end WP8 obligation, separate from WP6b range-stage peak evidence; Doppler, timing, reporting, and detection demands are unchanged.
 
@@ -79,11 +108,7 @@ Independent gates prevent a successful separation plot from concealing coordinat
 
 ## Consequences
 
-The authorized next step is the future-session reference-only numerical study in [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24). It may calculate independent reference evidence and propose numerical budgets for Julio's review; it is not a draft public API, production implementation, production acceptance, or final component walkthrough. Any missing fixture conventions must be explicit before execution, and fixed physical criteria must not be tuned to make cases pass. The eventual component walkthrough must call the actual public per-PRI API.
+The reference-only study and bounded independent numerical review are complete within their recorded scopes. Julio's 2026-11-09 approval of the fixture-scoped budgets above resolves that numerical-budget review only; it does not authorize production implementation or establish broader acceptance.
 
-[Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) remains open for Julio's review and approval of remaining decisions and a final resolution comment. Study completion alone does not resolve that decision, authorize production implementation, or advance a gate; the linked evidence, not this decision record, establishes the observed numerical results.
-The future-session wording above describes the authorization before execution; the study has now run, as recorded below.
-
-The authorized study subsequently ran under Julio's approval; its [evidence report](../research/range-acceptance-evidence.md) and [machine-readable results](../../evidence/range_acceptance_results.json) record the observations and limits.
-Independent numerical revalidation completed with no unresolved implementation or evidence errors in its assigned scope; validation does not approve proposed numerical budgets, revise accepted definitions, or imply human tolerance/RCS approval.
-The next authorized action is Julio's step-5 review; [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) remain open, with no resolution comment, issue closure, production authorization, or gate advancement recorded.
+The next actions are to create a durable candidate replay artifact and complete the final step-5/evidence issue disposition, including any remaining decision and resolution record. Issues [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) remain open. Only after that disposition may implementation authorization be considered separately; no issue closure, production authorization, or gate advancement is recorded here.
+The scratch candidate runner is not a committed replay artifact. The eventual component walkthrough must call the actual public per-PRI API.

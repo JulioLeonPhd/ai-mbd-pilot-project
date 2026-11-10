@@ -2,13 +2,13 @@
 
 ## Question and decision boundary
 
-This reference-only study asks whether the Julio-approved two-target fixture can resolve two 50 m-separated echoes under the fixed ideal-reference and sampled-DDC paths, and what floating-point comparison and coordinate residuals were observed.
+This report describes the reference-only numerical study for the original two-target fixture and its measured observations. Its historical proposed budgets are not universal error bounds; Julio later approved fixture-scoped engineering budgets for the separate 200 m² point-target candidate, recorded in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md#width-numerical-budgets-and-evidence-ownership).
 
-It provides evidence and tolerance proposals for Julio's step-5 review; it does not approve tolerances, define a production API, constitute WP8 acceptance, or advance a gate.
+Neither the original study nor the later approval authorizes production implementation, hardware acceptance, issue closure, or gate advancement.
 
-Julio approved the fixture assumptions in the [issue 24 approval record](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6474237580).
+Julio approved the original fixture assumptions in the [issue 24 approval record](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6474237580).
 
-The approved criteria and evidence boundary remain in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md); both [Define range acceptance criteria (#23)](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [Establish numerical evidence for range acceptance (#24)](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) remain open pending the authorized human review.
+[Define range acceptance criteria (#23)](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [Establish numerical evidence for range acceptance (#24)](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) remain open pending durable candidate replay and final step-5/evidence issue disposition.
 
 ## Reproduce the reference study
 
@@ -189,27 +189,9 @@ Here $D$ is the output-sample coordinate delay: $D=0$ for the ideal path and $D=
 
 The guarded phase comparison reported a maximum residual of $4.5417009\times10^{-13}$ rad for ideal and $4.0481639\times10^{-10}$ rad for sampled DDC, after excluding unguarded near-null values.
 
-The study's proposed correlation budget is
+The study's numerical proposals and observations above belong to that historical run and retain their recorded values and labels; the later approval does not rewrite the original report or historical JSON.
 
-$$
- b[k]=\gamma(8M)q[k]+128u(\log_2L+1)F,\qquad
- q[k]=\frac{1}{M}\sum_{m=0}^{M-1} |x[k+m]||s[m]|,\qquad
- F=\frac{\lVert x\rVert_2}{\sqrt{M}},
-$$
-
-where $u=\mathrm{eps}(\mathrm{double})/2$, $\gamma(n)=nu/(1-nu)$, $M=500$, and $L$ is the FFT length; this is an engineering proposal, not a proved MATLAB FFT error bound.
-
-The associated phase guard requires $|d[k]|\ge\sqrt{u}F$ and $|d[k]|\gt b[k]$, with proposed phase budget $\operatorname{atan2}(b[k],|d[k]|-b[k])$; phase is excluded near nulls rather than assigning them an unstable angle comparison.
-
-The coordinate arithmetic proposal is $32u(|R_0|+|k\Delta R|+\Delta R)$ metres; it is also unapproved.
-
-These floating-point residuals are not the physical peak-localization error, the off-grid/Doppler mismatch, or the isolated complex-response ratio above.
-
-The report records all 2,004 calibration valid-lag assertions (501 per stream across four streams), aligned complex recovery at delays 0, 37, 243, and 500, and validity, startup, blanking, internal-gap, suffix, valid-zero, short-input, and plateau/valley self-checks.
-
-Exact mask, output dimensions, invalid-zero behavior, and validity are discrete contract assertions; they do not use a numerical epsilon.
-
-The proposals remain unapproved and no unrelated DDC epsilon is borrowed; see [Set unresolved numerical acceptance tolerances and their evidence (#13)](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/13).
+The approved fixture-scoped budgets, candidate-specific observations, and their limitations are recorded in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md#width-numerical-budgets-and-evidence-ownership). The separately performed root-side coordinate check is described there as JS binary64 evidence, not as a MATLAB rerun or stored pointwise MATLAB proof.
 
 ## Evidence and limitations
 
@@ -220,7 +202,7 @@ MATLAB Code Analyzer recorded `code_issues=[]`, and the root's completed rerun w
 Independent numerical revalidation by `matlab-validator-deep` completed on 2026-10-28 with no unresolved implementation or evidence errors in its assigned scope; current runner and JSON bytes matched the recorded hashes.
 The reviewer independently reconstructed `sampled_g1_seed1` stream 0 using physical echoes, fixed-seed noise, quantization, the public DDC, and manual time-domain correlation at all 6,229 valid lags, and reconstructed `sampled_g6` isolated responses as a quarter-bin/nonzero-phase check.
 The repaired isolated FWHM and half-open physical supports, actual range-input powers and frozen noise-only denominator, all 2,004 aligned calibration comparisons, exact peak lags, and physical complex-response diagnostics were corroborated.
-The complete 96-cell/384-stream audit is field-level evidence, not independent waveform reconstruction of every realization; neither it nor the bounded reconstruction approves tolerances, RCS, production use, or WP8 acceptance.
+The complete 96-cell/384-stream audit is field-level evidence, not independent waveform reconstruction of every realization; neither it nor the bounded reconstruction by itself approves tolerances, RCS, production use, or WP8 acceptance. Julio's later, separately scoped numerical-budget approval is recorded in ADR 0027.
 
 Graphify orientation found no MATLAB source node because MATLAB extraction is unavailable; repository documentation orientation and supplied exact artifact scopes were used, with no graph infrastructure changes.
 
