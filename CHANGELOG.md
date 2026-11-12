@@ -13,8 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - OMP-native project definitions for all nine specialists, preserving Codex TOMLs and role instructions.
-- Added the executable range-acceptance study, reproducible results, and evidence report; independent numerical validation is complete within its recorded scope. The later fixture-scoped budget approval is recorded separately; durable candidate replay and final step-5/evidence disposition remain open.
-- Recorded Julio's fixture-scoped numerical budget approval for the 200 m², 20 km range candidate and updated current-facing status and evidence boundaries; durable replay and final step-5/evidence disposition remain open.
+- Archived the exact candidate range-study runner and recorded the 2026-11-10 full replay: 384/384 evaluations passed, recursive comparison differed from the golden JSON only at `report_path`, and Code Analyzer reported no issues. The generated replay JSON duplicate was removed after comparison and is not tracked.
+- Recorded root's 2026-11-10 final resolutions and closure of issues #24 and #23 after the exact candidate replay and bounded independent reviews. The 200 m² point target at 20 km remains fixture-scoped evidence, not production authorization or gate advancement.
 
 ### Changed
 

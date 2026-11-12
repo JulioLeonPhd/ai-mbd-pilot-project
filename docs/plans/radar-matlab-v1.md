@@ -64,27 +64,25 @@ G2 contracts, allowing independent work.
 
 ### WP6b range-acceptance planning
 
-[ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md) records the accepted criteria, fixture definitions, rationale, and remaining decisions for [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23).
+[ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md) records the accepted criteria, fixture definitions, rationale, and final resolutions for [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23).
 The correlation, coordinate, validity, and public API contracts in ADRs 0025 and 0026 remain unchanged.
 
 | Area | Planning summary; ADR 0027 holds the detailed decision |
 | --- | --- |
 | Mandatory gates | Range calibration, complex gain/phase fidelity, 50 m two-target separation, and complete-window validity are independent passes. |
 | Separation | Distinct valid peaks within one output bin of each true range, with a valid valley at least 3 dB in power below the smaller peak; no threshold relaxation or weighting after a failed required case. |
-| Fixture matrix | Ideal-reference and sampled-DDC paths, all four streams, equal RCS and physical range-dependent amplitudes near the configured detection-interval midpoint; four fractional-bin offsets crossed with four relative phases and three fixed separation-noise seeds, with shared 20 m/s radial velocity. |
-| SNR and noise | At least 30 dB estimated post-compression SNR for the weaker target in every evaluated stream, with input SNR reported separately; one stationary noise-only record per path estimates mean noise power over a valid interior region without a statistical lower-bound guarantee. |
-| Physical assumptions | Derive one common RCS from the explicit illustrative radar-equation budget, with 23 dBi receive gain already including the evaluated row's azimuth beamforming; use the approved ADC-band noise and one documented counts scale without clipping in evaluated realizations. |
-| Numerical evidence | Original reference-only results are in [the study report](../research/range-acceptance-evidence.md) and [JSON evidence](../../evidence/range_acceptance_results.json); Julio's 2026-11-09 fixture-scoped numerical budget approval for the separate 200 m², 20 km candidate is recorded in ADR 0027. |
+| Fixture matrix | Historical reference matrix: ideal-reference and sampled-DDC paths, all four streams, equal RCS and physical range-dependent amplitudes near configured detection-interval midpoint; four fractional-bin offsets crossed with four relative phases and three fixed separation-noise seeds. For the current bounded decision only, Julio selected an ideal point target with actual echo RCS 200 m² at the 20 km midpoint; its replayed candidate covers the ideal and sampled paths, four streams, 16 geometries and three separation seeds. |
+| SNR and noise | At least 30 dB estimated post-compression SNR for the weaker target in every evaluated stream, with input SNR reported separately; the stationary noise-only estimate and sparse seeds provide no statistical lower-bound guarantee. |
+| Physical assumptions | Historical radar-equation derivation remains a record, not a selected or retroactively approved RCS. The current candidate uses the approved actual echo RCS and midpoint; the physical gates are unchanged. |
+| Numerical evidence | Historical reference-only results are in [the study report](../research/range-acceptance-evidence.md) and [JSON evidence](../../evidence/range_acceptance_results.json). The 200 m², 20 km candidate, its exact runner snapshot, and replay are recorded in [the candidate replay evidence](../research/range-acceptance-evidence.md#durable-candidate-replay); Julio's fixture-scoped numerical-budget approval is in ADR 0027. |
 
 RAD-V1-006 now references the approved range-stage SNR condition in ADR 0027 rather than requiring an unspecified high input SNR.
 Its two-report obligation remains with WP8; range-stage peaks or estimated SNR alone do not establish end-to-end detection acceptance.
 
-The original authorized reference-only study and its independent numerical review are complete within their recorded scopes.
-The 2026-11-09 candidate run reports 192/192 passing stream evaluations on each path; Julio approved its fixture-scoped numerical budgets, not universal error bounds or hardware acceptance.
-The historical common RCS and historical report/JSON labels remain unchanged and are not retroactively approved.
-The next actions are a durable candidate replay artifact and final step-5/evidence issue disposition; issues [#23](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [#24](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) remain open.
-Only after that disposition may implementation authorization be considered separately; no formal work-package or gate assignment, issue closure, or gate advancement is recorded.
-The candidate is fixture feasibility evidence, not full configured-range proof, hardware validation, WP8 acceptance, production evidence, or a production API. The eventual walkthrough must call the actual public API.
+The original authorized reference-only study and its independent numerical review are complete within their recorded scopes. The exact archived 200 m², 20 km candidate runner was replayed by root on 2026-11-10 in MATLAB R2026a Update 5; all 384/384 stream evaluations passed, the recursive golden comparison differed only at `report_path`, and Code Analyzer reported no issues.
+The historical common RCS and historical report/JSON labels remain unchanged and are not retroactively approved. The candidate replaces the configured-interval midpoint / derived-RCS fixture only for this bounded current decision.
+On 2026-11-10, root closed [#24](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6762277382) and [#23](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23#issuecomment-6762278228) after the exact candidate replay and bounded independent reviews. These close the planning/evidence disposition only. The candidate remains limited to its synthetic 200 m² point-target fixture at the 20 km midpoint; it does not establish full configured-range, hardware, or WP8 acceptance. Production implementation remains unauthorized pending Julio's separate explicit decision; no gate advancement is implied.
+The candidate is fixture feasibility evidence, not full configured-range proof, hardware validation, WP8 acceptance, production evidence, or a production API. Any production implementation authorization is separate and explicit.
 <!-- markdownlint-enable MD013 -->
 
 WP7 may use synthetic resolved candidates, while WP6f may use synthetic

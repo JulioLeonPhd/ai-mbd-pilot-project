@@ -147,9 +147,9 @@ All 384 evaluations passed near/far association, distinct-peak, valid-valley, 3 
 
 The historical reference runner was not modified: the run used a parameter-only scratch adaptation to place the geometry midpoint at 20 km and set actual echo RCS to 200 m², without using the derived common RCS for echoes. The historical 48,639.35 m² common-RCS fixture and its recorded evidence remain unchanged and unapproved; the new JSON is separate candidate evidence.
 
-This remains point-target fixture feasibility evidence only, not full configured-range proof, an airliner signature, hardware/ADC validation, probability-of-detection evidence, or production authorization. Julio later approved fixture-scoped numerical budgets for this 200 m² candidate in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md#width-numerical-budgets-and-evidence-ownership); that does not approve the historical derived 48,639.35 m² RCS or close issues 23/24.
+This remains point-target fixture feasibility evidence only, not full configured-range proof, an airliner signature, hardware/ADC validation, probability-of-detection evidence, or production authorization. Julio's fixture-scoped numerical budgets for this 200 m² candidate are recorded in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md#width-numerical-budgets-and-evidence-ownership); they do not approve the historical derived 48,639.35 m² RCS.
 
-The candidate replay artifact and final step-5/evidence issue disposition remain outstanding before separate implementation authorization.
+Root posted the final resolutions and closed issues [#24](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6762277382) and [#23](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23#issuecomment-6762278228) on 2026-11-10. The bounded dispositions do not authorize production implementation; the next step is Julio's explicit authorization decision.
 
 The result records Julio's selected candidate and the matrix outcome; it does not establish a representative 3 GHz RCS for an aircraft.
 

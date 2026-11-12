@@ -6,9 +6,8 @@ Product progress > AI infrastructure progress until v1.
 
 ## Now
 
-1. Keep [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [Establish numerical evidence for range acceptance](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) open pending durable candidate replay and final step-5/evidence issue disposition; Julio's fixture-scoped numerical budget approval is recorded in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md).
-2. Preserve the separate candidate-specific and historical evidence boundaries: numerical budgets apply only to the approved 200 m², 20 km point-target fixture, and historical reports/JSON are not rewritten.
-3. Only after the final disposition may production implementation authorization be considered separately; this approval does not close issues, authorize production, or advance a gate.
+1. Range-acceptance issues #24 and #23 closed on 2026-11-10; see the final [#24 resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6762277382) and [#23 resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23#issuecomment-6762278228). The candidate evidence remains bounded to the approved 200 m², 20 km point-target fixture; historical reports and JSON remain unchanged.
+2. Next, request Julio's explicit production-implementation authorization. Issue closure and evidence do not authorize implementation or advance a gate; no new milestone or gate assignment is recorded.
 
 Completed context: the DDC PRI baseline merged in PR #17, and Julio accepted
 the redrawn architecture diagrams on 2026-10-26; neither result grants range

@@ -4,11 +4,29 @@
 
 This report describes the reference-only numerical study for the original two-target fixture and its measured observations. Its historical proposed budgets are not universal error bounds; Julio later approved fixture-scoped engineering budgets for the separate 200 m² point-target candidate, recorded in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md#width-numerical-budgets-and-evidence-ownership).
 
-Neither the original study nor the later approval authorizes production implementation, hardware acceptance, issue closure, or gate advancement.
+The original study and its approval did not themselves authorize production implementation, hardware acceptance, or gate advancement.
 
 Julio approved the original fixture assumptions in the [issue 24 approval record](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6474237580).
 
-[Define range acceptance criteria (#23)](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23) and [Establish numerical evidence for range acceptance (#24)](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24) remain open pending durable candidate replay and final step-5/evidence issue disposition.
+On 2026-11-10, root posted final resolutions and closed [#24](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6762277382) and [#23](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23#issuecomment-6762278228). The planning and bounded numerical-evidence dispositions are complete; they do not authorize production implementation or advance a gate.
+
+## Durable candidate replay
+
+The active bounded decision uses Julio's approved ideal point-target fixture with actual echo RCS 200 m² at a 20 km midpoint; it does not use the historical common-RCS derivation. This fixture replaces the configured-interval midpoint / derived-RCS fixture only for this decision. The original study report and historical JSON remain unchanged; the fixture-scoped numerical criteria and unchanged physical gates are defined in [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md#width-numerical-budgets-and-evidence-ownership). The correlation, lag, coordinate, and validity formulas remain those in [ADR 0025](../adr/0025-adopt-range-compression-numerical-and-validity-contract.md#reference-and-correlation) and the fixture criteria in ADR 0027. The independent physical gates remain one-bin peak association, a valid valley at least 3 dB below the smaller peak, and at least 30 dB estimated post-compression SNR.
+
+Run the archived candidate snapshot from the repository root:
+
+```matlab
+run("evidence/range-20km-200m2/range_acceptance_study.m")
+```
+
+This same-basename archival snapshot is deliberately frozen for exact provenance, not a second production algorithm. Its SHA-256 is `c4ff98bb4b3d154e55ba6bb286a5e4457bdc6981044f6c00406b2b0d9405a707`. The snapshot retains its recorded repository root; reproducing the exact run requires that environment. Editing the root for a different checkout changes the runner hash but not the physical constants. This is not a portable API.
+
+On 2026-11-10, root replayed the exact snapshot in MATLAB R2026a Update 5 (PID 18062). All 384/384 stream evaluations passed. Root's recursive comparison against the golden candidate file `evidence/range-20km-200m2-feasibility.json` found exactly one leaf difference, `report_path`; all other JSON content was identical. Code Analyzer returned `code_issues=[]`. The golden candidate JSON remains unchanged.
+
+Replay output is `evidence/range-20km-200m2/range_acceptance_results.json`, distinct from the golden candidate JSON and historical `evidence/range_acceptance_results.json`. Root removed this generated duplicate after comparison; it is not tracked.
+
+This result is finite synthetic point-target feasibility evidence, not the full configured range, an aircraft signature, hardware/ADC or probability-of-detection validation, WP8/two-report acceptance, or production evidence. The issues are closed by the root's final resolutions linked above; that does not change the evidence boundary or authorize production implementation. The next step is to request Julio's explicit production-implementation authorization.
 
 ## Reproduce the reference study
 

@@ -85,6 +85,6 @@ and revised G1 acceptance in [ADR 0014](../adr/0014-adopt-revised-v1-analytic-si
 
 <!-- markdownlint-disable MD013 -->
 
- [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md) records the approved range-stage separation criteria, fixture definitions, and evidence boundary. Julio's 2026-11-09 numerical budget approval applies only to the 200 m² point-target candidate at the 20 km midpoint; the study report retains historical observations and labels. Durable replay and final step-5/evidence issue disposition remain before any separate implementation authorization. The estimated post-compression SNR reference does not replace WP8's two-report obligation.
+ [ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md) records range-stage criteria, the historical fixture, and the current bounded 200 m² point-target candidate at the 20 km midpoint. The candidate replay is recorded in [the evidence report](../research/range-acceptance-evidence.md#durable-candidate-replay); it does not establish acceptance across the configured range. The historical report/JSON remain unchanged. Issues [#24](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6762277382) and [#23](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23#issuecomment-6762278228) were closed with bounded planning/evidence dispositions; production implementation authorization remains a separate explicit decision.
 
 <!-- markdownlint-enable MD013 -->
