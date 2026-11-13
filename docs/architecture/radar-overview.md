@@ -74,8 +74,9 @@ full-scan DDC walkthrough pass; historical fixture hashes preserved.
 Pinned DDC-002 replay passed at historical revision. Independent numerical
 validation passed for current per-PRI profile; all 23 historical fixture
 hashes preserved. Julio accepted the redrawn diagrams on 2026-10-26;
-see [current status](../../CURRENT.md) for implementation evidence, incomplete
-code-review scope, and merge authorization. Range-processing boundary: next component review.
+see the [V1 delivery action plan](../plans/v1-delivery-action-plan.md) for
+implementation evidence, incomplete code-review scope, and merge authorization.
+The optional local `CURRENT.md` may also be present. Range-processing boundary: next component review.
 Future Simulink models use fixed dimensions per configured model; do not
 support runtime-variable frame sizes. Build behavioral Simulink model first;
 later hardware-oriented implementation model may follow. HDL generation
@@ -133,7 +134,7 @@ diagrams passed on 2026-10-26 at the PR head recorded above. Scoped
 WP4/G2 baseline and evidence documented in
 [`architecture.md`](architecture.md), [ADR 0017](../adr/0017-adopt-v1-commanded-look-receive-processing-and-g2-schedule.md),
 [ADR 0018](../adr/0018-freeze-wp4-g2-phase0-contract.md), and
-[`CURRENT.md`](../../CURRENT.md). Chain in `architecture.md` historical;
+optional local `CURRENT.md` snapshot. Chain in `architecture.md` historical;
 does not define current end-to-end module order. See ADR 0021 and this
 overview for current approved responsibilities and unresolved ordering.
 Updated responsibilities and open

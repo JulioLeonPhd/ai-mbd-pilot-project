@@ -36,9 +36,9 @@ and fixture-preservation audit. new per-PRI evidence is distinct from
 historical continuous-state evidence; neither scope establishes hardware or
 real-time performance, full FIR precursor/waveform retention, or detection
 performance. complete ADC-to-detection floating-point reference, fixed-point
-design, and Simulink representation are incomplete. See [CURRENT.md](CURRENT.md)
-for status and the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md)
-for evidence and limitations.
+design, and Simulink representation are incomplete. See the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md)
+for evidence and limitations; an optional local `CURRENT.md` checkpoint may be
+present in some worktrees.
 The approved MATLAB per-PRI range-compression API is implemented at `radardemo.rangeCompression.processPri`, with four complex elevation streams, a matching logical validity mask, and caller-supplied range origin in metres.
 Run the [executable MATLAB walkthrough](examples/runRangeCompressionWalkthrough.m) with `matlab -batch "run('examples/runRangeCompressionWalkthrough.m')"` to inspect one PRI's range-compression outputs and validity metadata.
 The focused API tests passed 26/26 cases, and the bounded production fixture runner passed 96/96 records and 384/384 stream evaluations; the [production report](tests/rangeCompression/range-production-acceptance-results.json) records those observations.
@@ -55,8 +55,9 @@ ADC decisions are recorded in [ADR 0019](docs/adr/0019-adopt-human-led-module-de
 [ADR 0020](docs/adr/0020-adopt-pilot-adc-storage-and-sample-integrity.md), and
 [ADR 0021](docs/adr/0021-adopt-dsp-responsibilities-and-ambiguity-baseline.md);
 independent document review passed on 2026-09-26 with no unresolved semantic
-findings. Julio accepted the redrawn diagrams on 2026-10-26; see
-[current status](CURRENT.md) for the separate code-review limits. These
+findings. Julio accepted the redrawn diagrams on 2026-10-26; see the
+[V1 delivery action plan](docs/plans/v1-delivery-action-plan.md) for the
+separate code-review limits. These
 decisions do not claim complete ADC-to-detection implementation exists.
 Proposed architecture changes
 require Julio's review before code is restructured.
@@ -75,8 +76,10 @@ in force until Julio explicitly revises them. See the
 
 ## Start here
 
-1. Read [CURRENT.md](CURRENT.md) for present capability, limits, and next
-   open question.
+1. Start with tracked plans, decisions, and evidence: the [V1 implementation
+   plan](docs/plans/radar-matlab-v1.md), relevant [architecture decisions](docs/adr/),
+   and [range-acceptance evidence](tests/rangeCompression/range-production-acceptance-results.json).
+   An optional local `CURRENT.md` checkpoint may be consulted when present.
 2. Start with the [ideal range-resolution sweep](evidence/radar_v1_range_resolution_study.m)
    and its [recorded results](evidence/radar_v1_range_resolution_results.json).
    finite coherent sinc point-spread study varies bandwidth in Hz, range
@@ -112,7 +115,8 @@ in force until Julio explicitly revises them. See the
 
 ## Repository guide
 
-- [CURRENT.md](CURRENT.md) — concise current state and next decision.
+- Optional, worktree-local `CURRENT.md` — concise checkpoint when present;
+  see tracked plans and decisions first.
 - [docs/examples](docs/examples) — runnable learning examples and figures.
 - [docs/reference](docs/reference) — dated evidence snapshots and technical
   reference material.

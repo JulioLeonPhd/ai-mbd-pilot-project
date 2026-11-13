@@ -61,3 +61,6 @@ notes/
 /learning-records/
 /lessons/
 /reference/
+# Worktree-local status logs
+/CURRENT.md
+/HISTORY.md

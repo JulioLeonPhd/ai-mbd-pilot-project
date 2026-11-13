@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Replaced the active nine-role/deep-profile governance with the approved six-role OMP-native topology and direct single-agent Codex fallback; recorded Julio's 2026-11-13 removal of demonstrated pre-V1 payback as an acceptance condition while retaining effort accounting, cap, correctness, safety, and rollback. Runtime acceptance remains pending.
 - Consolidated the always-loaded agent contract and moved branch-specific operating guidance to `docs/agents/task-guidance.md`.
+- Documented optional worktree-local status logs and timestamped `CURRENT.md` checkpoints.
 
 ### Added
 
