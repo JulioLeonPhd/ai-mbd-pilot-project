@@ -1,87 +1,107 @@
 ---
 name: commit
-description: Create one scoped Git commit by delegating staging and commit execution to a low-cost subagent after the root agent has analyzed the change and supplied commit context.
+description: Create one scoped Git commit by delegating staging and commit execution through the active session's native task tool after the root agent has resolved commit context.
 ---
 
 # Delegated commit finalization
 
 Use this skill only as the root agent's finalization step. The root agent owns
-the interpretation, scope, and authorization of the commit. The spawned worker
-owns the Git operations and must not broaden the change.
+the interpretation, scope, and authorization of the commit. A worker delegated
+through the active session's native `task` tool owns the Git operations and
+must not broaden the change.
 
 Do not use this skill to push, tag, merge, rebase, reset, clean, or otherwise
 rewrite history. Amending is prohibited unless the user explicitly authorizes
 amending a named commit. Do not modify version files unless the root agent
 explicitly includes them in the allowed scope.
 
-## Prepare the bounded handoff
+## Prepare a bounded handoff
 
-Before spawning the worker, inspect the repository and determine what belongs in
-this commit. At minimum, inspect:
+Complete these steps before delegating the worker:
 
-- `git status --short`
-- `git diff --stat` and `git diff`
-- `git diff --cached --stat` and `git diff --cached`
-- the current branch and recent commit-message convention
+1. Inspect the repository and determine what belongs in this commit. At
+   minimum, inspect:
+   - `git status --short`
+   - `git diff --stat` and `git diff`
+   - `git diff --cached --stat` and `git diff --cached`
+   - the current branch and recent commit-message convention
+2. Distinguish the requested changes from unrelated or pre-staged user changes.
+3. Build a bounded packet containing:
+   - the objective and human-facing context for this commit;
+   - the exact allowed paths, plus explicit exclusions;
+   - whether already-staged changes are in scope;
+   - the current branch and any issue or work-item reference;
+   - the notable behavior/API changes and their compatibility impact;
+   - the root agent's resolved `SemVer impact`: `major`, `minor`, `patch`, or
+     `none`;
+   - requested checks and the expected result report.
+4. Select and verify the configured Luna-capable `technical-writer` role for
+   the worker. Its model is configured by the native role definition; do not
+   supply a model or reasoning-effort override. If this requested routing is
+   unavailable, return `blocked` rather than silently using a higher-default
+   role.
+5. Dispatch the worker with the active session's native `task` tool and a
+   bounded packet in its `tasks` array, as shown below.
 
-Distinguish the requested changes from unrelated or pre-staged user changes.
-Pass a bounded packet containing:
-
-- the objective and human-facing context for this commit;
-- the exact allowed paths, plus explicit exclusions;
-- whether already-staged changes are in scope;
-- the current branch and any issue or work-item reference;
-- the notable behavior/API changes and their compatibility impact;
-- the root agent's resolved `SemVer impact`: `major`, `minor`, `patch`, or
-  `none`;
-- requested checks and the expected result report.
-
-Use a compact task packet such as:
-
-```yaml
-task:
-  objective: "Create one commit for the approved change"
-  context: "Why this change matters and what the commit should communicate"
-  allowed_paths: ["path/to/in-scope-file"]
-  excluded_paths: ["path/to/unrelated-file"]
-  include_staged_changes: false
-  operation: "new"
-  target_commit: null
-  branch: "expected-branch"
-  semver_impact: "minor"
-  references: ["issue or work-item reference"]
-  requested_checks: ["git diff --cached --check"]
-```
-
-If the scope or compatibility impact is unresolved, resolve it before spawning;
-do not ask the worker to infer product intent from an ambiguous diff.
-Use `operation: "new"` for the normal workflow and set `target_commit` to
-`null`. Use `operation: "amend"` only when the user explicitly authorizes
-amending the named commit in `target_commit`.
-
-## Spawn the commit worker
-
-The root agent remains the orchestrator. A spawned worker is the delegated
-commit executor; the root agent must not perform the commit itself. Call
-`collaboration.spawn_agent` with:
+For example:
 
 ```yaml
-task_name: commit-worker
-message: <bounded task packet>
-fork_turns: none
-model: gpt-6-luna
-reasoning_effort: low
+i: "Delegate approved commit finalization"
+context: "The root agent resolved scope and commit intent; preserve the low-cost Luna route by selecting the configured technical-writer role. The worker owns only the specified Git operations."
+tasks:
+  - name: CommitWorker
+    agent: technical-writer
+    task: |
+      task:
+        id: "commit-finalization"
+        objective: "Create one commit for the approved change"
+        context: "Why this change matters and what the commit should communicate"
+        inputs:
+          - "Current repository working tree on expected-branch"
+        constraints:
+          - "Allowed paths: [path/to/in-scope-file]; excluded paths: [path/to/unrelated-file]"
+          - "Include staged changes: false; operation: new; target_commit: null"
+          - "SemVer impact: minor; references: [issue or work-item reference]"
+          - "Do not push, tag, change version files, use git add -A/. or git commit -a, bypass hooks, or rewrite history"
+        acceptance_criteria:
+          - "One commit on expected-branch contains only the authorized paths and intended content"
+          - "Return the SHA, message, included paths, checks, and post-commit working-tree state"
+          - "Validate the raw stored message has actual newlines and no unintended 0x5C 0x6E byte sequence"
+        allowed_mutations:
+          - "Git index and commit history, limited to the authorized commit"
+          - "Creation and cleanup of the worker's temporary commit-message file only at the exact location or directory approved by the root agent in this packet (preferably outside the repository); no arbitrary temporary filesystem access"
+        requested_checks:
+          - "git diff --cached --check"
 ```
 
-Put the bounded packet in the initial message. The worker starts without the
-root conversation, so include every fact it needs. Tell it to operate on the
-current branch and working tree, preserve other agents' edits, and return the
-commit SHA plus a compact structured result. Wait with
-`collaboration.wait_agent`; use `collaboration.followup_task` only when a
-bounded follow-up is required. There is no separate close-agent step.
+After preparing the packet:
 
-If the delegation tool is unavailable, return `blocked`; do not silently
-perform the commit in the root agent.
+1. Use only the native task API: it accepts `i`, `context`, and `tasks`; each
+   task item accepts `task`, `name`, and optional `agent`. Do not pass
+   `collaboration.*` calls or invent parameters such as `model`,
+   `reasoning_effort`, or `fork_turns`.
+2. Preserve the configured role routing. Ordinary tasks do not support model
+   overrides; the `technical-writer` role's configured Luna model is selected
+   by its `agent` name. Do not silently substitute a different model or role.
+   If the native `task` tool or requested role routing is unavailable, return
+   `blocked`; do not silently perform the commit in the root agent.
+3. Include every fact the worker needs because it starts without the root
+   conversation. Tell it to operate on the current branch and working tree,
+   preserve other agents' edits, and return a structured result.
+4. Resolve scope and compatibility impact before dispatch. Do not ask the
+   worker to infer product intent from an ambiguous diff.
+5. Set `operation: "new"` and `target_commit: null` for the normal workflow.
+   Use `operation: "amend"` only when the user explicitly authorizes amending
+   the named commit in `target_commit`.
+6. Task results are delivered automatically. Wait only when blocked pending a
+   result, and use a bounded follow-up task only when additional work is
+   required. There is no separate close-agent step.
+
+## Native task dispatch
+
+The root agent remains the orchestrator. A delegated worker is the commit
+executor; the root agent must not perform the commit itself. Dispatch it with
+the active session's native `task` tool using the bounded packet above.
 
 The worker must:
 
@@ -148,16 +168,16 @@ and does not authorize changing a version file or creating a tag.
 ## Root-agent verification
 
 After the worker reports success, independently verify the result rather than
-treating the spawn or commit command as proof:
+treating task dispatch or the commit command as proof:
 
-- resolve the reported SHA with `git rev-parse`;
-- inspect the committed message and paths with `git show --stat` and
-  `git diff-tree --name-status`;
-- confirm only allowed paths and intended content were committed;
-- confirm the commit is on the expected branch and inspect `git status --short`
-  for remaining changes;
-- check that the message contains the applicable changelog category and the
-  root-approved SemVer impact.
+1. Resolve the reported SHA with `git rev-parse`.
+2. Inspect the committed message and paths with `git show --stat` and
+   `git diff-tree --name-status`.
+3. Confirm only allowed paths and intended content were committed.
+4. Confirm the commit is on the expected branch and inspect `git status --short`
+   for remaining changes.
+5. Check that the message contains the applicable changelog category and the
+   root-approved SemVer impact.
 
 Report the SHA, message, included paths, remaining working-tree state, and any
 warning or skipped check. If verification fails, do not create a compensating

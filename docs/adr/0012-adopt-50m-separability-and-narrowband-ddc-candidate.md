@@ -22,6 +22,8 @@ resolution (about 3.3 nominal resolution cells across 50 m).
 Accepted two-target separability requirement: 50 m. Waveform and DDC
 values below remain candidates pending validation.
 
+The approved range-fixture definitions and evidence boundary are recorded in [ADR 0027](0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md); unresolved numerical tolerances and study evidence remain pending.
+
 At decision time, following candidate for WP4/WP6/WP8
 validation; ADR 0013 supersedes its ADC/IF/DDC rate path:
 

@@ -62,6 +62,32 @@ G2 contracts, allowing independent work.
 | WP6e — Range/velocity ambiguity study | D17–27 | G2; parallel with WP6a–d | Compare executable candidates against known folded cases through ±800 km/h, range aliases, competing targets, and inconsistent measurements. Record failed candidates and evidence. **Selection gate:** one candidate passes agreed cases; otherwise stop dependent work; root records failed-candidate evidence in WP6e report and `CURRENT.md`, reopens affected G1/G2 gate, routes WP2/WP4/contract or ADR revision as needed, reruns corresponding independent review, and resumes only after gate passes. |
 | WP6f — Ambiguity-resolution implementation | D28–38 | WP6e | selected method passes independent tests using synthetic per-PRF candidate lists, including alias boundaries and documented ambiguous-input behavior. |
 
+### WP6b range-acceptance planning
+
+[ADR 0027](../adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md) records the accepted criteria, fixture definitions, rationale, and final resolutions for [Define range acceptance criteria](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23).
+The correlation, coordinate, validity, and public API contracts in ADRs 0025 and 0026 remain unchanged.
+
+| Area | Planning summary; ADR 0027 holds the detailed decision |
+| --- | --- |
+| Mandatory gates | Range calibration, complex gain/phase fidelity, 50 m two-target separation, and complete-window validity are independent passes. |
+| Separation | Distinct valid peaks within one output bin of each true range, with a valid valley at least 3 dB in power below the smaller peak; no threshold relaxation or weighting after a failed required case. |
+| Fixture matrix | Historical reference matrix: ideal-reference and sampled-DDC paths, all four streams, equal RCS and physical range-dependent amplitudes near configured detection-interval midpoint; four fractional-bin offsets crossed with four relative phases and three fixed separation-noise seeds. For the current bounded decision only, Julio selected an ideal point target with actual echo RCS 200 m² at the 20 km midpoint; its replayed candidate covers the ideal and sampled paths, four streams, 16 geometries and three separation seeds. |
+| SNR and noise | At least 30 dB estimated post-compression SNR for the weaker target in every evaluated stream, with input SNR reported separately; the stationary noise-only estimate and sparse seeds provide no statistical lower-bound guarantee. |
+| Physical assumptions | Historical radar-equation derivation remains a record, not a selected or retroactively approved RCS. The current candidate uses the approved actual echo RCS and midpoint; the physical gates are unchanged. |
+| Numerical evidence | Historical reference-only results are in [the study report](../research/range-acceptance-evidence.md) and [JSON evidence](../../evidence/range_acceptance_results.json). The 200 m², 20 km candidate, its exact runner snapshot, and replay are recorded in [the candidate replay evidence](../research/range-acceptance-evidence.md#durable-candidate-replay); Julio's fixture-scoped numerical-budget approval is in ADR 0027. |
+
+RAD-V1-006 now references the approved range-stage SNR condition in ADR 0027 rather than requiring an unspecified high input SNR.
+Its two-report obligation remains with WP8; range-stage peaks or estimated SNR alone do not establish end-to-end detection acceptance.
+
+The original authorized reference-only study and its independent numerical review are complete within their recorded scopes. The exact archived 200 m², 20 km candidate runner was replayed by root on 2026-11-10 in MATLAB R2026a Update 5; all 384/384 stream evaluations passed, the recursive golden comparison differed only at `report_path`, and Code Analyzer reported no issues.
+The historical common RCS and historical report/JSON labels remain unchanged and are not retroactively approved. The candidate replaces the configured-interval midpoint / derived-RCS fixture only for this bounded current decision.
+On 2026-11-10, root closed [#24](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6762277382) and [#23](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23#issuecomment-6762278228) after the exact candidate replay and bounded independent reviews. These close the planning/evidence disposition only.
+On 2026-11-12, Julio separately authorized production implementation of the approved MATLAB range-compression `processPri` component. The implementation is at `src/+radardemo/+rangeCompression/processPri.m`, its focused tests are at `tests/rangeCompression/TestProcessPri.m`, and the runnable Live Script is `examples/runRangeCompressionWalkthrough.m`.
+In MATLAB R2026a Update 5 (PID 75572), all 26 focused tests passed and Code Analyzer reported no issues for the implementation, tests, walkthrough, or production acceptance runner. The walkthrough executed with a maximum aligned complex residual of `1.8209e-14`; its rendered source-only narrative and equations were inspected without embedded outputs, and its plot was separately observed.
+The production runner `tests/rangeCompression/runRangeProductionAcceptance.m` completed 96/96 records and 384/384 stream evaluations with all fixture-scoped physical gates passing; correlation, validity, and peak self-checks passed. Its report is `tests/rangeCompression/range-production-acceptance-results.json`.
+All 32 coordinate records passed the tolerance check, with a maximum residual-to-budget ratio of `0.062455592152661873`.
+Independent deep numerical and documentation reviews are complete within their assigned scopes with no unresolved errors. The numerical reviewer inspected source, tests, oracle, runner, and regenerated JSON, while root performed MATLAB execution; the reviewer did not independently execute MATLAB.
+Julio has approved both the walkthrough and MATLAB `processPri` component. The next step is PR review and merge, not automatic merge; this remains limited to the approved per-PRI MATLAB contract and fixture-scoped evidence and does not advance a gate or establish full configured-range acceptance, hardware behavior, WP8 acceptance, or broader production evidence.
 <!-- markdownlint-enable MD013 -->
 
 WP7 may use synthetic resolved candidates, while WP6f may use synthetic

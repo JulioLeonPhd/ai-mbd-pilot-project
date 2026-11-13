@@ -49,7 +49,7 @@ For MATLAB and Simulink-associated MATLAB code:
 2. Consult local rule files above for coding and Live Script decisions.
 3. Apply performance guidance after profiling identifies real bottleneck.
 4. Use repository's agent workflow and validation gates in
-   [AGENTS.md](../../AGENTS.md).
+   [AGENTS.md](../../../AGENTS.md).
 
 Performance guidance is advisory and context-dependent. In particular, do not
 make vectorization, parallelism, single precision, MEX, or code generation

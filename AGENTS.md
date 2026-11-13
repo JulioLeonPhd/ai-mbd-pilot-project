@@ -62,6 +62,30 @@ comparisons, mappings, attributes, or status. Use bullets for parallel points
 when they make concepts faster to grasp, numbered lists for ordered steps, and
 prose for explanations that benefit from connected reasoning.
 
+### Mathematical documentation
+
+Write mathematical relationships as rendered TeX rather than code or prose-only substitutes, preserving the approved decisions and semantics.
+Use inline `$...$` for short symbols and `$$` delimiters on separate lines for substantive display equations.
+Define symbols, indices and ranges, units, and assumptions near the equations; use tables for meaningful parameter, value, and unit mappings.
+See [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md) as a style example.
+
+Inside math, write comparisons with TeX commands such as `\lt`, `\gt`, `\le`, and `\ge`, not raw angle brackets or HTML entities.
+HTML escaping before KaTeX parsing can turn angle brackets into literal entities and cause parse errors.
+
+Verify every inline and display expression in each changed math document with the available KaTeX renderer, using `renderToString` with `throwOnError: true` and the matching `displayMode`.
+Ignore code spans and fenced code when extracting expressions.
+Repeat the check after HTML-escaping ampersands and angle brackets in the extracted TeX to catch escaping-pipeline failures.
+Markdown lint does not verify rendering.
+
+This command smoke-checks the available renderer; it does not replace checking all expressions in the actual document:
+
+```sh
+node -e 'const katex = require("katex"); katex.renderToString(String.raw`x \lt y`, {throwOnError: true}); console.log("KaTeX smoke check passed");'
+```
+
+If KaTeX is unavailable, report rendering as unavailable rather than passing it.
+Do not install a dependency just for the check or claim visual preview equivalence without an actual preview.
+
 ### Engineering walkthroughs
 
 Treat executable walkthroughs as primary human-review surfaces for non-trivial
@@ -241,8 +265,8 @@ All nine roles, including the three deep variants, have definitions for both
 runtimes; runtime availability is session-dependent. Before spawning one, the
 root confirms that it is selectable in the current session and reports a failure
 when it is unavailable. For safety or complex design, the root does not silently
-fall back to a lower-capability role. Astra is selected by the explicit deep
-routes, not by standard roles.
+fall back to a lower-capability role. Deep routes remain explicit specialist
+selections, not fallback roles.
 
 Read both the matching [.codex/agents](.codex/agents/) TOML and
 [.omp/agents](.omp/agents/) Markdown before changing or reviewing a specialist
@@ -258,14 +282,15 @@ settings.
 
 | Roles | Codex model | OMP model selector | Thinking level |
 | --- | --- | --- | --- |
-| `technical-writer`, `matlab-implementer` | `gpt-6-luna` | `openai-codex/gpt-6-luna` | `high` |
-| `matlab-architect` | `gpt-6.1-sol` | `openai-codex/gpt-6.1-sol` | `high` |
-| `technical-writer-validator`, `simulink-implementer`, `matlab-validator` | `gpt-6.1-sol` | `openai-codex/gpt-6.1-sol` | `medium` |
-| `matlab-architect-deep`, `matlab-validator-deep` | `gpt-6-astra` | `openai-codex/gpt-6-astra` | `high` |
-| `technical-writer-validator-deep` | `gpt-6-astra` | `openai-codex/gpt-6-astra` | `medium` |
+| `technical-writer` | `gpt-6-luna` | `openai-codex/gpt-6-luna` | `high` |
+| `matlab-implementer` | `gpt-6-luna` | `openai-codex/gpt-6-luna` | `xhigh` |
+| `matlab-architect` | `gpt-5.6-sol` | `openai-codex/gpt-5.6-sol` | `high` |
+| `technical-writer-validator`, `matlab-validator` | `gpt-5.6-sol` | `openai-codex/gpt-5.6-sol` | `medium` |
+| `simulink-implementer` | `gpt-6.1-sol` | `openai-codex/gpt-6.1-sol` | `medium` |
+| `matlab-architect-deep`, `matlab-validator-deep`, `technical-writer-validator-deep` | `gpt-6.1-sol` | `openai-codex/gpt-6.1-sol` | `max` |
 
-These correspond to the current `@smol` Luna, `@default` Sol, and `@slow` Astra
-model families, but deliberately do not inherit those aliases' effort suffixes.
+Each project role has explicit model and effort settings; they do not inherit effort
+from global aliases.
 OMP settings or launch-time policy can override model and effort; record
 observed execution metadata in results and recheck availability after
 configuration changes.

@@ -4,7 +4,7 @@
 
 This note checks candidate glossary equations for project's stationary,
 monostatic, pulsed-LFM radar. It is source note, not implementation
-contract. project defines positive radial velocity, $v_r>0$, as
+contract. project defines positive radial velocity, $v_r\gt 0$, as
 **receding**.
 
 Unless stated otherwise, use analytic-signal convention
@@ -36,11 +36,11 @@ unambiguous up-chirp complex envelope is
 
 $$
 x(t)=A(t)\exp\!\left\{j\left[2\pi f_{\min}t+
-\pi\mu t^2+\phi_0\right]\right\},\qquad 0\le t<T,
+\pi\mu t^2+\phi_0\right]\right\},\qquad 0\le t\lt T,
 $$
 
 with $x(t)=0$ outside pulse when $A(t)$ is rectangular pulse,
-$\mu=(f_{\max}-f_{\min})/T=B/T$ in Hz/s, $B=f_{\max}-f_{\min}>0$,
+$\mu=(f_{\max}-f_{\min})/T=B/T$ in Hz/s, $B=f_{\max}-f_{\min}\gt 0$,
 $T$ pulse duration, and $\phi_0$ initial phase. Its instantaneous
 frequency is $f_i(t)=f_{\min}+\mu t$. symmetric baseband sweep uses
 $f_{\min}=-B/2$ and $f_{\max}=+B/2$. down-chirp is represented by a
@@ -186,11 +186,11 @@ and notes that noise figure excludes antenna noise
 ### Maximum unambiguous radial velocity
 
 **Classification: conditionally correct.** Uniform slow-time sampling at PRF
-has unaliased Doppler interval $-\mathrm{PRF}/2\le f_d<\mathrm{PRF}/2$.
+has unaliased Doppler interval $-\mathrm{PRF}/2\le f_d\lt\mathrm{PRF}/2$.
 For monostatic Doppler magnitude $|f_d|=2|v_r|/\lambda$,
 
 $$
-|v_r|<\frac{\lambda\,\mathrm{PRF}}{4},
+|v_r|\lt\frac{\lambda\,\mathrm{PRF}}{4},
 $$
 
 with $\lambda\mathrm{PRF}/4$ commonly quoted as maximum unambiguous

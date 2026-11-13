@@ -13,9 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - OMP-native project definitions for all nine specialists, preserving Codex TOMLs and role instructions.
+- Archived the exact candidate range-study runner and recorded the 2026-11-10 full replay: 384/384 evaluations passed, recursive comparison differed from the golden JSON only at `report_path`, and Code Analyzer reported no issues. The generated replay JSON duplicate was removed after comparison and is not tracked.
+- Recorded root's 2026-11-10 final resolutions and closure of issues #24 and #23 after the exact candidate replay and bounded independent reviews. The 200 m² point target at 20 km remains fixture-scoped evidence, not production authorization or gate advancement.
+- Recorded implementation and bounded MATLAB evidence for the authorized range-compression `processPri` component; the 26 focused tests and 96-record / 384-stream fixture run passed, and independent numerical and documentation reviews found no unresolved errors within scope, without advancing a gate.
 
 ### Changed
 
+- Refined the range-compression walkthrough with numbered sections, pre-call expectations, separate dB panels, dimensionless amplitude units, horizontal labels, and a helper section.
 - Expanded the DDC Live Script filter-response explanation with wideband FIR magnitude views before the passband zoom and alias envelope, two-sentence plot introductions, simplified dB labels, and ordinary decimal passband ticks.
 - Documented model/effort mapping and OMP sandbox limitations; extended handoff checks to cover both runtimes.
 - Recorded pilot evidence and limitations for parallel OMP MATLAB MCP session isolation.

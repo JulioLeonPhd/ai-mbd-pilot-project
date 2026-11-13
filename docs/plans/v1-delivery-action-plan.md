@@ -6,11 +6,13 @@ Product progress > AI infrastructure progress until v1.
 
 ## Now
 
-1. Make DDC walkthrough transparent.
-2. Complete human implementation review.
-3. Complete visual architecture review.
-4. Authorise merge.
-5. Merge DDC PRI.
+1. Range-acceptance issues #24 and #23 closed on 2026-11-10; see the final [#24 resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6762277382) and [#23 resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23#issuecomment-6762278228). The candidate evidence remains bounded to the approved 200 m², 20 km point-target fixture; historical reports and JSON remain unchanged.
+2. Julio authorized the approved MATLAB `processPri` component on 2026-11-12; implementation, focused tests, walkthrough, and fixture-scoped production results are recorded in [CURRENT.md](../../CURRENT.md). Independent numerical and documentation reviews are complete within scope, with no unresolved errors; root executed MATLAB, while the numerical reviewer did not independently rerun it. Julio has approved both the walkthrough and component; next is PR review and merge, not automatic merge or gate advancement.
+3. Run the focused suite with `matlab -batch "results = runtests('tests/rangeCompression/TestProcessPri.m'); assertSuccess(results)"`, the production fixture runner with `matlab -batch "run('tests/rangeCompression/runRangeProductionAcceptance.m')"`, and the walkthrough with `matlab -batch "run('examples/runRangeCompressionWalkthrough.m')"`. The runner writes `tests/rangeCompression/range-production-acceptance-results.json`; these bounded checks do not establish full-range, hardware, or WP8 acceptance.
+
+Completed context: the DDC PRI baseline merged in PR #17, and Julio accepted
+the redrawn architecture diagrams on 2026-10-26; neither result grants range
+implementation authorization or settles open architecture choices.
 
 ## Then
 

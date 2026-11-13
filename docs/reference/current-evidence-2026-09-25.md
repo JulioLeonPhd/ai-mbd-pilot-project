@@ -216,4 +216,4 @@ cascade rejection `85.2548307898255 dB`.
   [examples/checker directory](../../contracts/wp3/examples/)
 - [WP4/G2 recovery plan](../plans/wp4-g2-recovery-plan-2026-09-21.md)
 
-[adr0014]: docs/adr/0014-adopt-revised-v1-analytic-simulation-baseline.md
+[adr0014]: ../adr/0014-adopt-revised-v1-analytic-simulation-baseline.md

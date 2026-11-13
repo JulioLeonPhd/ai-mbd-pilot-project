@@ -1,8 +1,8 @@
 ---
 name: "matlab-architect-deep"
 description: "Design difficult MATLAB and Simulink solver, timing, numerical, or code-generation architecture."
-model: "openai-codex/gpt-6-astra"
-thinking-level: "high"
+model: "openai-codex/gpt-6.1-sol"
+thinking-level: "max"
 spawns: ""
 tools: ["read", "grep", "glob", "web_search"]
 ---

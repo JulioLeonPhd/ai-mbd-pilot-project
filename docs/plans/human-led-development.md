@@ -31,17 +31,21 @@ Steps 1 and 2 are drafted and passed independent document review on 2026-09-26.
 The top-level overview and three diagrams are in the main working tree at
 `docs/architecture/radar-overview.md`; their PlantUML syntax/render checks and
 preview inspection passed, and the documents passed independent review.
-Julio's visual review of the redrawn views remains pending. Julio closed the
-joint DDC design discussion on 2026-09-29 and confirmed the Phase 0 interface
-and evidence migration on 2026-10-02, then explicitly authorized implementation.
-The per-PRI core and WP4 suites and full-scan walkthrough pass. Pinned DDC-002
-replay passed strict 1/1 at its historical revision, and all 23 historical
-fixture hashes remain unchanged. Independent numerical validation passed,
-including the exact-zero and inactive-channel oracle checks. Julio approved
-the DDC walkthrough on 2026-10-08; implementation review and merge-readiness
-work remain ongoing. Julio's visual review of the separate
-redrawn architecture views remains unapproved; see [CURRENT.md](../../CURRENT.md).
-The repeat-component workflow remains incomplete.
+Julio accepted the redrawn diagrams on 2026-10-26. This visual acceptance does
+not approve open architecture choices or code and hardware implementation.
+The DDC design discussion closed on 2026-09-29; Julio confirmed the Phase 0
+interface and evidence migration and authorized implementation on 2026-10-02.
+The recorded per-PRI core and WP4 suites and full-scan walkthrough pass. Pinned
+DDC-002 replay passed strict 1/1 at its historical revision, and all 23
+historical fixture hashes remain unchanged. Independent numerical validation
+passed, including exact-zero and inactive-channel checks. Julio approved the
+DDC walkthrough on 2026-10-08. The DDC PRI baseline was merged in PR #17; this
+does not mean all reviews passed. Full-branch Standards/Spec assessments remain
+incomplete, and MATLAB source review was blocked by Graphify's missing MATLAB
+extractor. These bounded results do not establish complete-receiver or
+hardware performance. The repeat-component workflow remains incomplete. See
+[CURRENT.md](../../CURRENT.md) for the active range-boundary milestone and
+authorization status.
 
 ## Ordered work
 
@@ -150,14 +154,18 @@ The DDC design choices below are approved and implemented in the MATLAB
 reference. The historical implementation accepted variable frames with
 continuous state. Julio approved independent per-PRI processing on 2026-09-29,
 confirmed the sample-only API and responsibilities on 2026-10-02, and authorized
-implementation that day. Scoped core and WP4 tests, the full-scan walkthrough,
-pinned DDC-002 replay, and fixture-preservation audit passed. Independent
+implementation that day. The recorded scoped core and WP4 tests and full-scan
+walkthrough passed. Pinned DDC-002 replay passed strict 1/1 at its historical
+revision; all 23 historical fixture hashes remain unchanged. Independent
 numerical validation passed, including exact-zero and inactive-channel checks.
-Julio approved the DDC walkthrough on 2026-10-08; implementation review and
-merge-readiness work remain ongoing. The historical G2 continuous-state
-baseline remains separate. Future
-Simulink models use fixed dimensions per configured model; execution choices
-remain deferred. Channel count is configurable for tests, with 64 as the default.
+Julio approved the DDC walkthrough on 2026-10-08. The DDC PRI baseline was
+merged in PR #17, but this does not mean all reviews passed: full-branch
+Standards/Spec assessments remain incomplete and MATLAB source review was
+blocked by Graphify's missing MATLAB extractor. The historical G2
+continuous-state baseline remains separate. These bounded checks do not
+establish complete-receiver or hardware performance. Future Simulink models
+use fixed dimensions per configured model; execution choices remain deferred.
+Channel count is configurable for tests, with 64 as the default.
 
 **Settled:** Preserve raw ADC samples as `int16` on disk and in the loaded ADC
 matrix. The caller converts each selected complete physical PRI to `double` at
@@ -313,13 +321,14 @@ The MATLAB Code Analyzer and focused DDC walkthrough/state-continuity checks
 passed on 2026-09-28. The full WP4 MATLAB MCP suite completed on 2026-09-28
 with 54 passed, 0 failed, and 0 incomplete in 84.2901 seconds. The joint design
 discussion closed on 2026-09-29; Julio confirmed the Phase 0 contract and
-authorized implementation on 2026-10-02. The per-PRI implementation, scoped
-core and WP4 suites, full-scan walkthrough, pinned DDC-002 replay, and
-independent numerical validation have passed. Julio approved the DDC
-walkthrough on 2026-10-08; implementation review and merge-readiness work
-remain ongoing. Visual review of the redrawn architecture
-diagrams remains unapproved. Then select
-the next component question under step 5.
+authorized implementation on 2026-10-02. The recorded per-PRI implementation,
+scoped core and WP4 suites, full-scan walkthrough, pinned DDC-002 replay, and
+independent numerical validation passed. Julio approved the DDC walkthrough
+on 2026-10-08. The DDC PRI baseline was merged in PR #17; full-branch
+Standards/Spec assessments remain incomplete and MATLAB source review was
+blocked by Graphify's missing MATLAB extractor. Julio accepted the redrawn
+architecture diagrams on 2026-10-26. The repeat-component workflow remains
+incomplete. Then select the next component question under step 5.
 
 Completion: the implementation and relevant checks pass, and the guide,
 glossary, diagrams, and current status describe the same API and compatibility
@@ -341,6 +350,10 @@ Q1–Q22 architecture summary on 2026-09-26. Steps 1 and 2 are drafted and passe
 independent document review. The new ADRs record approved decisions and passed
 independent semantic review on 2026-09-26. Step 3's overview is in the main
 working tree; its three PlantUML views passed syntax/render checks and preview
-inspection. The documents passed independent review; Julio's visual review of
-the redrawn views remains pending. Steps 4 and 5 remain incomplete. Completion
-still requires each step's stated acceptance criteria and required reviews.
+inspection. The documents passed independent review, and Julio accepted the
+redrawn diagrams on 2026-10-26. The DDC PRI baseline was merged in PR #17, but
+the merge does not mean all reviews passed. Full-branch Standards/Spec
+assessments remain incomplete; MATLAB source review was blocked by Graphify's
+missing MATLAB extractor. The repeat-component workflow remains incomplete.
+Steps 4 and 5 remain incomplete. Completion still requires each step's stated
+acceptance criteria and required reviews.

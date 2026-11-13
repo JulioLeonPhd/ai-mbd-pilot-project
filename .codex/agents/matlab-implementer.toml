@@ -1,7 +1,7 @@
 name = "matlab-implementer"
 description = "Implement MATLAB code and simple localized Simulink edits; use simulink-implementer for substantive model changes."
 model = "gpt-6-luna"
-model_reasoning_effort = "high"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 
 developer_instructions = """
