@@ -13,10 +13,12 @@ the model prompt; at that point the schema becomes the machine contract while
 the machine schemas at `contracts/agent-handoff/task.schema.json` and
 `contracts/agent-handoff/result.schema.json`.
 
-This plan separates instructions from enforcement. `AGENTS.md` governs agent
-behaviour; role TOMLs contain only role-specific differences; future runtime
-code owns canonical serialisation, content hashes, cache controls, and
-telemetry. Prompt caching cannot be enforced through `AGENTS.md`.
+This plan separates instructions from enforcement. `AGENTS.md` governs the
+shared contract; the six OMP-native role definitions contain bounded
+responsibilities and native defaults; future runtime code owns canonical
+serialisation, content hashes, cache controls, and telemetry. Codex remains a
+direct single-agent fallback without a parallel role inventory. Prompt caching
+cannot be enforced through `AGENTS.md`.
 
 ## Phase 1: compact, stable handoffs
 
@@ -55,15 +57,17 @@ telemetry. Prompt caching cannot be enforced through `AGENTS.md`.
    stable-prefix bytes for equivalent role/revision inputs and dynamic data is
    excluded from that prefix.
 
-3. **Reduce role-prompt duplication (root agent owns TOML edits, if needed).**
-   Compare `.codex/agents/*.toml` with `AGENTS.md`; remove duplicated global
-   workflow rules from role TOMLs and retain only model, sandbox, tools, and
-   role-specific responsibilities. Keep exact remaining role names. Mermaid work
-   uses the repository `diagrammer` skill directly rather than a specialist
-   handoff.
+3. **Keep role instructions bounded.** The six OMP-native Markdown definitions
+   are the sole sources of specialist instructions; keep them focused on
+   responsibility and preserve their native defaults. Do not create a parallel
+   Codex role inventory or deep profiles. Higher-capability execution uses an
+   exact approved native per-task selection without changing role identity.
+   Mermaid work uses the repository `diagrammer` skill directly rather than a
+   specialist handoff.
 
-   Completion criterion: each retained TOML instruction is demonstrably
-   role-specific, and global contract text has one authoritative source.
+   Completion criterion: `AGENTS.md` remains the single source for shared
+   workflow rules, and the six OMP-native definitions contain only their
+   bounded responsibilities and execution defaults.
 
 ## Phase 2: runtime enforcement and measurement
 

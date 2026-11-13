@@ -13,8 +13,9 @@ Work directly in the artifact owned by the current agent; this skill is not a
 delegation boundary. Record the diagram's purpose, audience, required elements,
 relationships, and constraints before authoring when they are not already explicit.
 
-Render or verify every Mermaid diagram with `mmdc` using the Edge procedure in the
-repository root `AGENTS.md`. Report the exact command and result. Treat an
-unavailable renderer as an unavailable check and a rejected diagram as a failed
-check. Completion requires accepted Mermaid source and a rendered diagram that
-preserves every required element and relationship.
+Render or verify every Mermaid diagram with `mmdc` using the Edge procedure in
+[task-specific agent guidance](../../../docs/agents/task-guidance.md#mermaid-diagrams).
+Report the exact command and result. Treat an unavailable renderer as an
+unavailable check and a rejected diagram as a failed check. Completion requires
+accepted Mermaid source and a rendered diagram that preserves every required
+element and relationship.

@@ -2,6 +2,12 @@
 
 Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
 
+## Authorization and execution
+
+Run all `gh` issue-tracker commands outside the command sandbox through execution-environment escalation.
+This outside-sandbox execution is authorized for all GitHub issue-tracker operations in this repository.
+Repository authorization does not replace applicable platform permission; if escalation is unavailable or denied, report `blocked` rather than bypass it.
+
 ## Conventions
 
 - **Create an issue**: `gh issue create --title "..." --body "..."`
