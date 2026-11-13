@@ -6,4 +6,4 @@
 | [Frozen WP4/G2 topology](architecture/architecture.md#architecture-wp4-topology) | Historical topology and evidence context for the bounded WP4/G2 scope; later DDC decisions remain authoritative. |
 | [Architecture decision records](adr/) | Authoritative approved decisions and their recorded status. |
 | [Radar V1 data contracts](contracts/radar-v1-data-contracts.md) | Authoritative data fields and invariants. |
-| [Current project status](../CURRENT.md) | Active work status and next authorized step. |
+| [V1 delivery action plan](plans/v1-delivery-action-plan.md) | Tracked work status and authorized next steps; the optional local `CURRENT.md` may supplement it when present. |

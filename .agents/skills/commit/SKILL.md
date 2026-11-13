@@ -76,15 +76,16 @@ tasks:
 
 After preparing the packet:
 
-1. Use only the native task API: it accepts `i`, `context`, and `tasks`; each
-   task item accepts `task`, `name`, and optional `agent`. Do not pass
-   `collaboration.*` calls or invent parameters such as `model`,
-   `reasoning_effort`, or `fork_turns`.
-2. Preserve the configured role routing. Ordinary tasks do not support model
-   overrides; the `technical-writer` role's configured Luna model is selected
-   by its `agent` name. Do not silently substitute a different model or role.
-   If the native `task` tool or requested role routing is unavailable, return
-   `blocked`; do not silently perform the commit in the root agent.
+1. Use only the active runtime's native task API and its documented schema.
+   Preserve `agent: technical-writer` for commit finalization and its configured
+   default selection; do not invent parameters or use another launcher.
+2. Preserve the configured role routing. Ordinary tasks use the role's native
+   default model; higher-capability tasks may use an exact approved per-task
+   model selection when the runtime supports it and the required permission is
+   available. Compare observed resolved execution with the approved need; never
+   silently substitute a different model or role. If the native `task` tool or
+   requested role routing is unavailable, return `blocked`; do not silently
+   perform the commit in the root agent.
 3. Include every fact the worker needs because it starts without the root
    conversation. Tell it to operate on the current branch and working tree,
    preserve other agents' edits, and return a structured result.

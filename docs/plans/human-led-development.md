@@ -43,9 +43,9 @@ DDC walkthrough on 2026-10-08. The DDC PRI baseline was merged in PR #17; this
 does not mean all reviews passed. Full-branch Standards/Spec assessments remain
 incomplete, and MATLAB source review was blocked by Graphify's missing MATLAB
 extractor. These bounded results do not establish complete-receiver or
-hardware performance. The repeat-component workflow remains incomplete. See
-[CURRENT.md](../../CURRENT.md) for the active range-boundary milestone and
-authorization status.
+hardware performance. The repeat-component workflow remains incomplete. The
+optional local `CURRENT.md` may contain the active range-boundary milestone and
+authorization checkpoint; tracked context is in the [V1 delivery action plan](v1-delivery-action-plan.md).
 
 ## Ordered work
 
@@ -69,15 +69,18 @@ definitions.
 
 ### 2. Improve the project overview and current-state references
 
-Revise `README.md`, `GLOSSARY.md`, and `CURRENT.md`:
+Revise `README.md`, `GLOSSARY.md`, and, when maintaining a local checkpoint,
+`CURRENT.md`:
 
 - `README.md` explains the project purpose, learning goals, architecture
   diagram, current capability, a starting example, and human and agent roles.
 - `GLOSSARY.md` contains the domain vocabulary, starting with radar and DSP
   concepts. Preserve mathematical conventions. Move workflow vocabulary to an
   appropriate workflow reference rather than mixing it into domain terms.
-- `CURRENT.md` identifies only the active work package, gate, or milestone, its approval and evidence state, pending human decisions or reviews, and the next authorized step.
-- Follow the status and archival lifecycle in [AGENTS.md](../../AGENTS.md).
+- Optional, worktree-local `CURRENT.md` identifies only the active work package,
+  gate, or milestone, its approval and evidence state, pending human decisions or reviews,
+  and the next authorized step.
+- Follow the status and archival lifecycle in [Active status and history](../agents/task-guidance.md#active-status-and-history).
 
 Completion: readers can find project orientation, domain terms, and current
 status in the appropriate document, with claims linked to their evidence.

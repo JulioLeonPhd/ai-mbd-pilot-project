@@ -11,11 +11,6 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-try:
-    import tomllib
-except ModuleNotFoundError:  # pragma: no cover - Python 3.10 compatibility path
-    import tomli as tomllib  # type: ignore[import-not-found,no-redef]
-
 ROOT = Path(__file__).resolve().parents[1]
 TASK_FIELDS = (
     "id",
@@ -38,11 +33,77 @@ RESULT_FIELDS = (
     "handoff",
 )
 RESULT_STATUSES = ("complete", "needs-input", "blocked", "failed")
-GLOBAL_PROMPT_MARKERS = (
-    "task and result packet contract",
-    "inherit-full-conversation",
-    "allowed_mutations",
-    "do not spawn subagents",
+
+NATIVE_ROLES = (
+    "matlab-architect",
+    "matlab-implementer",
+    "simulink-implementer",
+    "matlab-validator",
+    "technical-writer",
+    "technical-writer-validator",
+)
+NATIVE_DECLARATIONS = {
+    "matlab-architect": (
+        "Design MATLAB and Simulink solutions, including solver, timing, numerical, "
+        "and code-generation concerns.",
+        "openai-codex/gpt-5.6-sol",
+        "high",
+        False,
+        ("design", "interfaces", "Julio owns"),
+    ),
+    "matlab-implementer": (
+        "Implement MATLAB code and simple localized Simulink edits; use "
+        "simulink-implementer for substantive model changes.",
+        "openai-codex/gpt-6-luna",
+        "xhigh",
+        True,
+        ("approved MATLAB code changes", "localized Simulink edits", "Julio owns"),
+    ),
+    "simulink-implementer": (
+        "Implement substantive Simulink topology, interface, configuration, or "
+        "multi-step MCP model changes.",
+        "openai-codex/gpt-6.1-sol",
+        "medium",
+        True,
+        ("substantive Simulink topology", "approved architecture", "Julio owns"),
+    ),
+    "matlab-validator": (
+        "Independently validate complex MATLAB and Simulink changes, including "
+        "control, solver, numerical, safety, and code-generation risks.",
+        "openai-codex/gpt-5.6-sol",
+        "medium",
+        False,
+        (
+            "Independently validate",
+            "without changing implementation artifacts",
+            "findings",
+        ),
+    ),
+    "technical-writer": (
+        "Produce concise Markdown documents and manifest JSON files.",
+        "openai-codex/gpt-6-luna",
+        "high",
+        True,
+        ("Create or edit concise Markdown", "approved", "technical-writer-validator"),
+    ),
+    "technical-writer-validator": (
+        "Independently validate complex Markdown, including safety guidance and "
+        "intricate architecture documentation.",
+        "openai-codex/gpt-5.6-sol",
+        "medium",
+        False,
+        ("Independently validate complex Markdown", "do not silently", "findings"),
+    ),
+}
+OMP_READ_TOOLS = {"read", "grep", "glob", "web_search"}
+OMP_WRITE_TOOLS = OMP_READ_TOOLS | {"write", "edit", "bash", "eval"}
+OMP_READ_POLICY_MARKERS = (
+    "MCP, extension, and custom tools may still",
+    "not filesystem or external-service isolation",
+)
+OMP_WRITE_POLICY_MARKERS = (
+    "extension, and custom tools only within that same authorization",
+    "do not confine filesystem or external-service access",
 )
 MARKDOWN_PATHS = (
     "AGENTS.md",
@@ -50,18 +111,19 @@ MARKDOWN_PATHS = (
     ".agents/skills/diagrammer/SKILL.md",
     "docs/adr/0001-root-agent-orchestrated-matlab-simulink-specialists.md",
     "docs/adr/0018-flatten-specialist-orchestration.md",
+    "docs/adr/0028-permit-bounded-omp-native-orchestration-simplification.md",
     "docs/plans/agent-handoff-token-optimisation.md",
+    "docs/plans/omp-native-orchestration-simplification.md",
+    "docs/agents/task-guidance.md",
     "docs/architecture/agent-orchestration-runtime.md",
     "CHANGELOG.md",
+    ".omp/agents/matlab-architect.md",
+    ".omp/agents/matlab-implementer.md",
+    ".omp/agents/simulink-implementer.md",
+    ".omp/agents/matlab-validator.md",
+    ".omp/agents/technical-writer.md",
+    ".omp/agents/technical-writer-validator.md",
 )
-OMP_MODELS = {
-    "gpt-6-luna": "openai-codex/gpt-6-luna",
-    "gpt-5.6-sol": "openai-codex/gpt-5.6-sol",
-    "gpt-6.1-sol": "openai-codex/gpt-6.1-sol",
-    "gpt-6-astra": "openai-codex/gpt-6-astra",
-}
-OMP_READ_TOOLS = {"read", "grep", "glob", "web_search"}
-OMP_WRITE_TOOLS = OMP_READ_TOOLS | {"write", "edit", "bash", "eval"}
 OMP_PROMPT_MARKERS = (
     "Read the repository root `AGENTS.md` before acting",
     "do not spawn subagents",
@@ -91,12 +153,14 @@ def _failed(name: str, evidence: str) -> Check:
     return Check(name, "failed", evidence)
 
 
-def _registry_names(contract: str) -> set[str]:
+def _registry_names(contract: str) -> list[str]:
     section = contract.split("## Specialist registry and conditional routing", 1)
     if len(section) != 2:
-        return set()
-    table = section[1].split("## Workflow sequencing", 1)[0]
-    return set(re.findall(r"^\| `([^`]+)` \|", table, flags=re.MULTILINE))
+        return []
+    table = re.search(r"(?m)^\|.*(?:\n\|.*)*", section[1])
+    if table is None:
+        return []
+    return re.findall(r"^\| `([^`]+)` \|", table.group(), flags=re.MULTILINE)
 
 
 def _packet_fields(contract: str, packet: str) -> set[str]:
@@ -109,20 +173,6 @@ def _packet_fields(contract: str, packet: str) -> set[str]:
         if match is not None:
             return set(re.findall(r"^  ([a-z_]+):", match.group("body"), re.MULTILINE))
     return set()
-
-
-def _load_agents(root: Path) -> tuple[list[dict[str, object]], list[str]]:
-    agents: list[dict[str, object]] = []
-    errors: list[str] = []
-    for path in sorted((root / ".codex/agents").glob("*.toml")):
-        try:
-            data = tomllib.loads(path.read_text(encoding="utf-8"))
-        except (OSError, tomllib.TOMLDecodeError) as error:
-            errors.append(f"{path.relative_to(root)}: {error}")
-            continue
-        data["_path"] = path
-        agents.append(data)
-    return agents, errors
 
 
 def _parse_omp_agent(content: str) -> dict[str, object]:
@@ -148,15 +198,14 @@ def _parse_omp_agent(content: str) -> dict[str, object]:
     return data
 
 
-def _check_omp_agents(
-    root: Path, codex_agents: list[dict[str, object]], registry: set[str]
-) -> Check:
-    """Check native equivalents and declared controls without claiming isolation."""
+def _check_omp_agents(root: Path, registry: list[str]) -> Check:
+    """Check the six native roles and their declared controls, not isolation."""
 
     errors: list[str] = []
+    paths = sorted((root / ".omp/agents").glob("*.md"))
     names: list[str] = []
-    codex = {str(agent.get("name")): agent for agent in codex_agents}
-    for path in sorted((root / ".omp/agents").glob("*.md")):
+    parsed: dict[str, tuple[Path, dict[str, object]]] = {}
+    for path in paths:
         label = str(path.relative_to(root))
         try:
             agent = _parse_omp_agent(path.read_text(encoding="utf-8"))
@@ -168,52 +217,90 @@ def _check_omp_agents(
             errors.append(f"{label}: invalid name")
             continue
         names.append(name)
-        if path.stem != name or name.lower() in {"main", "sub"}:
-            errors.append(f"{label}: invalid or mismatched filename/name")
-        source = codex.get(name)
-        if source is None:
-            errors.append(f"{label}: no matching Codex definition")
+        if path.stem != name:
+            errors.append(f"{label}: filename does not match {name!r}")
+        if name in parsed:
+            errors.append(f"duplicate OMP agent name: {name}")
             continue
-        expected = {
-            "description": source.get("description"),
-            "model": OMP_MODELS.get(str(source.get("model"))),
-            "thinking-level": source.get("model_reasoning_effort"),
-            "spawns": "",
-        }
-        for key, value in expected.items():
-            if key not in agent or value is None or agent[key] != value:
-                errors.append(f"{label}: incorrect {key}; expected {value!r}")
-        tools = agent.get("tools")
-        expected_tools = (
-            OMP_READ_TOOLS
-            if source.get("sandbox_mode") == "read-only"
-            else OMP_WRITE_TOOLS
+        parsed[name] = (path, agent)
+
+    duplicate_registry = sorted({name for name in registry if registry.count(name) > 1})
+    if duplicate_registry:
+        errors.append(f"duplicate registry roles: {duplicate_registry}")
+    if set(registry) != set(NATIVE_ROLES) or len(registry) != len(NATIVE_ROLES):
+        errors.append(f"registry roles={registry}; expected={list(NATIVE_ROLES)}")
+    if set(names) != set(NATIVE_ROLES) or len(names) != len(NATIVE_ROLES):
+        errors.append(f"OMP roles={names}; expected={list(NATIVE_ROLES)}")
+
+    for path in sorted((root / ".codex/agents").glob("*.toml")):
+        errors.append(
+            f"maintained Codex specialist definition: {path.relative_to(root)}"
         )
+
+    required = {"name", "description", "model", "thinking-level", "spawns", "tools"}
+    for name, (path, agent) in parsed.items():
+        label = str(path.relative_to(root))
+        expected = NATIVE_DECLARATIONS.get(name)
+        if expected is None:
+            errors.append(f"{label}: unexpected OMP role {name!r}")
+            continue
+        description, model, effort, writable, scope_markers = expected
+        for key, value in (
+            ("name", name),
+            ("description", description),
+            ("model", model),
+            ("thinking-level", effort),
+            ("spawns", ""),
+        ):
+            if agent.get(key) != value:
+                errors.append(f"{label}: incorrect {key}; expected {value!r}")
+        missing = required - agent.keys()
+        if missing:
+            errors.append(f"{label}: missing {', '.join(sorted(missing))}")
+        tools = agent.get("tools")
+        expected_tools = OMP_WRITE_TOOLS if writable else OMP_READ_TOOLS
         if (
             not isinstance(tools, list)
             or not all(isinstance(tool, str) for tool in tools)
             or set(tools) != expected_tools
+            or len(tools) != len(expected_tools)
         ):
             errors.append(f"{label}: incorrect built-in tool allowlist")
-        body = str(agent["_body"])
-        if str(source.get("developer_instructions", "")).strip() not in body:
-            errors.append(f"{label}: Codex role instructions differ or are missing")
-        for marker in OMP_PROMPT_MARKERS:
-            if marker not in body:
-                errors.append(f"{label}: missing operating boundary {marker!r}")
-    inventory = set(names)
-    if len(names) != len(inventory):
-        errors.append("duplicate OMP agent names")
-    if inventory != registry or inventory != set(codex):
-        errors.append(
-            f"OMP={sorted(inventory)}; registry={sorted(registry)}; "
-            f"Codex={sorted(codex)}"
+        body = str(agent.get("_body", ""))
+        normalized_body = " ".join(body.split())
+        if f"# {name}\n" not in body:
+            errors.append(f"{label}: missing role heading")
+        policy_markers = (
+            OMP_WRITE_POLICY_MARKERS if writable else OMP_READ_POLICY_MARKERS
         )
+        for marker in (*OMP_PROMPT_MARKERS, *policy_markers, *scope_markers):
+            if not re.search(
+                r"(?<!\w)" + re.escape(marker) + r"(?!\w)", normalized_body
+            ):
+                errors.append(f"{label}: missing operating boundary {marker!r}")
+        for sentence in re.split(r"(?<=[.!?])\s+", normalized_body):
+            if re.search(
+                r"\b(?:spawn\w*|delegate\w*)\b",
+                sentence,
+                flags=re.IGNORECASE,
+            ) and not re.search(
+                r"\b(?:do not|don't|never|must not|cannot|no tool may be)\b",
+                sentence,
+                flags=re.IGNORECASE,
+            ):
+                errors.append(f"{label}: may not spawn or delegate subagents")
+        if name in {"matlab-validator", "technical-writer-validator"}:
+            if (
+                "inspection-only" not in body
+                or "Do not invoke mutation operations" not in body
+            ):
+                errors.append(f"{label}: validator must remain nonrepairing")
+
     if errors:
         return _failed("OMP native agents", "; ".join(errors))
     return _passed(
         "OMP native agents",
-        f"{len(names)} aligned roles; declared tools/spawns only, not OS isolation",
+        f"{len(names)} native roles; declared tools/spawns only, not OS isolation",
     )
 
 
@@ -228,56 +315,23 @@ def collect_checks(
         return [_failed("orchestration contract", "AGENTS.md is missing")]
     contract = contract_path.read_text(encoding="utf-8")
 
-    agents, parse_errors = _load_agents(root)
-    required = {
-        "name",
-        "description",
-        "model",
-        "model_reasoning_effort",
-        "sandbox_mode",
-        "developer_instructions",
-    }
-    structural_errors = list(parse_errors)
-    names: list[str] = []
-    for agent in agents:
-        path = agent["_path"]
-        assert isinstance(path, Path)
-        missing = required - agent.keys()
-        if missing:
-            structural_errors.append(
-                f"{path.relative_to(root)}: missing {', '.join(sorted(missing))}"
-            )
-        name = agent.get("name")
-        if not isinstance(name, str):
-            structural_errors.append(f"{path.relative_to(root)}: invalid name")
-            continue
-        names.append(name)
-        if path.stem != name:
-            structural_errors.append(
-                f"{path.relative_to(root)}: filename does not match {name!r}"
-            )
-    duplicate_names = sorted({name for name in names if names.count(name) > 1})
-    if duplicate_names:
-        structural_errors.append(f"duplicate agent names: {', '.join(duplicate_names)}")
-    if structural_errors:
-        checks.append(_failed("agent TOMLs", "; ".join(structural_errors)))
-    else:
-        checks.append(_passed("agent TOMLs", f"parsed {len(agents)} unique roles"))
-
     registry = _registry_names(contract)
-    inventory = set(names)
-    if registry == inventory:
-        checks.append(_passed("specialist registry", f"matches {len(inventory)} TOMLs"))
+    registry_set = set(registry)
+    if len(registry) == len(NATIVE_ROLES) and registry_set == set(NATIVE_ROLES):
+        checks.append(
+            _passed("specialist registry", "contains exactly six native roles")
+        )
     else:
+        duplicates = sorted({name for name in registry if registry.count(name) > 1})
         checks.append(
             _failed(
                 "specialist registry",
-                f"contract-only={sorted(registry - inventory)}; "
-                f"TOML-only={sorted(inventory - registry)}",
+                f"roles={registry}; duplicates={duplicates}; "
+                f"expected={list(NATIVE_ROLES)}",
             )
         )
 
-    checks.append(_check_omp_agents(root, agents, registry))
+    checks.append(_check_omp_agents(root, registry))
 
     task_fields = _packet_fields(contract, "task")
     result_fields = _packet_fields(contract, "result")
@@ -297,44 +351,18 @@ def collect_checks(
             _passed("packet contract", "required field names and status tokens found")
         )
 
-    nested = []
-    duplicated = []
-    for agent in agents:
-        instructions = str(agent.get("developer_instructions", "")).lower()
-        name = str(agent.get("name", "<unnamed>"))
-        if "spawn_agent" in instructions or re.search(
-            r"spawn\w*\s+(?:a\s+)?(?:sub)?agent", instructions
-        ):
-            nested.append(name)
-        markers = [marker for marker in GLOBAL_PROMPT_MARKERS if marker in instructions]
-        if markers:
-            duplicated.append(f"{name}: {', '.join(markers)}")
-    if (
-        nested
-        or "Specialists work independently and never spawn subagents." not in contract
-    ):
-        checks.append(_failed("flat orchestration", f"nested roles={nested}"))
-    else:
+    if "Specialists work independently and never spawn subagents." not in contract:
         checks.append(
-            _passed(
-                "flat orchestration",
-                "contract declares root-only spawning; TOMLs contain no spawn markers",
-            )
+            _failed("flat orchestration", "missing root-only spawning policy")
         )
-    if duplicated:
-        checks.append(_failed("role prompt economy", "; ".join(duplicated)))
     else:
         checks.append(
-            _passed("role prompt economy", "no global prompt markers in TOMLs")
+            _passed("flat orchestration", "contract declares root-only spawning")
         )
 
     diagram_skill = root / ".agents/skills/diagrammer/SKILL.md"
-    diagram_agents = (
-        root / ".codex/agents/diagrammer.toml",
-        root / ".omp/agents/diagrammer.md",
-    )
-    diagram_agent_present = any(path.exists() for path in diagram_agents)
-    if diagram_skill.is_file() and not diagram_agent_present:
+    diagram_agent = root / ".omp/agents/diagrammer.md"
+    if diagram_skill.is_file() and not diagram_agent.exists():
         checks.append(
             _passed("diagrammer boundary", "skill present; specialist absent")
         )
@@ -342,7 +370,7 @@ def collect_checks(
         checks.append(
             _failed(
                 "diagrammer boundary",
-                f"skill={diagram_skill.is_file()}, specialist={diagram_agent_present}",
+                f"skill={diagram_skill.is_file()}, specialist={diagram_agent.exists()}",
             )
         )
 
@@ -356,9 +384,6 @@ def collect_checks(
             paths = [
                 str(root / path) for path in MARKDOWN_PATHS if (root / path).is_file()
             ]
-            paths.extend(
-                str(path) for path in sorted((root / ".omp/agents").glob("*.md"))
-            )
             result = subprocess.run(
                 [executable, *paths],
                 cwd=root,
