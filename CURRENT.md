@@ -15,7 +15,7 @@ These results do not establish full-receiver or hardware performance, and histor
 The range brief review uses the [WP6b acceptance criteria](docs/plans/radar-matlab-v1.md#wp6-unit-test-gates), [current data contracts](docs/contracts/radar-v1-data-contracts.md), and [approved responsibility boundaries](docs/adr/0021-adopt-dsp-responsibilities-and-ambiguity-baseline.md).
 Range processing follows commanded-look azimuth beamforming and precedes separate pulse accumulation/range-migration handling and Doppler processing.
 The four complex elevation streams and calibrated range-bin coordinates are baseline requirements; the batch range seam does not settle a streaming public API.
-Approved decisions are recorded in [#19](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/19#issuecomment-6417700433) (ideal reference, correlation scaling and lag conventions) and [#20](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/20#issuecomment-6421083854) (range mapping and caller-owned exactly-once DDC delay correction). These are planning decisions, not implementation authorization.
+The decisions in issues #19–#22 define the approved processing contracts; Julio's separate 2026-11-12 authorization permits implementation only within the MATLAB `processPri` component.
 
 Julio approved complete-window eligibility on 2026-10-26: lag `k` requires all 500 input samples from `k` through `k+499`, inclusive, to be valid; a contiguous valid interval `[a,b]` permits `a <= k <= b-499`. Zeros do not imply invalidity, and coordinate correction does not recover missing samples. See the [#21 partial resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/21#issuecomment-6425156364).
 Julio also approved retaining the full lag grid with an authoritative validity mask, noting that omitting bins would complicate Simulink integration; see the [#21 output-representation resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/21#issuecomment-6425209343).
@@ -30,9 +30,37 @@ The original reference-only study and independent numerical review are complete 
 
 Earlier study reports and historical JSON retain their original observations and approval labels; the later approval does not rewrite them. The root-side coordinate check covered 7,353 values per path in JS binary64 with maximum residual/budget ratios 0.062455592152661873 (ideal) and 0.06176666066598693 (sampled), zero violations; this was not a MATLAB rerun or stored pointwise MATLAB proof.
 
-On 2026-11-10, root posted final resolutions and closed [#24](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6762277382) and [#23](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23#issuecomment-6762278228). The bounded planning and evidence dispositions are complete; neither authorizes production implementation or advances a gate. Next, request Julio's explicit production-implementation authorization. No new milestone or gate assignment is recorded.
+On 2026-11-12, Julio explicitly authorized production implementation of the approved MATLAB `processPri` range-compression component; this authorization is limited to that component and does not advance a gate or authorize Simulink, hardware acceptance, or broader receiver claims.
+The active milestone remains range-acceptance evidence within human-led development step 5 on `component/range-processor`, with no formal work-package or gate assignment recorded.
+The public API, implementation, focused tests, and executable walkthrough are present at `radardemo.rangeCompression.processPri`, `src/+radardemo/+rangeCompression/processPri.m`, `tests/rangeCompression/TestProcessPri.m`, and `examples/runRangeCompressionWalkthrough.m`.
+In MATLAB R2026a Update 5 (PID 75572), the focused API suite passed 26/26 tests, and Code Analyzer reported no issues for the implementation, tests, walkthrough, or production acceptance runner.
+The walkthrough executed with a maximum aligned complex residual of `1.8209e-14`; its narrative and equations were inspected as browser-rendered source-only content without embedded outputs, and its plot was separately observed.
+The production runner `tests/rangeCompression/runRangeProductionAcceptance.m` completed with 96/96 records and 384/384 stream evaluations passing all fixture-scoped physical gates; correlation, validity, and peak self-checks passed.
+All 32 coordinate records passed the tolerance check, with a maximum residual-to-budget ratio of `0.062455592152661873`; the runner report is `tests/rangeCompression/range-production-acceptance-results.json`.
+The independent deep numerical review completed with no unresolved errors in its assigned scope after inspection of source, tests, oracle, runner, and regenerated JSON; root executed MATLAB, and the reviewer did not independently execute MATLAB.
+Independent documentation review also found no errors within scope; human walkthrough/component review was the next step at that checkpoint and was not implied by those results.
+The accepted contracts remain in [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md) and [ADR 0026](docs/adr/0026-adopt-per-pri-range-compression-api.md), with fixture-scoped criteria in [ADR 0027](docs/adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md).
+Simulink Boolean ports, boundary conversion, scheduling, and downstream ambiguity choices remain outside this authorization.
+Historical reports and evidence retain their original observations and approval labels.
 
-The approved contracts in [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md) and [ADR 0026](docs/adr/0026-adopt-per-pri-range-compression-api.md) remain the baseline. Simulink Boolean ports, boundary conversion, scheduling, and downstream ambiguity choices remain outside this approval. Executable walkthrough and implementation/evidence work remain subject to the component workflow and separate authorization.
+Julio authorized the walkthrough and portable teaching-skill revisions following his review.
+The first revision had 13 numbered sections, pre-call analytical expectations, separate four-stream dB and I/Q panels, and explicit validity interpretation.
+The final source executed successfully in MATLAB R2026a batch mode (PID 56148), preserving all three figures; aligned complex residual was `1.8209e-14`, and shape, mask, and zero-semantics assertions passed.
+Code Analyzer reported no issues; all 31 equations passed KaTeX checks before and after HTML escaping, and the exported source-only HTML and actual figures were visually inspected.
+Independent numerical, narrative, and portable-skill reviews found no unresolved errors; reviewers inspected sources rather than independently executing MATLAB.
+At that check, fresh output embedding failed twice because nested Live Editor execution was unsupported; the source then contained no embedded outputs, and native Live Editor appearance remained unverified.
+At that checkpoint, Julio's human walkthrough delivery review remained pending; the checks did not advance the milestone or gate, and the earlier production-suite evidence was not rerun.
+
+Following Julio's delivery feedback, the walkthrough now has a fourteenth section identifying its local path-management helper, horizontal reference labels, requested 1000-by-900-pixel panel canvases, and explicit dimensionless amplitude/dB-reference labels.
+Prior-run embedded outputs subsequently present in the file were preserved; they have not been refreshed for these presentation changes.
+The portable skill now covers helper sections, honest synthetic units, readable annotations, and canvas-sizing limitations.
+The presentation-only changes leave the public API and processing unchanged.
+The final presentation source ran successfully in MATLAB R2026a batch mode (PID 66784): eight horizontal annotations, three retained figures, both requested canvas sizes, and aligned-response assertions passed.
+Fresh exported magnitude and I/Q figures were visually inspected; Code Analyzer reported no issues, 32 inline expressions passed both KaTeX pipelines, and independent source review found no unresolved errors.
+Julio subsequently approved the walkthrough, completing its human delivery review.
+This approval applies to the walkthrough only; it does not establish component acceptance or advance a broader gate.
+Julio subsequently also approved the MATLAB `processPri` range-compression component, completing its human component review.
+Both the component and its walkthrough are now human-approved within the recorded MATLAB scope; this does not authorize Simulink integration, hardware acceptance, broader receiver claims, or advancement of an unassigned gate.
 
 AI-infrastructure development remains frozen until radar v1 under [ADR 0023](docs/adr/0023-freeze-ai-infrastructure-until-v1.md).
 [ADR 0024](docs/adr/0024-require-plain-text-matlab-live-script-walkthroughs.md) requires executable R2025a+ plain-text `.m` walkthroughs; no repository-wide migration completion is recorded.
