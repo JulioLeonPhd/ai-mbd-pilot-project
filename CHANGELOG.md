@@ -8,6 +8,71 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.9.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.9.0) - 2026-11-13
+
+<small>[Compare with v0.8.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.8.0...v0.9.0)</small>
+
+### Added
+
+- Added: implement approved per-PRI range compression ([fcefc43](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/fcefc436c89c944a0182628c514afeb4abbe4e4a) by Julio Leon). SemVer impact: minor
+- Added: preserve range candidate replay and final decisions ([280f885](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/280f8857046bbfe8e9031132ba901247cce7f185) by Julio Leon). SemVer impact: none
+- Added: record range evidence and realistic fixture selection ([fa7eb27](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/fa7eb27fd0031c58d9aca6a31f5df960991df79c) by Julio Leon). SemVer impact: none
+- Added: record range acceptance fixtures and evidence boundary ([054d44d](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/054d44d60995f635e0f883938ef15722823b6c9f) by Julio Leon). Refs: #23, #24, SemVer impact: none
+- Added: record approved range-compression contracts ([afaf9dc](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/afaf9dca313d25d9c3eb89887bf14ceddefd4f3f) by Julio Leon). SemVer impact: none
+- Added: support native OMP project specialists ([53f5247](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/53f524756ed1d2a1b78800dceb604a3193048758) by Julio Leon). SemVer impact: none
+- Added: second-brain decision recovery lessons ([b773552](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/b773552d39b6271b8a0317ffc0005168dd81627e) by Julio Leon). SemVer impact: none
+- Added: Obsidian vault docs ([feb5722](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/feb5722fed7d9a9232ebdbed404c48020707275c) by Julio Leon).
+
+### Changed
+
+- Changed: record approved range numerical budgets ([57a671c](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/57a671c99bd4d7d7e24f28a11a08cb67d6668814) by Julio Leon). SemVer impact: none
+- Changed: record range acceptance decisions and deferred study ([a11ad46](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/a11ad46f53fb3dcfc0a2ba39e3e3f74b2734ef09) by Julio Leon). Refs: #23, SemVer impact: none
+- Changed: Default models for the subagents. ([5bff173](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/5bff17338d5a7ecddafa3694821a82b53615f76d) by Julio Leon).
+- Changed: update project history to reflect DDC merge and transition to range-component boundary review ([c3e0bb3](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c3e0bb3954d2f1a7b4ca722b947f5ab82ed970eb) by Julio Leon).
+- Changed: finalize PR review records and exclude private notes ([03cc188](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/03cc188f50e21889c23de5a4fde0f6841a1aec98) by Julio Leon).
+- Changed: clarify DDC filter-response walkthrough ([c1e82f7](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c1e82f7267d77033b72d1240e26f551004397e92) by Julio Leon). SemVer impact: none
+- Changed: define MATLAB MCP session ownership ([7a33009](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/7a33009e9a8f1481798bc14186a1e33c83b24f2c) by Julio Leon). SemVer impact: none
+- Changed: add modest ADC noise to the DDC walkthrough ([79362fb](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/79362fb761fa07a7118c71db256840895089ae44) by Julio Leon). SemVer impact: none
+- Changed: make DDC walkthrough an explicit Live Script lesson ([e74b2fa](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/e74b2fa739d91edb42bf14a28603a1fd09a95f1d) by Julio Leon). SemVer impact: none
+- Changed: prioritize radar v1 delivery over AI infrastructure ([e055e59](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/e055e592b9559070f83a304a88033e7684f8a2e5) by Julio Leon). SemVer impact: none
+- Changed: keep project status focused on active work ([08069ec](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/08069ec9fb35e11a4a8009c021254a37498d5e7e) by Julio Leon). SemVer impact: none
+- Changed: update Obsidian workspace preferences ([1ddcd18](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/1ddcd1801a52c213eb74bb9a7b6a80e0b5d16631) by Julio Leon). SemVer impact: none
+- Changed: use Luna with high reasoning for MATLAB implementation ([ac4cb7a](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/ac4cb7aa49b2ddcf4934194392e13854bf0eb968) by Julio Leon). SemVer impact: none
+- Changed: use gpt-6.1-sol for documentation validation ([c43c591](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c43c591d1bcf554591ba664bf84b88f8090af312) by Julio Leon). SemVer impact: none
+- Changed: tune documentation specialist settings ([afa3e49](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/afa3e49927492b7914033d445f198a14d1df9bef) by Julio Leon). SemVer impact: none
+- Changed: align architecture and validation model settings ([2d516e1](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/2d516e1cde9a21ebe92f78b5773470206f2ff905) by Julio Leon). SemVer impact: none
+- Changed: update specialist model assignments ([4e1bfc7](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/4e1bfc7dac9b38dc5f9928874f7c21436ab5ed58) by Julio Leon). SemVer impact: none
+- Changed: separate domain vocabulary from radar equations ([45a70ab](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/45a70ab79b516e8733e8f18373f1d6bda53b73ac) by Julio Leon). SemVer impact: none
+- Changed: record DDC walkthrough approval and merge follow-ups ([b775198](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/b7751985c8909865c8990023d5b3e991c331f327) by Julio Leon). Refs: #6; ADR 0022, SemVer impact: none
+- Changed: simplify DDC walkthrough into a one-PRI lesson ([10b6456](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/10b6456794bf8f952c2ce3989791b9e3e8c8357d) by Julio Leon). SemVer impact: none
+- Changed: simplify oracle validation and clustering helpers ([ae0323a](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/ae0323a266190c0b936a5e47a762d26d064c825c) by Julio Leon). SemVer impact: none
+- Changed: implement independent per-PRI DDC processing ([73e0e41](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/73e0e41a989f432b77d9719e7dcbddec4815fdb2) by Julio Leon). Refs: #6, #7, #8; ADR 0022, SemVer impact: major
+
+### Fixed
+
+- Fixed: restore real-tone amplitude in per-PRI DDC ([78ecf00](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/78ecf005b547a59b4bf0dcb696900c00a9e917b5) by Julio Leon). SemVer impact: major
+- Fixed: cover the full DDC cascade stopband for issue #6 ([c4599a3](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c4599a33842cf4e518a2c83dba04aad754992d28) by Julio Leon). Refs: #6; ADR 0022, SemVer impact: patch
+
+### Removed
+
+- Removed: .obsidian workspace configuration file ([11c3c77](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/11c3c77da37c56d809a2779427bf7ac55476c118) by Julio Leon).
+
+### Merged
+
+- Merge pull request #26 from JulioLeonPhd/component/range-processor ([64ed326](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/64ed326b06041973e7fff71272c77f525c4ee600) by Julio León).
+- Merge pull request #17 from JulioLeonPhd/component/ddc-pri-processing ([7aae9e6](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/7aae9e6f71c30c29814a7aa647748f0aec65dc19) by Julio León).
+
+### Misc
+
+- Updated: Codex Orchestration rules ([7be6642](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/7be66424f89487c5d189653ec4f856feaabe7da3) by Julio Leon).
+- Updated: documentation across multiple files, including architecture navigation, human-led development plan, and MATLAB standards, to reflect recent changes and clarifications in project scope and implementation status. ([f40e1f2](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/f40e1f2614106f4cd5dd0f92ff6decfbdb805e71) by Julio Leon).
+- Minor update to AGENTS.md ([460656c](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/460656c8c54118d5a2d52af20dc60e7eb45d42b3) by Julio Leon).
+- Updated: routing model in commit skill ([43a23bc](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/43a23bcadebea26594d3ee0f6dc063300d15b9cf) by Julio Leon).
+- Updated obsidian config files ([d2152bb](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/d2152bb5395544a1465895dfe614963771dec67c) by Julio Leon).
+- Enhanced: AGENTS.md with documentation style guidelines for clarity and consistency. Added: Obsidian plugins for HTML, git and search. ([73451c9](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/73451c91d073efa64555051a089df0d0cb2e4d66) by Julio Leon).
+- Refactored:  DDC processing and validation: restructure output design, enhance check case logic. ([c846f7b](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c846f7b7121e1fdf3eb8d60df31ba63aa94613a5) by Julio Leon).
+- Updated: technical-writer for clarity ([af8d9e2](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/af8d9e26d8ab31547eccf568303391cb650c15fb) by Julio Leon).
+
 ## Unreleased
 
 ### Added
