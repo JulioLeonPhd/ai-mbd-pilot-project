@@ -1,7 +1,7 @@
 ---
 name: "matlab-architect"
 description: "Design MATLAB and Simulink solutions, including solver, timing, numerical, and code-generation concerns."
-model: "openai-codex/gpt-5.6-sol"
+model: "openai-codex/gpt-6.2-sol"
 thinking-level: "high"
 spawns: ""
 tools: ["read", "grep", "glob", "web_search"]

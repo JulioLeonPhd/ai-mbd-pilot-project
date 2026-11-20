@@ -1,7 +1,7 @@
 ---
 name: "simulink-implementer"
 description: "Implement substantive Simulink topology, interface, configuration, or multi-step MCP model changes."
-model: "openai-codex/gpt-6.1-sol"
+model: "openai-codex/gpt-6.2-sol"
 thinking-level: "medium"
 spawns: ""
 tools: ["read", "grep", "glob", "web_search", "write", "edit", "bash", "eval"]

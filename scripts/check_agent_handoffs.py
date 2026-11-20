@@ -46,7 +46,7 @@ NATIVE_DECLARATIONS = {
     "matlab-architect": (
         "Design MATLAB and Simulink solutions, including solver, timing, numerical, "
         "and code-generation concerns.",
-        "openai-codex/gpt-5.6-sol",
+        "openai-codex/gpt-6.2-sol",
         "high",
         False,
         ("design", "interfaces", "Julio owns"),
@@ -54,15 +54,15 @@ NATIVE_DECLARATIONS = {
     "matlab-implementer": (
         "Implement MATLAB code and simple localized Simulink edits; use "
         "simulink-implementer for substantive model changes.",
-        "openai-codex/gpt-6-luna",
-        "xhigh",
+        "openai-codex/gpt-6.1-terra",
+        "medium",
         True,
         ("approved MATLAB code changes", "localized Simulink edits", "Julio owns"),
     ),
     "simulink-implementer": (
         "Implement substantive Simulink topology, interface, configuration, or "
         "multi-step MCP model changes.",
-        "openai-codex/gpt-6.1-sol",
+        "openai-codex/gpt-6.2-sol",
         "medium",
         True,
         ("substantive Simulink topology", "approved architecture", "Julio owns"),
@@ -70,7 +70,7 @@ NATIVE_DECLARATIONS = {
     "matlab-validator": (
         "Independently validate complex MATLAB and Simulink changes, including "
         "control, solver, numerical, safety, and code-generation risks.",
-        "openai-codex/gpt-5.6-sol",
+        "openai-codex/gpt-6.2-sol",
         "medium",
         False,
         (
@@ -89,7 +89,7 @@ NATIVE_DECLARATIONS = {
     "technical-writer-validator": (
         "Independently validate complex Markdown, including safety guidance and "
         "intricate architecture documentation.",
-        "openai-codex/gpt-5.6-sol",
+        "openai-codex/gpt-6.1-terra",
         "medium",
         False,
         ("Independently validate complex Markdown", "do not silently", "findings"),
