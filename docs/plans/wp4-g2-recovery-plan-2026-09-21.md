@@ -321,7 +321,7 @@ task:
 - `handoff` — only when refreshing this note for another session.
 - `specifying-mbd-algorithms` — when sharpening numerical acceptance
   matrix or interfaces.
-- `diagrammer` — only if Mermaid diagram is added or changed.
+- `drawing-mermaid-diagrams` — only if Mermaid diagram is added or changed.
 - `docs/standards/matlab/README.md` and
   `docs/standards/matlab/matlab-coding-standards.md` — required MATLAB
   standards references during Phases 2–4.

@@ -69,10 +69,10 @@ diagrams a purpose and audience, with only the nodes, relationships, and status
 labels needed to answer a real reader question. Julio retains architectural
 authority; distinguish approved decisions from proposals and agent contributions.
 
-When a document needs a Mermaid diagram, use the repository `diagrammer` skill
-directly. Record the diagram purpose, audience, required nodes or states,
-relationships, and constraints. Integrate the Mermaid source and rerun Markdown
-linting on the finished document.
+When a document needs a Mermaid diagram, use the repository
+`drawing-mermaid-diagrams` skill directly. Record the diagram purpose, audience,
+required nodes or states, relationships, and constraints. Integrate the Mermaid
+source and rerun Markdown linting on the finished document.
 
 Keep MATLAB/Simulink architecture, MATLAB code, and Simulink model changes out of
 this role. Do not perform semantic approval of your own document; the root agent

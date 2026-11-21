@@ -22,15 +22,116 @@ If KaTeX is unavailable, report rendering as unavailable. Do not install a depen
 
 ## Mermaid diagrams
 
-For Mermaid, the artifact owner uses the repository [diagrammer skill](../../.agents/skills/diagrammer/SKILL.md) directly. State the diagram's purpose, audience, required nodes or states, relationships, and constraints before authoring when not already explicit. Preserve only supplied intent. Render or verify every diagram and report the exact command and result. From the repository root, use Microsoft Edge:
+Any agent, including root, may use the repository
+[drawing-mermaid-diagrams skill](../../.agents/skills/drawing-mermaid-diagrams/SKILL.md)
+when authoring a Mermaid diagram within its assigned artifact scope.
+Documentation specialist routing does not restrict skill access; Mermaid needs
+no specialist handoff. The artifact owner's task and allowed mutations still
+govern the work. The local render gate remains required; Microsoft Edge and
+full desktop Chrome are not prerequisites. Use `mmdc` 12.0.0 with Puppeteer
+25.15.0 and Node.js >=22.13.0, using Puppeteer's managed headless shell with
+the browser sandbox enabled. Prerequisites include a supported platform,
+Puppeteer's required system libraries, and permission to execute the browser;
+see [Puppeteer system requirements](https://pptr.dev/guides/system-requirements).
+
+From the repository root, set `INPUT_FILE` to an existing Markdown document or
+standalone `.mmd` file. For Markdown, independently enumerate all intended
+Mermaid fences and set `EXPECTED_SVGS` to that positive count before running
+this snippet. For an ambiguous Markdown document, extract each intended
+definition to a standalone `.mmd` file and render those separately; do not rely
+on the CLI's fence matching alone.
 
 ```sh
-EDGE_BIN='/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
-PUPPETEER_EXECUTABLE_PATH="$EDGE_BIN" mmdc -i <input.md> -o <output.md> \
-  -a <asset-directory>
+(
+  set -eu
+  : "${INPUT_FILE:?Set INPUT_FILE to a Markdown document or standalone .mmd \
+file}"
+  case "$INPUT_FILE" in
+    /*) input="$INPUT_FILE" ;;
+    *) input="$PWD/$INPUT_FILE" ;;
+  esac
+  test -r "$input"
+  case "$input" in
+    *.md|*.markdown)
+      : "${EXPECTED_SVGS:?Set EXPECTED_SVGS to the independently enumerated \
+positive Mermaid-fence count}"
+      output_mode=markdown
+      ;;
+    *.mmd)
+      EXPECTED_SVGS=1
+      output_mode=svg
+      ;;
+    *)
+      printf '%s\n' 'INPUT_FILE must end in .md, .markdown, or .mmd' >&2
+      exit 2
+      ;;
+  esac
+  case "$EXPECTED_SVGS" in
+    ''|*[!0-9]*) printf '%s\n' \
+      'EXPECTED_SVGS must be a positive integer' >&2; exit 2 ;;
+  esac
+  test "$EXPECTED_SVGS" -gt 0
+  work="$(mktemp -d)"
+  test -d "$work"
+  cd "$work"
+  unset PUPPETEER_BROWSER PUPPETEER_PRODUCT PUPPETEER_EXECUTABLE_PATH \
+    PUPPETEER_CHROME_VERSION PUPPETEER_CHROME_HEADLESS_SHELL_VERSION \
+    PUPPETEER_FIREFOX_VERSION PUPPETEER_SKIP_CHROME_DOWNLOAD \
+    PUPPETEER_SKIP_CHROME_HEADLESS_SHELL_DOWNLOAD \
+    PUPPETEER_DANGEROUS_NO_SANDBOX
+  export PUPPETEER_CACHE_DIR="$work/cache"
+  export PUPPETEER_SKIP_DOWNLOAD=true
+  npm install --prefix "$work" --no-save --package-lock=false \
+    @mermaid-js/mermaid-cli@12.0.0 puppeteer@25.15.0
+  printf '%s\n' '{"headless":"shell"}' > "$work/.puppeteerrc.json"
+  "$work/node_modules/.bin/puppeteer" browsers install chrome-headless-shell
+  unset PUPPETEER_SKIP_DOWNLOAD
+  "$work/node_modules/.bin/mmdc" --version
+  if test "$output_mode" = markdown; then
+    mkdir "$work/assets"
+    "$work/node_modules/.bin/mmdc" -p "$work/.puppeteerrc.json" \
+      -i "$input" -o "$work/output.md" -a "$work/assets"
+    svg_count="$(find "$work/assets" -type f -name '*.svg' -size +0c \
+      -print | wc -l | tr -d '[:space:]')"
+  else
+    "$work/node_modules/.bin/mmdc" -p "$work/.puppeteerrc.json" \
+      -i "$input" -o "$work/output.svg"
+    test -s "$work/output.svg"
+    svg_count=1
+  fi
+  if test "$svg_count" -le 0 || test "$svg_count" -ne "$EXPECTED_SVGS"; then
+    printf 'Expected %s nonempty SVG(s); found %s\n' \
+      "$EXPECTED_SVGS" "$svg_count" >&2
+    exit 1
+  fi
+  printf 'Rendered %s SVG(s); output directory: %s\n' "$svg_count" "$work"
+)
 ```
 
-This procedure does not grant permission to run outside the command sandbox; request execution-environment escalation. Never add `--no-sandbox`. Use temporary output paths unless rendered output is a deliverable. If Edge is unavailable or rendering fails, report the check as unavailable or failed.
+The fresh temporary directory contains the install, Puppeteer cache, and
+outputs; the source is only read. `PUPPETEER_SKIP_DOWNLOAD` prevents npm from
+downloading a browser, then the explicit Puppeteer command installs the managed
+shell into that same cache. The configured `headless: "shell"` selects the
+managed shell. Do not set an executable override or add `--no-sandbox`; this
+procedure does not grant permission to run outside the command sandbox or
+bypass its restrictions.
+
+For Markdown, inspect the generated Markdown and assets and manually map every
+independently enumerated intended fence to exactly one resolving link and one
+nonempty fresh SVG. This mapping is required even when the executable count
+agrees; missing, extra, stale, or mismatched outputs fail the gate. The count
+check is a regression against zero or count mismatch, not proof of
+correspondence. The CLI recognizes fences with a regex rather than a Markdown
+parser, so ambiguity or fence forms it may miss require standalone extraction
+and per-diagram rendering.
+
+Record the exact input, command, `mmdc` version, managed headless-shell version
+shown by the fresh Puppeteer browser-install output, output location, and
+result. A rejected matched diagram is a source/render failure; a missing
+browser, system dependency, or execution permission is an environment failure
+and must be reported as unavailable rather than accepted. Local export
+establishes only the result from that local toolchain. For GitHub, inspect the
+actual GitHub Markdown preview and its `info` diagram/version separately.
 
 ## Engineering walkthroughs
 

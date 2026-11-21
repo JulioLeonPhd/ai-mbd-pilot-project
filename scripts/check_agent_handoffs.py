@@ -105,10 +105,10 @@ OMP_WRITE_POLICY_MARKERS = (
     "extension, and custom tools only within that same authorization",
     "do not confine filesystem or external-service access",
 )
+_MERMAID_SKILL = ".agents/skills/drawing-mermaid-diagrams/SKILL.md"
 MARKDOWN_PATHS = (
     "AGENTS.md",
     "README.md",
-    ".agents/skills/diagrammer/SKILL.md",
     "docs/adr/0001-root-agent-orchestrated-matlab-simulink-specialists.md",
     "docs/adr/0018-flatten-specialist-orchestration.md",
     "docs/adr/0028-permit-bounded-omp-native-orchestration-simplification.md",
@@ -360,17 +360,26 @@ def collect_checks(
             _passed("flat orchestration", "contract declares root-only spawning")
         )
 
-    diagram_skill = root / ".agents/skills/diagrammer/SKILL.md"
-    diagram_agent = root / ".omp/agents/diagrammer.md"
-    if diagram_skill.is_file() and not diagram_agent.exists():
+    mermaid_skill_present = (root / _MERMAID_SKILL).is_file()
+    forbidden_mermaid_paths = [
+        path
+        for path in (
+            ".agents/skills/diagrammer/SKILL.md",
+            ".omp/agents/diagrammer.md",
+            ".omp/agents/drawing-mermaid-diagrams.md",
+        )
+        if (root / path).exists()
+    ]
+    if mermaid_skill_present and not forbidden_mermaid_paths:
         checks.append(
-            _passed("diagrammer boundary", "skill present; specialist absent")
+            _passed("Mermaid boundary", "new skill present; forbidden paths absent")
         )
     else:
         checks.append(
             _failed(
-                "diagrammer boundary",
-                f"skill={diagram_skill.is_file()}, specialist={diagram_agent.exists()}",
+                "Mermaid boundary",
+                f"{_MERMAID_SKILL} present={mermaid_skill_present}; "
+                f"forbidden paths present={forbidden_mermaid_paths}",
             )
         )
 

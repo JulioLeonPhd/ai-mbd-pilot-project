@@ -33,10 +33,10 @@ class AgentHandoffCheckTest(unittest.TestCase):
                 CHECKER.ROOT / ".omp/agents" / f"{name}.md",
                 agents / f"{name}.md",
             )
-        skill = root / ".agents/skills/diagrammer"
+        skill = root / ".agents/skills/drawing-mermaid-diagrams"
         skill.mkdir(parents=True)
         shutil.copy2(
-            CHECKER.ROOT / ".agents/skills/diagrammer/SKILL.md",
+            CHECKER.ROOT / ".agents/skills/drawing-mermaid-diagrams/SKILL.md",
             skill / "SKILL.md",
         )
         return root
@@ -117,16 +117,30 @@ task:
             "OMP native agents",
             "packet contract",
             "flat orchestration",
-            "diagrammer boundary",
+            "Mermaid boundary",
         ):
             with self.subTest(check=name):
                 self.assertEqual(self._check(root, name).status, "passed")
 
-    def test_diagrammer_remains_a_skill_not_a_specialist(self) -> None:
+    def test_mermaid_boundary_requires_new_skill(self) -> None:
         root = self._fixture()
-        diagrammer = root / ".omp/agents/diagrammer.md"
-        diagrammer.write_text("unregistered specialist\n", encoding="utf-8")
-        self.assertEqual(self._check(root, "diagrammer boundary").status, "failed")
+        (root / ".agents/skills/drawing-mermaid-diagrams/SKILL.md").unlink()
+        self.assertEqual(self._check(root, "Mermaid boundary").status, "failed")
+
+    def test_mermaid_boundary_rejects_legacy_skill_and_shadow_roles(self) -> None:
+        for forbidden in (
+            ".agents/skills/diagrammer/SKILL.md",
+            ".omp/agents/diagrammer.md",
+            ".omp/agents/drawing-mermaid-diagrams.md",
+        ):
+            with self.subTest(path=forbidden):
+                root = self._fixture()
+                path = root / forbidden
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.touch()
+                check = self._check(root, "Mermaid boundary")
+                self.assertEqual(check.status, "failed")
+                self.assertIn(forbidden, check.evidence)
 
     def test_native_inventory_rejects_missing_and_extra_deep_roles(self) -> None:
         with self.subTest(inventory="missing role"):

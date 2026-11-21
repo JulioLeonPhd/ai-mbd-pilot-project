@@ -62,8 +62,8 @@ cannot be enforced through `AGENTS.md`.
    responsibility and preserve their native defaults. Do not create a parallel
    Codex role inventory or deep profiles. Higher-capability execution uses an
    exact approved native per-task selection without changing role identity.
-   Mermaid work uses the repository `diagrammer` skill directly rather than a
-   specialist handoff.
+   Mermaid work uses the repository `drawing-mermaid-diagrams` skill directly
+   rather than a specialist handoff.
 
    Completion criterion: `AGENTS.md` remains the single source for shared
    workflow rules, and the six OMP-native definitions contain only their

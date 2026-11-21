@@ -50,8 +50,9 @@ declarations do not establish filesystem isolation. OMP frontmatter does not
 reproduce an operating-system sandbox; use applicable platform controls when
 those guarantees are required.
 
-Mermaid work belongs to the artifact owner using the repository `diagrammer`
-skill; it is not a specialist handoff.
+Any agent, including root, may use the repository
+`drawing-mermaid-diagrams` skill when authoring a Mermaid diagram within its
+assigned artifact scope. This is not a specialist handoff.
 
 ## Specialist registry and conditional routing
 
@@ -173,7 +174,7 @@ classify as complex.
 | --- | --- | --- |
 | Trivial MATLAB/Simulink | Assign an appropriate implementer, usually `matlab-implementer`; root reviews implementation evidence, a diff or model inspection, and requested smoke checks. Omit `matlab-validator` unless independent validation is requested or the change becomes complex. | Requested implementation, evidence, and lightweight review recorded. |
 | Complex MATLAB/Simulink | Route design to `matlab-architect`; resolve `needs-input` and obtain Julio's explicit decision for choices crossing his boundary. Then assign `matlab-implementer`, or `simulink-implementer` for substantive model topology, interfaces, configuration, or multi-step MCP edits. Route results and criteria to `matlab-validator`; revise design or assign a bounded fix for errors, then repeat validation. Route implementation notes to `technical-writer` when needed. | Approved architecture, coherent implementation, independent validation without unresolved errors, and disclosed warnings or limitations. |
-| Documentation | Give `technical-writer` the approved brief, sources, and target paths. Use the repository diagrammer skill directly for Mermaid. Run `markdownlint-cli2` on every touched repository-authored Markdown file; exclude a third-party Markdown snapshot only when it is byte-for-byte verified against its pinned source hash. Route complex documents or explicitly requested independent review to `technical-writer-validator`; assign revisions to the writer. | Traceable artifacts, passing Markdown lint, and required independent review without unresolved errors. |
+| Documentation | Give `technical-writer` the approved brief, sources, and target paths. For Mermaid authoring, any agent, including root, may use the repository `drawing-mermaid-diagrams` skill within its assigned artifact scope; no specialist handoff is needed. Run `markdownlint-cli2` on every touched repository-authored Markdown file; exclude a third-party Markdown snapshot only when it is byte-for-byte verified against its pinned source hash. Route complex documents or explicitly requested independent review to `technical-writer-validator`; assign revisions to the writer. | Traceable artifacts, passing Markdown lint, and required independent review without unresolved errors. |
 | Manifest JSON | Give `technical-writer` the approved schema, target path, exact agent/tool names, and required values. Run the specified JSON syntax and schema checker; review semantics and activate only after the manifest satisfies the contract. | Valid manifest and disclosed checker result. Markdown lint is not required; an unavailable checker is not a pass. |
 | Validation-only | Send the artifact, requirements, and requested checks to the relevant validator. Validators return findings and evidence only; repair requires a new bounded implementation assignment. | Findings and evidence; no repair is performed under the inspection assignment. |
 | Codex direct fallback | When no project specialist is dispatched, perform authorized source/document work and requested checks directly. Apply the same repository standards and platform controls. A specialist-result requirement applies only to a dispatched specialist. | Required work and checks are complete. Do not substitute self-review for required independent review; if that review is unavailable, return `blocked`. |
@@ -197,7 +198,8 @@ warnings, assumptions, and skipped checks. Complex changes require independent
 validation with no unresolved error findings. This contract's handoff checker is
 a strict gate: run `uv run --frozen python scripts/check_agent_handoffs.py`
 from the worktree root after changing `AGENTS.md`, `.omp/agents/*.md`, the
-diagrammer skill, or agent orchestration architecture documents. It MUST pass
+`drawing-mermaid-diagrams` skill, or agent orchestration architecture
+documents. It MUST pass
 before completion; user acceptance of another limitation cannot waive it. An
 unavailable or failed checker means the gate is incomplete.
 
@@ -211,7 +213,7 @@ sections only when the task crosses their branch.
 | Writing or editing prose documentation | [Documentation style](docs/agents/task-guidance.md#documentation-style) |
 | Writing or editing a math document | [Mathematical documentation](docs/agents/task-guidance.md#mathematical-documentation) |
 | Creating or reviewing an engineering walkthrough | [Engineering walkthroughs](docs/agents/task-guidance.md#engineering-walkthroughs) |
-| Creating or rendering Mermaid | [Mermaid diagrams](docs/agents/task-guidance.md#mermaid-diagrams) and the [diagrammer skill](.agents/skills/diagrammer/SKILL.md) |
+| Creating or rendering Mermaid | [Mermaid diagrams](docs/agents/task-guidance.md#mermaid-diagrams) and the [drawing-mermaid-diagrams skill](.agents/skills/drawing-mermaid-diagrams/SKILL.md) |
 | Updating `CURRENT.md`, `HISTORY.md`, or milestone status | [Active status and history](docs/agents/task-guidance.md#active-status-and-history) |
 | Making any MATLAB/Simulink MCP call | [MATLAB MCP session ownership](docs/agents/task-guidance.md#matlab-mcp-session-ownership) |
 | Editing MATLAB or Simulink-associated MATLAB code | [MATLAB standards and analysis](docs/agents/task-guidance.md#matlab-standards-and-analysis); read the standards bundle and applicable rule files |
