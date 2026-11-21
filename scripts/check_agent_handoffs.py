@@ -89,8 +89,8 @@ NATIVE_DECLARATIONS = {
     "technical-writer-validator": (
         "Independently validate complex Markdown, including safety guidance and "
         "intricate architecture documentation.",
-        "openai-codex/gpt-6.1-terra",
-        "medium",
+        "openai-codex/gpt-6.2-sol",
+        "high",
         False,
         ("Independently validate complex Markdown", "do not silently", "findings"),
     ),
