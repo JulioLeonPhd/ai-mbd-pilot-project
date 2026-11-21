@@ -41,9 +41,10 @@ Change only the task's authorized paths or model elements in the workspace;
 never modify global configuration or unrelated user files. Use shell, eval, MCP,
 extension, and custom tools only within that same authorization. No tool may be
 used to spawn another agent. OMP frontmatter does not reproduce Codex's
-`workspace-write` OS sandbox; the tool allowlist and these instructions do not
-confine filesystem or external-service access. Return `blocked` if required
-platform isolation or permission is unavailable; do not claim sandbox parity.
+`workspace-write` OS sandbox; the tool allowlist and these instructions
+do not confine filesystem or external-service access.
+Return `blocked` if required platform isolation or permission is
+unavailable; do not claim sandbox parity.
 
 ## Role instructions
 
@@ -52,13 +53,13 @@ implementation results. When explicitly assigned, create or edit manifest JSON
 files using the approved schema and exact agent and tool names. Preserve technical
 meaning and flag unsupported or ambiguous claims instead of guessing.
 
-When editing root `CURRENT.md`, follow its active-status and history lifecycle in `AGENTS.md`.
+When editing root `CURRENT.md`, follow its active-status and history lifecycle
+in `AGENTS.md`.
 
-For prose, do not enforce a fixed source width; preserve code blocks, tables, and
-intentional line breaks, and do not bulk-reflow existing text. Prefer tables
-when content can be meaningfully tabulated, bullets for parallel points when
-they speed understanding, numbered lists for ordered steps, and prose for
-connected explanations.
+For prose, follow the repository's [Documentation style](../../docs/agents/task-guidance.md#documentation-style),
+including its width, reflow, and intentional-break requirements. Prefer tables
+for meaningful comparisons, mappings, or attributes; bullets for parallel
+points, numbered lists for ordered steps, and prose for connected reasoning.
 
 Human clarity is an explicit objective for project docs: readers
 should quickly find project purpose, current capability and limits, the next

@@ -70,13 +70,20 @@ specialist identities. Codex uses the direct fallback above. Before changing or
 reviewing an OMP specialist, read its matching `.omp/agents` definition. The
 defaults stay in those native role files; do not cache or change them here.
 
-Before each OMP dispatch, inspect the native `/agents` inventory for all six project roles.
-Confirm their selected models, thinking levels, tools, and denied child spawning; static checker success is not native-discovery or execution proof.
-Verify the selected role and active session's `task` tool are available, then record the role and observable reason in the bounded task packet.
-For higher-capability work, use the same responsibility identity with an exact approved native per-task selector only when supported and permitted.
-Compare observed resolved capability with the approved task need.
-If a required role, tool, selector, permission, or capability is unavailable, unapproved, or insufficient, return `blocked` to the root; never silently fall back.
-Preserve supplied execution metadata in results; report unavailable metadata as `unknown`.
+Before each OMP dispatch, inspect the native `/agents` inventory for all six
+project roles. Confirm their selected models, thinking levels, tools, and denied
+child spawning; static checker success is not native-discovery or execution
+proof.
+Verify the selected role and active session's `task` tool are available, then
+record the role and observable reason in the bounded task packet.
+For higher-capability work, use the same responsibility identity with an exact
+approved native per-task selector only when supported and permitted. Compare
+observed resolved capability with the approved task need.
+If a required role, tool, selector, permission, or capability is unavailable,
+unapproved, or insufficient, return `blocked` to the root; never silently fall
+back.
+Preserve supplied execution metadata in results; report unavailable metadata as
+`unknown`.
 
 ## Task and result packets
 

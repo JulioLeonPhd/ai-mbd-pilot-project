@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).with_name("check_agent_handoffs.py")
 SPEC = importlib.util.spec_from_file_location("check_agent_handoffs", SCRIPT)
@@ -47,6 +50,98 @@ class AgentHandoffCheckTest(unittest.TestCase):
             for check in CHECKER.collect_checks(root, skip_markdownlint=True)
             if check.name == name
         )
+
+    def test_markdown_lint_limits_scope_to_changes_from_git_base(self) -> None:
+        root = self._fixture()
+        environment = patch.dict(
+            os.environ,
+            {"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"},
+        )
+        environment.start()
+        self.addCleanup(environment.stop)
+
+        def git(*args: str) -> None:
+            subprocess.run(["git", *args], cwd=root, check=True, capture_output=True)
+
+        def commit(message: str) -> None:
+            git(
+                "-c",
+                "user.name=Fixture",
+                "-c",
+                "user.email=test@example.com",
+                "commit",
+                "-m",
+                message,
+            )
+
+        def put(path: str, content: str = "# Document\n") -> None:
+            (root / path).write_text(content, encoding="utf-8")
+
+        def check(markdown_base: str | None = None):
+            checks = (
+                CHECKER.collect_checks(root)
+                if markdown_base is None
+                else CHECKER.collect_checks(root, markdown_base=markdown_base)
+            )
+            return next(result for result in checks if result.name == "Markdown lint")
+
+        git("init", "--template=")
+        put(".gitignore", "ignored.md\n")
+        put("README.md", "An untouched legacy line " * 5 + "\n")
+        put("deleted.md")
+        put("edited.md")
+        put("unstaged.md")
+        git("add", "--all")
+        commit("baseline")
+        git("tag", "baseline")
+        with patch.object(CHECKER.shutil, "which", return_value=None):
+            self.assertEqual(check().status, "passed")
+            self.assertEqual(check(markdown_base="missing-revision").status, "failed")
+            self.assertEqual(check(markdown_base="--cached").status, "failed")
+
+        put("committed.md")
+        git("add", "committed.md")
+        commit("branch work")
+
+        put("--staged [draft].md")
+        put("missing.md")
+        git("add", "--", "--staged [draft].md", "missing.md")
+        (root / "missing.md").unlink()
+        (root / "deleted.md").unlink()
+        put("unstaged.md", "# Edited\n")
+        git("mv", "edited.md", "renamed.MD")
+        (root / ".drafts").mkdir()
+        put(".drafts/untracked.markdown")
+        put("ignored.md")
+        put("not-markdown.txt")
+
+        run_git = subprocess.run
+        lint_paths: list[str] = []
+
+        def run(args, **kwargs):
+            if args[0] == "git":
+                return run_git(args, **kwargs)
+            self.assertEqual(args[0], "markdownlint-cli2")
+            self.assertEqual(args[1], "--no-globs")
+            self.assertEqual(kwargs["cwd"], root)
+            lint_paths.extend(args[2:])
+            return subprocess.CompletedProcess(args, 0, stdout="", stderr="")
+
+        expected = [
+            ":--staged [draft].md",
+            ":.drafts/untracked.markdown",
+            ":renamed.MD",
+            ":unstaged.md",
+        ]
+        with (
+            patch.object(CHECKER.shutil, "which", return_value="markdownlint-cli2"),
+            patch.object(CHECKER.subprocess, "run", side_effect=run),
+        ):
+            self.assertEqual(check().status, "passed")
+            self.assertCountEqual(lint_paths, expected)
+            lint_paths.clear()
+            self.assertEqual(check(markdown_base="baseline").status, "passed")
+            self.assertCountEqual(lint_paths, [*expected, ":committed.md"])
 
     @staticmethod
     def _replace_frontmatter(content: str, field: str, value: str) -> str:
