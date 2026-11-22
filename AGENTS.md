@@ -254,6 +254,7 @@ sections only when the task crosses their branch.
 
 | Trigger | Required reference |
 | --- | --- |
+| Root or Researcher preparing an authorized `technical-writer` dispatch | [Writing genres](docs/agents/task-guidance.md#writing-genres) |
 | Writing or editing prose documentation | [Documentation style](docs/agents/task-guidance.md#documentation-style) |
 | Writing or editing a math document | [Mathematical documentation](docs/agents/task-guidance.md#mathematical-documentation) |
 | Creating or reviewing an engineering walkthrough | [Engineering walkthroughs](docs/agents/task-guidance.md#engineering-walkthroughs) |

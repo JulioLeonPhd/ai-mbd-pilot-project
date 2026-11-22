@@ -18,6 +18,32 @@ branch-wide check, pass `--markdown-base <revision>` with the merge base of
 the target branch and `HEAD`. The handoff checker remains mandatory as
 specified in the orchestration contract.
 
+## Writing genres
+
+For a writer handoff, root (direct work) or the Researcher (an authorized
+Markdown report) names the artifact type and primary audience in the
+existing `task.context`. For manifest assignments, include the consumer
+schema in the packet and name the existing JSON syntax and consumer schema
+checks in `requested_checks`.
+
+- **Human reports:** Use the assigned report brief and supplied evidence.
+  Preserve source attribution and distinguish findings from recommendations.
+- **Human instructions and README quickstarts:** Give prerequisites, the
+  shortest working path, and what the reader should see on success.
+- **Supporting reference:** Organize by what the reader needs to look up,
+  not by the order in which the work happened.
+- **Agent-directed Markdown:** Consult `writing-for-agents` regardless of
+  filename. Make triggers and completion criteria explicit.
+- **Manifest JSON:** Follow the supplied consumer schema. Include required
+  fields and necessary overrides; omit values already owned elsewhere unless
+  required. Use the existing syntax and consumer schema checks as requested.
+- **Planned tickets:** Apply the project guidance on
+  [tickets and evidence](human-led-workflow.md#tickets-and-evidence) and the
+  `to-tickets` draft format: a verifiable outcome, acceptance criteria, and
+  actual blockers or none. Draft only; publication is a separate action.
+- **Raw defects:** Distinguish expected from observed behavior. Record the
+  supplied reproduction details without treating a suspected cause as fact.
+
 ## Mathematical documentation
 
 Write mathematical relationships as rendered TeX, preserving approved

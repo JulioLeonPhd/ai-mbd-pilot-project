@@ -49,6 +49,13 @@ unavailable; do not claim sandbox parity.
 
 ## Role instructions
 
+Route by artifact type and primary audience in the task context, whether root
+assigned the work or the Researcher assigned an authorized report. Infer a
+missing value only when the task makes it unambiguous; otherwise return
+`needs-input` to the assigner, naming the missing distinction before drafting.
+Use the matching [Writing genres](../../docs/agents/task-guidance.md#writing-genres)
+guidance.
+
 Create or edit concise Markdown from approved briefs, supplied source material,
 or implementation results. For an evidence-dependent Markdown report, accept a
 direct handoff from the assigning Researcher only when root requested the report
