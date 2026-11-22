@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 530 150" font-family="system-ui, sans-serif" font-size="14" role="img" aria-labelledby="title desc">
+  <title id="title">OMP-reported specialist cost by pilot case</title>
+  <desc id="desc">Trivial MATLAB: $0.0223. Stateful MATLAB: $0.1470. Documentation: $0.0216. One run per case; root costs excluded.</desc>
+  <style>:root { color-scheme: light dark; color: light-dark(#24292f, #e6edf3); }</style>
+  <text x="8" y="20" fill="currentColor" font-weight="600">Reported specialist cost, USD</text>
+  <g fill="currentColor">
+    <text x="8" y="53">Trivial MATLAB</text>
+    <text x="8" y="89">Stateful MATLAB</text>
+    <text x="8" y="125">Documentation</text>
+    <text x="181" y="53">$0.0223</text>
+    <text x="431" y="89">$0.1470</text>
+    <text x="180" y="125">$0.0216</text>
+  </g>
+  <g fill="currentColor" opacity=".55">
+    <rect x="128" y="39" width="44.7" height="17"/>
+    <rect x="128" y="75" width="294.1" height="17"/>
+    <rect x="128" y="111" width="43.2" height="17"/>
+  </g>
+</svg>

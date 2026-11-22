@@ -1,7 +1,7 @@
 ---
 name: "matlab-validator"
 description: "Independently validate complex MATLAB and Simulink changes, including control, solver, numerical, safety, and code-generation risks."
-model: "openai-codex/gpt-5.6-sol"
+model: "openai-codex/gpt-6.2-sol"
 thinking-level: "medium"
 spawns: ""
 tools: ["read", "grep", "glob", "web_search"]

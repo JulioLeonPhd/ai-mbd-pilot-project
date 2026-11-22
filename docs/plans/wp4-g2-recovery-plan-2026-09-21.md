@@ -38,7 +38,6 @@ traceability. This records original task boundary, not current blocker.
 
 ## Phase progress
 
-<!-- markdownlint-disable MD013 -->
 | Phase | Status | Evidence / gate |
 | --- | --- | --- |
 | 1. Documentation contract | Complete; `da1e301` | Validated |
@@ -47,7 +46,6 @@ traceability. This records original task boundary, not current blocker.
 | 4. Independent validation | Complete; passed | 54/54 strict rows with provenance; 54 tests; independent timing and streaming boundary validation; MATLAB Code Analyzer clean; issues #4/#5 closed |
 | 5. Manifest and traceability | Complete; independent deep review passed | 54 rows use 20 distinct anchors; all resolve uniquely. Eight rows/selectors were updated in committed manifest at source `0fe89d45` and evidence `9675b2f2`; five documents lint clean. |
 | 6. Root completion gate | Complete; G2 accepted | MATLAB, provenance, document review, Markdown lint, Code Analyzer, and Mermaid checks passed. Issue #3 is disclosed nonblocking checker-hardening task. |
-<!-- markdownlint-enable MD013 -->
 
 This plan is detailed phase ledger and approved Phase 2 architecture record.
 `CURRENT.md` is concise current-state pointer. Phases 5 and 6 passed for
@@ -134,7 +132,6 @@ committed before tracked artifacts are regenerated from that exact revision.
 Base fixture directory: `contracts/wp4/fixtures/`. Every row has unique
 manifest ID and unique `matlab.unittest` method.
 
-<!-- markdownlint-disable MD013 -->
 | ID | Claim / artifact or selector | Expected | Test method |
 | --- | --- | --- | --- |
 | SCH-001 | Exact 151-record schedule; `schedule.json` | accept | `testScheduleValid` |
@@ -191,7 +188,6 @@ manifest ID and unique `matlab.unittest` method.
 | MIG-007 | Ambiguous commanded-look mapping | `PROVENANCE_MISMATCH context.commandedLooks[1]` | `testDraft1AmbiguousLookContext` |
 | META-001 | Every clause is `path#anchor`; IDs/artifacts/methods are unique and resolvable | accept | `testManifestTraceability` |
 | META-002 | Generator has no oracle dependency and oracle has no generator/DSP-response dependency | accept | `testGeneratorOracleSeparation` |
-<!-- markdownlint-enable MD013 -->
 
 ### Phase 3 — Generate executable evidence
 
@@ -321,7 +317,7 @@ task:
 - `handoff` — only when refreshing this note for another session.
 - `specifying-mbd-algorithms` — when sharpening numerical acceptance
   matrix or interfaces.
-- `diagrammer` — only if Mermaid diagram is added or changed.
+- `drawing-mermaid-diagrams` — only if Mermaid diagram is added or changed.
 - `docs/standards/matlab/README.md` and
   `docs/standards/matlab/matlab-coding-standards.md` — required MATLAB
   standards references during Phases 2–4.

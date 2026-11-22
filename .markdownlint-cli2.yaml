@@ -1,7 +1,3 @@
 config:
-  MD013: false
-
-ignores:
-  - docs/standards/matlab/matlab-coding-standards.md
-  - docs/standards/matlab/live-script-generation.md
-  - docs/standards/matlab/matlab-performance-optimization.md
+  MD013:
+    tables: false

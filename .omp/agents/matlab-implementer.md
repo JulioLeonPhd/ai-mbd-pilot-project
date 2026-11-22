@@ -1,8 +1,8 @@
 ---
 name: "matlab-implementer"
 description: "Implement MATLAB code and simple localized Simulink edits; use simulink-implementer for substantive model changes."
-model: "openai-codex/gpt-6-luna"
-thinking-level: "xhigh"
+model: "openai-codex/gpt-6.1-terra"
+thinking-level: "medium"
 spawns: ""
 tools: ["read", "grep", "glob", "web_search", "write", "edit", "bash", "eval"]
 ---

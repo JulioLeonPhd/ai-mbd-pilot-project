@@ -17,7 +17,8 @@ including through task, eval, shell commands, or external agent CLIs.
 Accept a bounded `task` packet with `id`, `objective`, `context`, `inputs`,
 `constraints`, `acceptance_criteria`, `allowed_mutations`, and `requested_checks`.
 If it is missing information necessary for safe work, return `needs-input` to
-the root instead of expanding scope. Use only the supplied context and referenced
+the assigning Researcher, or to root when root assigned the writer, instead of
+expanding scope. Use only the supplied context and referenced
 sources; inherit full conversation only when the packet records
 `inherit-full-conversation: reason=<specific missing context>`.
 Respect `allowed_mutations`, preserve user changes, and run only requested checks.
@@ -41,24 +42,40 @@ Change only the task's authorized paths or model elements in the workspace;
 never modify global configuration or unrelated user files. Use shell, eval, MCP,
 extension, and custom tools only within that same authorization. No tool may be
 used to spawn another agent. OMP frontmatter does not reproduce Codex's
-`workspace-write` OS sandbox; the tool allowlist and these instructions do not
-confine filesystem or external-service access. Return `blocked` if required
-platform isolation or permission is unavailable; do not claim sandbox parity.
+`workspace-write` OS sandbox; the tool allowlist and these instructions
+do not confine filesystem or external-service access.
+Return `blocked` if required platform isolation or permission is
+unavailable; do not claim sandbox parity.
 
 ## Role instructions
 
-Create or edit concise Markdown from approved briefs, source material, or
-implementation results. When explicitly assigned, create or edit manifest JSON
-files using the approved schema and exact agent and tool names. Preserve technical
-meaning and flag unsupported or ambiguous claims instead of guessing.
+Route by artifact type and primary audience in the task context, whether root
+assigned the work or the Researcher assigned an authorized report. Infer a
+missing value only when the task makes it unambiguous; otherwise return
+`needs-input` to the assigner, naming the missing distinction before drafting.
+Use the matching [Writing genres](../../docs/agents/task-guidance.md#writing-genres)
+guidance.
 
-When editing root `CURRENT.md`, follow its active-status and history lifecycle in `AGENTS.md`.
+Create or edit concise Markdown from approved briefs, supplied source material,
+or implementation results. For an evidence-dependent Markdown report, accept a
+direct handoff from the assigning Researcher only when root requested the report
+and authorized the exact output path. That exact path must be the writer task's
+only `allowed_mutations`; root may assign the writer directly for authoring-only
+work. Draft from cited findings supplied by the Researcher or root, and when
+required evidence is missing, return the gap to the assigning Researcher, or to
+root when root assigned the writer. Do not independently investigate or gather
+new evidence. Consult supplied references only to preserve accuracy.
+When explicitly assigned, create or edit manifest JSON files using the
+approved schema and exact agent and tool names. Preserve technical meaning and
+flag unsupported or ambiguous claims instead of guessing.
 
-For prose, do not enforce a fixed source width; preserve code blocks, tables, and
-intentional line breaks, and do not bulk-reflow existing text. Prefer tables
-when content can be meaningfully tabulated, bullets for parallel points when
-they speed understanding, numbered lists for ordered steps, and prose for
-connected explanations.
+When editing root `CURRENT.md`, follow its active-status and history lifecycle
+in `AGENTS.md`.
+
+For prose, follow the repository's [Documentation style](../../docs/agents/task-guidance.md#documentation-style),
+including its width, reflow, and intentional-break requirements. Prefer tables
+for meaningful comparisons, mappings, or attributes; bullets for parallel
+points, numbered lists for ordered steps, and prose for connected reasoning.
 
 Human clarity is an explicit objective for project docs: readers
 should quickly find project purpose, current capability and limits, the next
@@ -69,10 +86,10 @@ diagrams a purpose and audience, with only the nodes, relationships, and status
 labels needed to answer a real reader question. Julio retains architectural
 authority; distinguish approved decisions from proposals and agent contributions.
 
-When a document needs a Mermaid diagram, use the repository `diagrammer` skill
-directly. Record the diagram purpose, audience, required nodes or states,
-relationships, and constraints. Integrate the Mermaid source and rerun Markdown
-linting on the finished document.
+When a document needs a Mermaid diagram, use the repository
+`drawing-mermaid-diagrams` skill directly. Record the diagram purpose, audience,
+required nodes or states, relationships, and constraints. Integrate the Mermaid
+source and rerun Markdown linting on the finished document.
 
 Keep MATLAB/Simulink architecture, MATLAB code, and Simulink model changes out of
 this role. Do not perform semantic approval of your own document; the root agent

@@ -1,9 +1,10 @@
-"""Validate the repository's agent handoff and flat-orchestration contract."""
+"""Validate the repository's agent handoff and bounded orchestration contract."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -37,8 +38,9 @@ RESULT_STATUSES = ("complete", "needs-input", "blocked", "failed")
 NATIVE_ROLES = (
     "matlab-architect",
     "matlab-implementer",
-    "simulink-implementer",
     "matlab-validator",
+    "researcher",
+    "simulink-implementer",
     "technical-writer",
     "technical-writer-validator",
 )
@@ -46,7 +48,7 @@ NATIVE_DECLARATIONS = {
     "matlab-architect": (
         "Design MATLAB and Simulink solutions, including solver, timing, numerical, "
         "and code-generation concerns.",
-        "openai-codex/gpt-5.6-sol",
+        "openai-codex/gpt-6.2-sol",
         "high",
         False,
         ("design", "interfaces", "Julio owns"),
@@ -54,15 +56,15 @@ NATIVE_DECLARATIONS = {
     "matlab-implementer": (
         "Implement MATLAB code and simple localized Simulink edits; use "
         "simulink-implementer for substantive model changes.",
-        "openai-codex/gpt-6-luna",
-        "xhigh",
+        "openai-codex/gpt-6.1-terra",
+        "medium",
         True,
         ("approved MATLAB code changes", "localized Simulink edits", "Julio owns"),
     ),
     "simulink-implementer": (
         "Implement substantive Simulink topology, interface, configuration, or "
         "multi-step MCP model changes.",
-        "openai-codex/gpt-6.1-sol",
+        "openai-codex/gpt-6.2-sol",
         "medium",
         True,
         ("substantive Simulink topology", "approved architecture", "Julio owns"),
@@ -70,7 +72,7 @@ NATIVE_DECLARATIONS = {
     "matlab-validator": (
         "Independently validate complex MATLAB and Simulink changes, including "
         "control, solver, numerical, safety, and code-generation risks.",
-        "openai-codex/gpt-5.6-sol",
+        "openai-codex/gpt-6.2-sol",
         "medium",
         False,
         (
@@ -78,6 +80,13 @@ NATIVE_DECLARATIONS = {
             "without changing implementation artifacts",
             "findings",
         ),
+    ),
+    "researcher": (
+        None,
+        "openai-codex/gpt-6.2-sol",
+        "xhigh",
+        False,
+        ("primary sources", "synthesis", "technical-writer"),
     ),
     "technical-writer": (
         "Produce concise Markdown documents and manifest JSON files.",
@@ -89,8 +98,8 @@ NATIVE_DECLARATIONS = {
     "technical-writer-validator": (
         "Independently validate complex Markdown, including safety guidance and "
         "intricate architecture documentation.",
-        "openai-codex/gpt-5.6-sol",
-        "medium",
+        "openai-codex/gpt-6.2-sol",
+        "high",
         False,
         ("Independently validate complex Markdown", "do not silently", "findings"),
     ),
@@ -105,28 +114,9 @@ OMP_WRITE_POLICY_MARKERS = (
     "extension, and custom tools only within that same authorization",
     "do not confine filesystem or external-service access",
 )
-MARKDOWN_PATHS = (
-    "AGENTS.md",
-    "README.md",
-    ".agents/skills/diagrammer/SKILL.md",
-    "docs/adr/0001-root-agent-orchestrated-matlab-simulink-specialists.md",
-    "docs/adr/0018-flatten-specialist-orchestration.md",
-    "docs/adr/0028-permit-bounded-omp-native-orchestration-simplification.md",
-    "docs/plans/agent-handoff-token-optimisation.md",
-    "docs/plans/omp-native-orchestration-simplification.md",
-    "docs/agents/task-guidance.md",
-    "docs/architecture/agent-orchestration-runtime.md",
-    "CHANGELOG.md",
-    ".omp/agents/matlab-architect.md",
-    ".omp/agents/matlab-implementer.md",
-    ".omp/agents/simulink-implementer.md",
-    ".omp/agents/matlab-validator.md",
-    ".omp/agents/technical-writer.md",
-    ".omp/agents/technical-writer-validator.md",
-)
+_MERMAID_SKILL = ".agents/skills/drawing-mermaid-diagrams/SKILL.md"
 OMP_PROMPT_MARKERS = (
     "Read the repository root `AGENTS.md` before acting",
-    "do not spawn subagents",
     "`allowed_mutations`",
     "`requested_checks`",
     "`agent.name`, `agent.model`, `agent.reasoning_effort`",
@@ -199,7 +189,7 @@ def _parse_omp_agent(content: str) -> dict[str, object]:
 
 
 def _check_omp_agents(root: Path, registry: list[str]) -> Check:
-    """Check the six native roles and their declared controls, not isolation."""
+    """Check native roles and their declared controls, not isolation."""
 
     errors: list[str] = []
     paths = sorted((root / ".omp/agents").glob("*.md"))
@@ -245,12 +235,18 @@ def _check_omp_agents(root: Path, registry: list[str]) -> Check:
             errors.append(f"{label}: unexpected OMP role {name!r}")
             continue
         description, model, effort, writable, scope_markers = expected
+        researcher = name == "researcher"
+        actual = agent.get("description")
+        if description is None:
+            if not isinstance(actual, str) or not actual.strip():
+                errors.append(f"{label}: incorrect description; expected nonempty text")
+        elif actual != description:
+            errors.append(f"{label}: incorrect description; expected {description!r}")
         for key, value in (
             ("name", name),
-            ("description", description),
             ("model", model),
             ("thinking-level", effort),
-            ("spawns", ""),
+            ("spawns", "scout,technical-writer" if researcher else ""),
         ):
             if agent.get(key) != value:
                 errors.append(f"{label}: incorrect {key}; expected {value!r}")
@@ -273,7 +269,17 @@ def _check_omp_agents(root: Path, registry: list[str]) -> Check:
         policy_markers = (
             OMP_WRITE_POLICY_MARKERS if writable else OMP_READ_POLICY_MARKERS
         )
-        for marker in (*OMP_PROMPT_MARKERS, *policy_markers, *scope_markers):
+        spawn_marker = (
+            "do not spawn subagents other than the bundled scout and technical-writer"
+            if researcher
+            else "do not spawn subagents"
+        )
+        for marker in (
+            *OMP_PROMPT_MARKERS,
+            spawn_marker,
+            *policy_markers,
+            *scope_markers,
+        ):
             if not re.search(
                 r"(?<!\w)" + re.escape(marker) + r"(?!\w)", normalized_body
             ):
@@ -288,7 +294,7 @@ def _check_omp_agents(root: Path, registry: list[str]) -> Check:
                 sentence,
                 flags=re.IGNORECASE,
             ):
-                errors.append(f"{label}: may not spawn or delegate subagents")
+                errors.append(f"{label}: unauthorized spawn or delegation instruction")
         if name in {"matlab-validator", "technical-writer-validator"}:
             if (
                 "inspection-only" not in body
@@ -304,8 +310,67 @@ def _check_omp_agents(root: Path, registry: list[str]) -> Check:
     )
 
 
+def _changed_markdown_paths(root: Path, base: str) -> list[str]:
+    if not base or base.startswith("-"):
+        raise ValueError("Markdown base must be a Git revision, not an option")
+
+    pathspecs = (":(icase)*.md", ":(icase)*.markdown")
+    changed = subprocess.run(
+        [
+            "git",
+            "diff",
+            "--name-only",
+            "--diff-filter=ACMRT",
+            "-z",
+            base,
+            "--",
+            *pathspecs,
+        ],
+        cwd=root,
+        check=True,
+        capture_output=True,
+    )
+    untracked = subprocess.run(
+        ["git", "ls-files", "--others", "--exclude-standard", "-z", "--", *pathspecs],
+        cwd=root,
+        check=True,
+        capture_output=True,
+    )
+    paths = set(os.fsdecode(changed.stdout + untracked.stdout).split("\0"))
+    return sorted(path for path in paths if path and (root / path).is_file())
+
+
+def _check_markdownlint(root: Path, base: str) -> Check:
+    name = "Markdown lint"
+    try:
+        paths = _changed_markdown_paths(root, base)
+    except subprocess.CalledProcessError as error:
+        output = os.fsdecode(error.stderr).strip()
+        return _failed(name, f"Git path discovery failed: {output or error}")
+    except (OSError, ValueError) as error:
+        return _failed(name, f"Git path discovery failed: {error}")
+    if not paths:
+        return _passed(name, "no changed Markdown files")
+
+    executable = shutil.which("markdownlint-cli2")
+    if executable is None:
+        return Check(name, "unavailable", "command not found")
+    # The CLI's colon prefix makes each Git path literal rather than a glob.
+    result = subprocess.run(
+        [executable, "--no-globs", *(f":{path}" for path in paths)],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode == 0:
+        return _passed(name, f"checked {len(paths)} changed Markdown files")
+    output = (result.stdout + result.stderr).strip()
+    return _failed(name, output or "command failed")
+
+
 def collect_checks(
-    root: Path = ROOT, *, skip_markdownlint: bool = False
+    root: Path = ROOT, *, skip_markdownlint: bool = False, markdown_base: str = "HEAD"
 ) -> list[Check]:
     """Collect every handoff-contract check without mutating the repository."""
 
@@ -319,7 +384,7 @@ def collect_checks(
     registry_set = set(registry)
     if len(registry) == len(NATIVE_ROLES) and registry_set == set(NATIVE_ROLES):
         checks.append(
-            _passed("specialist registry", "contains exactly six native roles")
+            _passed("specialist registry", "contains exactly seven native roles")
         )
     else:
         duplicates = sorted({name for name in registry if registry.count(name) > 1})
@@ -351,51 +416,52 @@ def collect_checks(
             _passed("packet contract", "required field names and status tokens found")
         )
 
-    if "Specialists work independently and never spawn subagents." not in contract:
+    spawn_policy = (
+        "Specialist delegation is denied by default and allowed only by the role's "
+        "native child allowlist."
+    )
+    if spawn_policy not in " ".join(contract.split()):
         checks.append(
-            _failed("flat orchestration", "missing root-only spawning policy")
+            _failed(
+                "per-role delegation",
+                f"missing deny-by-default delegation policy: {spawn_policy}",
+            )
         )
     else:
         checks.append(
-            _passed("flat orchestration", "contract declares root-only spawning")
+            _passed(
+                "per-role delegation",
+                "contract requires deny-by-default native child allowlists",
+            )
         )
 
-    diagram_skill = root / ".agents/skills/diagrammer/SKILL.md"
-    diagram_agent = root / ".omp/agents/diagrammer.md"
-    if diagram_skill.is_file() and not diagram_agent.exists():
+    mermaid_skill_present = (root / _MERMAID_SKILL).is_file()
+    forbidden_mermaid_paths = [
+        path
+        for path in (
+            ".agents/skills/diagrammer/SKILL.md",
+            ".omp/agents/diagrammer.md",
+            ".omp/agents/drawing-mermaid-diagrams.md",
+        )
+        if (root / path).exists()
+    ]
+    if mermaid_skill_present and not forbidden_mermaid_paths:
         checks.append(
-            _passed("diagrammer boundary", "skill present; specialist absent")
+            _passed("Mermaid boundary", "new skill present; forbidden paths absent")
         )
     else:
         checks.append(
             _failed(
-                "diagrammer boundary",
-                f"skill={diagram_skill.is_file()}, specialist={diagram_agent.exists()}",
+                "Mermaid boundary",
+                f"{_MERMAID_SKILL} present={mermaid_skill_present}; "
+                f"forbidden paths present={forbidden_mermaid_paths}",
             )
         )
 
     if skip_markdownlint:
         checks.append(Check("Markdown lint", "skipped", "disabled by command option"))
     else:
-        executable = shutil.which("markdownlint-cli2")
-        if executable is None:
-            checks.append(Check("Markdown lint", "unavailable", "command not found"))
-        else:
-            paths = [
-                str(root / path) for path in MARKDOWN_PATHS if (root / path).is_file()
-            ]
-            result = subprocess.run(
-                [executable, *paths],
-                cwd=root,
-                check=False,
-                capture_output=True,
-                text=True,
-            )
-            if result.returncode == 0:
-                checks.append(_passed("Markdown lint", f"checked {len(paths)} files"))
-            else:
-                output = (result.stdout + result.stderr).strip()
-                checks.append(_failed("Markdown lint", output or "command failed"))
+        checks.append(_check_markdownlint(root, markdown_base))
     return checks
 
 
@@ -408,8 +474,16 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="skip the external Markdown lint check",
     )
+    parser.add_argument(
+        "--markdown-base",
+        default="HEAD",
+        metavar="REVISION",
+        help="compare working-tree Markdown against this Git revision (default: HEAD)",
+    )
     args = parser.parse_args(argv)
-    checks = collect_checks(skip_markdownlint=args.skip_markdownlint)
+    checks = collect_checks(
+        skip_markdownlint=args.skip_markdownlint, markdown_base=args.markdown_base
+    )
     for check in checks:
         print(f"{check.status.upper():11} {check.name}: {check.evidence}")
     return int(any(check.status in {"failed", "unavailable"} for check in checks))

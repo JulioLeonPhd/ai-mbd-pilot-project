@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import importlib.util
+import os
+import re
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).with_name("check_agent_handoffs.py")
 SPEC = importlib.util.spec_from_file_location("check_agent_handoffs", SCRIPT)
@@ -33,10 +37,10 @@ class AgentHandoffCheckTest(unittest.TestCase):
                 CHECKER.ROOT / ".omp/agents" / f"{name}.md",
                 agents / f"{name}.md",
             )
-        skill = root / ".agents/skills/diagrammer"
+        skill = root / ".agents/skills/drawing-mermaid-diagrams"
         skill.mkdir(parents=True)
         shutil.copy2(
-            CHECKER.ROOT / ".agents/skills/diagrammer/SKILL.md",
+            CHECKER.ROOT / ".agents/skills/drawing-mermaid-diagrams/SKILL.md",
             skill / "SKILL.md",
         )
         return root
@@ -47,6 +51,98 @@ class AgentHandoffCheckTest(unittest.TestCase):
             for check in CHECKER.collect_checks(root, skip_markdownlint=True)
             if check.name == name
         )
+
+    def test_markdown_lint_limits_scope_to_changes_from_git_base(self) -> None:
+        root = self._fixture()
+        environment = patch.dict(
+            os.environ,
+            {"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"},
+        )
+        environment.start()
+        self.addCleanup(environment.stop)
+
+        def git(*args: str) -> None:
+            subprocess.run(["git", *args], cwd=root, check=True, capture_output=True)
+
+        def commit(message: str) -> None:
+            git(
+                "-c",
+                "user.name=Fixture",
+                "-c",
+                "user.email=test@example.com",
+                "commit",
+                "-m",
+                message,
+            )
+
+        def put(path: str, content: str = "# Document\n") -> None:
+            (root / path).write_text(content, encoding="utf-8")
+
+        def check(markdown_base: str | None = None):
+            checks = (
+                CHECKER.collect_checks(root)
+                if markdown_base is None
+                else CHECKER.collect_checks(root, markdown_base=markdown_base)
+            )
+            return next(result for result in checks if result.name == "Markdown lint")
+
+        git("init", "--template=")
+        put(".gitignore", "ignored.md\n")
+        put("README.md", "An untouched legacy line " * 5 + "\n")
+        put("deleted.md")
+        put("edited.md")
+        put("unstaged.md")
+        git("add", "--all")
+        commit("baseline")
+        git("tag", "baseline")
+        with patch.object(CHECKER.shutil, "which", return_value=None):
+            self.assertEqual(check().status, "passed")
+            self.assertEqual(check(markdown_base="missing-revision").status, "failed")
+            self.assertEqual(check(markdown_base="--cached").status, "failed")
+
+        put("committed.md")
+        git("add", "committed.md")
+        commit("branch work")
+
+        put("--staged [draft].md")
+        put("missing.md")
+        git("add", "--", "--staged [draft].md", "missing.md")
+        (root / "missing.md").unlink()
+        (root / "deleted.md").unlink()
+        put("unstaged.md", "# Edited\n")
+        git("mv", "edited.md", "renamed.MD")
+        (root / ".drafts").mkdir()
+        put(".drafts/untracked.markdown")
+        put("ignored.md")
+        put("not-markdown.txt")
+
+        run_git = subprocess.run
+        lint_paths: list[str] = []
+
+        def run(args, **kwargs):
+            if args[0] == "git":
+                return run_git(args, **kwargs)
+            self.assertEqual(args[0], "markdownlint-cli2")
+            self.assertEqual(args[1], "--no-globs")
+            self.assertEqual(kwargs["cwd"], root)
+            lint_paths.extend(args[2:])
+            return subprocess.CompletedProcess(args, 0, stdout="", stderr="")
+
+        expected = [
+            ":--staged [draft].md",
+            ":.drafts/untracked.markdown",
+            ":renamed.MD",
+            ":unstaged.md",
+        ]
+        with (
+            patch.object(CHECKER.shutil, "which", return_value="markdownlint-cli2"),
+            patch.object(CHECKER.subprocess, "run", side_effect=run),
+        ):
+            self.assertEqual(check().status, "passed")
+            self.assertCountEqual(lint_paths, expected)
+            lint_paths.clear()
+            self.assertEqual(check(markdown_base="baseline").status, "passed")
+            self.assertCountEqual(lint_paths, [*expected, ":committed.md"])
 
     @staticmethod
     def _replace_frontmatter(content: str, field: str, value: str) -> str:
@@ -110,23 +206,52 @@ task:
             with self.subTest(content=content), self.assertRaises(ValueError):
                 CHECKER._parse_omp_agent(content)
 
-    def test_checker_accepts_exact_six_native_roles(self) -> None:
+    def test_checker_accepts_exact_seven_native_roles(self) -> None:
         root = self._fixture()
         for name in (
             "specialist registry",
             "OMP native agents",
             "packet contract",
-            "flat orchestration",
-            "diagrammer boundary",
+            "per-role delegation",
+            "Mermaid boundary",
         ):
             with self.subTest(check=name):
                 self.assertEqual(self._check(root, name).status, "passed")
 
-    def test_diagrammer_remains_a_skill_not_a_specialist(self) -> None:
+    def test_per_role_delegation_requires_deny_by_default_policy(self) -> None:
         root = self._fixture()
-        diagrammer = root / ".omp/agents/diagrammer.md"
-        diagrammer.write_text("unregistered specialist\n", encoding="utf-8")
-        self.assertEqual(self._check(root, "diagrammer boundary").status, "failed")
+        path = root / "AGENTS.md"
+        content = path.read_text(encoding="utf-8")
+        content, replacements = re.subn(
+            r"Specialist\s+delegation\s+is\s+denied\s+by\s+default",
+            "Specialist delegation is permitted by default",
+            content,
+        )
+        self.assertEqual(replacements, 1)
+        path.write_text(content, encoding="utf-8")
+        check = self._check(root, "per-role delegation")
+        self.assertEqual(check.status, "failed")
+        self.assertIn("missing deny-by-default delegation policy", check.evidence)
+
+    def test_mermaid_boundary_requires_new_skill(self) -> None:
+        root = self._fixture()
+        (root / ".agents/skills/drawing-mermaid-diagrams/SKILL.md").unlink()
+        self.assertEqual(self._check(root, "Mermaid boundary").status, "failed")
+
+    def test_mermaid_boundary_rejects_legacy_skill_and_shadow_roles(self) -> None:
+        for forbidden in (
+            ".agents/skills/diagrammer/SKILL.md",
+            ".omp/agents/diagrammer.md",
+            ".omp/agents/drawing-mermaid-diagrams.md",
+        ):
+            with self.subTest(path=forbidden):
+                root = self._fixture()
+                path = root / forbidden
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.touch()
+                check = self._check(root, "Mermaid boundary")
+                self.assertEqual(check.status, "failed")
+                self.assertIn(forbidden, check.evidence)
 
     def test_native_inventory_rejects_missing_and_extra_deep_roles(self) -> None:
         with self.subTest(inventory="missing role"):
@@ -222,7 +347,79 @@ task:
         path.write_text(content, encoding="utf-8")
         self.assertEqual(self._check(root, "OMP native agents").status, "failed")
 
-    def test_native_checker_preserves_safety_and_root_only_policy(self) -> None:
+    def test_researcher_declarations_reject_default_and_tool_drift(self) -> None:
+        for field, value in (
+            ("model", '"openai-codex/gpt-6.2-astra"'),
+            ("thinking-level", '"high"'),
+            ("tools", '["read", "grep", "glob", "web_search", "task"]'),
+        ):
+            with self.subTest(field=field):
+                root = self._fixture()
+                path = root / ".omp/agents/researcher.md"
+                content = self._replace_frontmatter(
+                    path.read_text(encoding="utf-8"), field, value
+                )
+                path.write_text(content, encoding="utf-8")
+                check = self._check(root, "OMP native agents")
+                self.assertEqual(check.status, "failed")
+                self.assertIn("researcher.md: incorrect", check.evidence)
+
+    def test_native_spawns_require_exact_per_role_allowlists(self) -> None:
+        for role, spawns in (
+            ("researcher", '""'),
+            ("researcher", '"*"'),
+            ("researcher", '"technical-writer"'),
+            ("researcher", '"scout"'),
+            ("researcher", '"scout,technical-writer,matlab-validator"'),
+            ("researcher", '"technical-writer,scout"'),
+            ("matlab-architect", '"scout"'),
+            ("technical-writer", '"scout"'),
+        ):
+            with self.subTest(role=role, spawns=spawns):
+                root = self._fixture()
+                path = root / f".omp/agents/{role}.md"
+                content = self._replace_frontmatter(
+                    path.read_text(encoding="utf-8"), "spawns", spawns
+                )
+                path.write_text(content, encoding="utf-8")
+                check = self._check(root, "OMP native agents")
+                self.assertEqual(check.status, "failed")
+                expected = "scout,technical-writer" if role == "researcher" else ""
+                self.assertIn(
+                    f"{role}.md: incorrect spawns; expected {expected!r}",
+                    check.evidence,
+                )
+
+    def test_researcher_role_requires_exact_spawn_guard(self) -> None:
+        root = self._fixture()
+        path = root / ".omp/agents/researcher.md"
+        content, replacements = re.subn(
+            r"do\s+not\s+spawn\s+subagents\s+other\s+than\s+the\s+bundled\s+scout"
+            r"\s+and\s+technical-writer",
+            "do not spawn subagents other than the bundled scout",
+            path.read_text(encoding="utf-8"),
+        )
+        self.assertEqual(replacements, 1)
+        path.write_text(content, encoding="utf-8")
+        check = self._check(root, "OMP native agents")
+        self.assertEqual(check.status, "failed")
+        self.assertIn(
+            "missing operating boundary 'do not spawn subagents other than the "
+            "bundled scout and technical-writer'",
+            check.evidence,
+        )
+
+    def test_researcher_role_requires_synthesis_boundary(self) -> None:
+        root = self._fixture()
+        path = root / ".omp/agents/researcher.md"
+        content = path.read_text(encoding="utf-8")
+        self.assertIn("synthesis", content)
+        path.write_text(content.replace("synthesis", "analysis"), encoding="utf-8")
+        check = self._check(root, "OMP native agents")
+        self.assertEqual(check.status, "failed")
+        self.assertIn("missing operating boundary 'synthesis'", check.evidence)
+
+    def test_native_checker_preserves_safety_and_no_child_roles(self) -> None:
         root = self._fixture()
         path = root / ".omp/agents/matlab-validator.md"
         content = path.read_text(encoding="utf-8").replace(
