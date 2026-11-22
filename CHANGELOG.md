@@ -273,6 +273,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added: define the batch MATLAB pulse-accumulation contract for a CPI in
+  scheduled slot order (#39). SemVer impact: none
 - OMP-native project definitions for all nine specialists, preserving
   Codex TOMLs and role instructions.
 - Archived the exact candidate range-study runner and recorded the
