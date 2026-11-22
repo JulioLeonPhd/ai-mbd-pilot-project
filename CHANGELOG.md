@@ -8,6 +8,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.11.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.11.0) - 2026-11-22
+
+<small>[Compare with v0.10.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.10.0...v0.11.0)</small>
+
+### Added
+
+- Added: assemble one CPI into a slow-time ensemble (#39)
+  ([9d412c7](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/9d412c7f8ca2aa129ffec2f04b2243178ac75a75)
+  by Julio Leon). SemVer impact: minor
+
+### Fixed
+
+- Fixed: preserve sparse CPI payloads in scheduled assembly (#39)
+  ([4799987](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/479998707bd2a0b0c0cb6da3d9aaef76a92d2ac3)
+  by Julio Leon). SemVer impact: minor
+
+### Merged
+
+- Merge pull request #40 from JulioLeonPhd/pulse-accumulation-integration
+  ([b8a3fc2](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/b8a3fc2290fb30c13f6498ccc40e446192be0761)
+  by Julio León).
+- Merge pull request #37 from JulioLeonPhd/docs/issue-31-mermaid
+  ([967f567](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/967f5675fb284f2d4f1680e8a879875f3512191d)
+  by Julio León). docs: redesign repository Mermaid diagrams for clarity (#31)
+
+### Documented
+
+- docs: redesign Mermaid diagrams for clarity (#31)
+  ([fe1e9ae](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/fe1e9aed42020fc7c770b2bde1290b78b56c3c6e)
+  by Julio Leon).
+
 ## [v0.10.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/releases/tag/v0.10.0) - 2026-11-22
 
 <small>[Compare with v0.9.0](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/compare/v0.9.0...v0.10.0)</small>
