@@ -45,18 +45,18 @@ scheduled slot. Arrival order is arbitrary. Each record has these fields:
 
 | Field | Required representation and meaning |
 | --- | --- |
-| `slot` | Integer-valued real `double` scalar in `1:P`, where `P` is `expectedPulseCount`. One-based scheduled slot. |
+| `slot` | Integer-valued real `double` scalar in $1 \le s \le P$, where $s$ is the slot and $P$ is `expectedPulseCount`. One-based scheduled slot. |
 | `pulseStartTick` | `uint64` scalar source pulse-start tick in 150 MHz ADC clock periods from the radar clock epoch. Tick zero is valid. |
 | `rangeSamples` | Finite complex `double` `[R,4]` values from `processPri`, in its original amplitude units. The four columns are the canonical elevation streams. |
 | `metadata.valid` | Logical `[R,4]` validity mask corresponding to `rangeSamples`. |
-| `metadata.rangeBinCentersM` | Finite real `double` `[R,1]` range-bin coordinate vector in metres. `R >= 1`. |
+| `metadata.rangeBinCentersM` | Finite real `double` `[R,1]` range-bin coordinate vector in metres, with $R \ge 1$. |
 
 The scalar struct `cpiContext` contains exactly the following fields:
 
 | Field | Required representation and meaning |
 | --- | --- |
-| `expectedPulseCount` | Finite positive integer-valued `double` scalar no greater than `flintmax`; defines `P`. |
-| `azimuthLookIndex` | Finite positive integer-valued `double` scalar no greater than `flintmax`; one-based commanded look index, unitless. |
+| `expectedPulseCount` | Finite positive integer-valued `double` scalar no greater than $2^{53}$ (`flintmax`); defines $P$. |
+| `azimuthLookIndex` | Finite positive integer-valued `double` scalar no greater than $2^{53}$ (`flintmax`); one-based commanded look index, unitless. |
 | `prfNominalHz` | Finite positive real `double` scalar in Hz. |
 
 These context values are caller-supplied declarations, not schedule lookups or
@@ -64,6 +64,9 @@ provenance evidence. No separate CPI identity is required by this interface.
 The component cannot infer whether all four stream columns retain their
 canonical meanings; callers must provide consistently ordered elevation
 streams.
+
+Sparse sample arrays and validity masks are accepted. Assembly converts them
+to full storage while preserving their values and complex sample type.
 
 ## 3. Output contract
 
@@ -93,13 +96,12 @@ Validate in this order:
 3. Validate each range payload and require its range grid to be numerically
    exactly equal to slot 1's grid.
 
-Require exactly `P` records, with one and only one record for each slot from
-`1` through `P`. Accept arbitrary arrival order. Source ticks must be strictly
-increasing by slot: for adjacent scheduled slots, require
-`pulseStartTicks(k) < pulseStartTicks(k+1)` using `uint64` comparisons. Do not
-convert ticks to `double` or infer order from arrival order. Equal or
-decreasing ticks are rejected. Increasing irregular ticks are accepted and
-returned unchanged.
+Require exactly $P$ records, with one and only one record for each slot from
+$1$ through $P$. Accept arbitrary arrival order. Let $t_k$ be the `uint64`
+`pulseStartTicks` entry at scheduled slot $k$. Require $t_k \lt t_{k+1}$ for
+$1 \le k \lt P$, using `uint64` comparisons. Do not convert ticks to `double`
+or infer order from arrival order. Equal or decreasing ticks are rejected.
+Increasing irregular ticks are accepted and returned unchanged.
 
 Raise a MATLAB error with the recommended stable identifier below. A rejected
 call returns no ensemble; assign the output only after the batch has passed
@@ -122,9 +124,10 @@ uniform spacing or source membership. The caller is responsible for verifying
 that records belong to the declared CPI, commanded look, and PRF, and for
 checking exact spacing against the configured integer PRI tick count before
 any downstream consumer that requires uniform slow-time sampling. Do not
-round `150 MHz / prfNominalHz` to create or validate the PRI count. In
-particular, successful assembly with irregular ticks is not a uniform-spacing
-Doppler precondition and does not establish Doppler readiness.
+round $150\,\mathrm{MHz}/f_\mathrm{PRF}$ to create or validate the PRI count,
+where $f_\mathrm{PRF}$ is `prfNominalHz` in Hz. In particular, successful
+assembly with irregular ticks is not a uniform-spacing Doppler precondition
+and does not establish Doppler readiness.
 
 ## 6. Public-interface acceptance cases
 
@@ -137,7 +140,7 @@ do not use a second implementation of the reordering logic as the oracle.
   with an all-false mask. Verify exact sample and mask values, grid, ticks,
   types, and axis order.
 - **Ticks:** Preserve an increasing irregular sequence exactly, including
-  adjacent `uint64` values above `2^53`. Reject equal or decreasing ticks in
+  adjacent `uint64` values above $2^{53}$. Reject equal or decreasing ticks in
   scheduled slot order and wrongly typed ticks. Shuffled arrival alone must
   not reject the batch.
 - **Singleton:** Accept slot 1 at tick zero and verify `[R,1,4]` samples and

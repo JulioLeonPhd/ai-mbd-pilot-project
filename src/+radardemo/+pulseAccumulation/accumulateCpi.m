@@ -1,11 +1,16 @@
 function ensemble = accumulateCpi(priResults, cpiContext)
-%ACCUMULATECPI Assemble one complete CPI in scheduled pulse order.
-%   ENSEMBLE = RADARDEMO.PULSEACCUMULATION.ACCUMULATECPI(PRIRESULTS,
-%   CPICONTEXT) preserves complex [rangeBin,4] per-PRI samples, logical
-%   validity, range centers in metres and uint64 150 MHz source ticks.
-%   The output sample and validity axes are [rangeBin,pulse,elevation].
-%   Context declares expectedPulseCount, azimuthLookIndex and prfNominalHz;
-%   the caller remains responsible for membership and exact PRI spacing.
+%accumulateCpi - Assemble one CPI in scheduled pulse order
+%   ENSEMBLE = radardemo.pulseAccumulation.accumulateCpi(priResults,cpiContext)
+%   orders one record per slot. Each record has a positive double integer
+%   slot, a uint64 pulseStartTick, complex double [R,4] rangeSamples, and
+%   metadata with logical [R,4] valid and real double [R,1]
+%   rangeBinCentersM. Samples and range centers must be finite; grids match
+%   exactly. Ticks increase strictly in slot order and use 150 MHz periods.
+%   cpiContext contains exactly expectedPulseCount and azimuthLookIndex
+%   (positive double integers), and prfNominalHz (positive finite double).
+%   ENSEMBLE contains rangeSamples and valid in [range,pulse,elevation]
+%   order, rangeBinCentersM, and uint64 column pulseStartTicks. The caller
+%   owns membership and exact PRI spacing checks.
 
 contextId = "radardemo:pulseAccumulation:InvalidContext";
 slotId = "radardemo:pulseAccumulation:InvalidSlotsOrTicks";
@@ -80,8 +85,16 @@ rangeSamples = complex(zeros(rangeCount, count, 4));
 valid = false(rangeCount, count, 4);
 for slot = 1:count
     record = priResults(recordForSlot(slot));
-    rangeSamples(:, slot, :) = reshape(record.rangeSamples, rangeCount, 1, 4);
-    valid(:, slot, :) = reshape(record.metadata.valid, rangeCount, 1, 4);
+    samples = record.rangeSamples;
+    mask = record.metadata.valid;
+    if issparse(samples)
+        samples = full(samples);
+    end
+    if issparse(mask)
+        mask = full(mask);
+    end
+    rangeSamples(:, slot, :) = reshape(samples, rangeCount, 1, 4);
+    valid(:, slot, :) = reshape(mask, rangeCount, 1, 4);
 end
 if isreal(rangeSamples)
     rangeSamples = complex(rangeSamples);

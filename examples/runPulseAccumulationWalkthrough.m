@@ -10,31 +10,32 @@ if ~isfolder(fullfile(repositoryRoot, "src"))
 end
 %%
 %[text] ## 2. Describe the declared context and synthetic records
-%[text] The caller declares three scheduled pulses for commanded look 2 at nominal PRF 1000 Hz. Each record has two range-bin centers in metres and four consistently ordered elevation streams. Synthetic complex amplitudes are dimensionless, not calibrated measurements. Ticks count 150 MHz ADC clock periods from the radar clock epoch.
+%[text] The caller declares three scheduled pulses for commanded look 2 at nominal PRF 1000 Hz. Each record has 501 range bins and four consistently ordered elevation streams. The 12.5 MS/s range-sample rate sets the bin spacing to approximately 11.9917 m. Synthetic complex amplitudes are dimensionless, not calibrated measurements. Ticks count 150 MHz ADC clock periods from the radar clock epoch.
 context = struct("expectedPulseCount", 3, "azimuthLookIndex", 2, "prfNominalHz", 1000);
-metadata = struct("valid", true(2, 4), "rangeBinCentersM", [100; 112]);
+metadata = struct("valid", false(501, 4), ...
+    "rangeBinCentersM", 100 + (0:500)'*(299792458/(2*12.5e6)));
+metadata.valid(1:2, :) = true;
 records = repmat(struct("slot", 1, "pulseStartTick", uint64(0), ...
-    "rangeSamples", complex(zeros(2, 4)), "metadata", metadata), 1, 3);
-records(1).rangeSamples = complex([0 13 15 17; 0 14 16 18], [0 1 1 1; 0 1 1 1]);
+    "rangeSamples", complex(zeros(501, 4)), "metadata", metadata), 1, 3);
+records(1).rangeSamples(1:2, :) = complex([0 13 15 17; 0 14 16 18], [0 1 1 1; 0 1 1 1]);
 records(1).metadata.valid(2, 1) = false;
 records(2).slot = 2;
 records(2).pulseStartTick = uint64(150000);
-records(2).rangeSamples = complex([21 23 25 27; 22 24 26 28], 2*ones(2, 4));
-records(2).metadata.valid = false(2, 4);
+records(2).metadata.valid = false(501, 4);
 records(3).slot = 3;
 records(3).pulseStartTick = uint64(310000);
-records(3).rangeSamples = complex([31 33 35 37; 32 34 36 38], 3*ones(2, 4));
+records(3).rangeSamples(1:2, :) = complex([31 33 35 37; 32 34 36 38], 3*ones(2, 4));
 arrival = records([3 1 2]);
-%[text] The arrival sequence is 3, 1, 2, but the expected output pulse axis is 1, 2, 3. In stream 1, slot 1 contains a valid zero at 100 m and an invalid zero at 112 m. Slot 2 is present even though its whole mask is false.
+%[text] The last 499 bins are invalid zeros, as required by range compression's 500-sample window. The arrival sequence is 3, 1, 2, but the expected output pulse axis is 1, 2, 3. In stream 1, slot 1 contains a valid zero at 100 m and an invalid zero at approximately 111.992 m. Slot 2 is present even though its whole mask is false and its samples are zero.
 %%
 %[text] ## 3. Assemble and inspect the result
 %[text] The public call accepts a struct vector of exactly one record per slot and a scalar context. It validates context, slot coverage and increasing source ticks before checking the finite complex samples, matching logical masks and exactly equal range grids. The helper only manages the source path around that public call.
 ensemble = accumulateWithRepositoryPath(repositoryRoot, arrival, context);
-disp(ensemble.rangeSamples(:, :, 1))
-disp(ensemble.valid(:, :, 1))
-disp(ensemble.rangeBinCentersM)
+disp(ensemble.rangeSamples(1:2, :, 1))
+disp(ensemble.valid(1:2, :, 1))
+disp(ensemble.rangeBinCentersM(1:2))
 disp(ensemble.pulseStartTicks)
-%[text] Samples and masks have axes range bin, pulse, elevation, here size 2-by-3-by-4. The displayed stream 1 rows correspond to 100 m and 112 m, and its columns should be slots 1, 2, 3: the first row is 0, 21+2i, 31+3i. The first two values in the first column are both zero, but their mask entries are true and false respectively. The range vector is unchanged and ticks are returned as a uint64 column in scheduled order.
+%[text] Samples and masks have axes range bin, pulse, elevation, here size 501-by-3-by-4. Only the first two bins of stream 1 are displayed; their columns should be slots 1, 2, 3. The first row is 0, 0, 31+3i. The first two values in the first column are both zero, but their mask entries are true and false respectively. The range vector is unchanged and ticks are returned as a uint64 column in scheduled order.
 %%
 %[text] ## 4. Reject a duplicate slot
 %[text] Changing slot 3 to slot 2 leaves the record count at three but duplicates one scheduled slot and omits another. The public call should reject the whole batch with `radardemo:pulseAccumulation:InvalidSlotsOrTicks`; no partial ensemble is returned.
