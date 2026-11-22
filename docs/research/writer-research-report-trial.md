@@ -32,11 +32,12 @@ recommendation criteria required a higher reader score, a candidate numbering
 pass, and no new material error or lost consequential caveat. Julio retains the
 adoption decision. One draft per arm is exploratory.
 
-The same substantive fixture was not packaged identically: the baseline
-Researcher parent received its verbatim text plus a link; the candidate parent
-received a reference to the fixture plus an addendum, which the writer read.
-This packaging difference is a confound. The mapped draft hashes are supplied
-as recorded; source packets and rubric are not independently hash-pinned here.
+Both Researcher parents received the fixture by reference. The baseline
+Researcher also embedded the verbatim fixture in its writer packet alongside
+the reference. The candidate writer received references to the fixture and
+addendum and read both. This unequal writer-packet packaging is a confound.
+The mapped draft hashes are supplied as recorded; source packets and rubric
+are not independently hash-pinned here.
 
 | Arm | Draft | SHA-256 | Reader vector | Score |
 | --- | --- | --- | --- | --- |

@@ -60,16 +60,17 @@ frozen rule.
 
 ## 4. Architecture case
 
-**Fixture and evidence.** The pinned documentation snapshots at commit
-[`6e1476558c1c7c9034803219a662c5ea23297323`](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/tree/6e1476558c1c7c9034803219a662c5ea23297323)
-link the navigation page to the current overview and distinguish it from the
-historical WP4/G2 topology. The supplied evidence distinguishes confirmed
-responsibilities, bounded implementation evidence, and unresolved choices.
-Independent semantic review and Julio's visual diagram acceptance are recorded;
-visual approval does not demonstrate full implementation, complete code review,
-MATLAB verification, end-to-end receiver behavior, or closure of open decisions.
-This is a report on pinned documents, not an independent verification. No
-operational or design specifics are inferred here.
+**Fixture and evidence.** The pinned [architecture navigation
+document](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/blob/6e1476558c1c7c9034803219a662c5ea23297323/docs/architecture.md)
+links to the [current radar overview](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/blob/6e1476558c1c7c9034803219a662c5ea23297323/docs/architecture/radar-overview.md)
+and distinguishes it from the historical WP4/G2 topology. The supplied
+evidence distinguishes confirmed responsibilities, bounded implementation
+evidence, and unresolved choices. Independent semantic review and Julio's
+visual diagram acceptance are recorded; visual approval does not demonstrate
+full implementation, complete code review, MATLAB verification, end-to-end
+receiver behavior, or closure of open decisions. This is a report on pinned
+documents, not an independent verification. No operational or design
+specifics are inferred here.
 
 **Frozen rubric results.** Baseline P8 scored **3/3 [1,1,1]**; candidate D3
 scored **3/3 [1,1,1]**. Both direct the reader to the current overview, separate
