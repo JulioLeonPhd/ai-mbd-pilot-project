@@ -14,40 +14,84 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added: record the blinded research-report trial ([34202aa](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/34202aadf642ed5845cd4596b504ebdbe70b3df6) by Julio Leon). SemVer impact: none
-- Added: record two blinded technical-report trials ([116a49e](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/116a49e0f3bd754cd9e71dd15456b9deb95a25a7) by Julio Leon). SemVer impact: none
-- Added: document Mermaid render findings and smoke evidence ([d736a2e](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/d736a2e761e84df9b4fca018706d0d65388a02ab) by Julio Leon). Refs: #29, #30, SemVer impact: none
+- Added: record the blinded research-report trial
+  ([34202aa](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/34202aadf642ed5845cd4596b504ebdbe70b3df6)
+  by Julio Leon). SemVer impact: none
+- Added: record two blinded technical-report trials
+  ([116a49e](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/116a49e0f3bd754cd9e71dd15456b9deb95a25a7)
+  by Julio Leon). SemVer impact: none
+- Added: document Mermaid render findings and smoke evidence
+  ([d736a2e](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/d736a2e761e84df9b4fca018706d0d65388a02ab)
+  by Julio Leon). Refs: #29, #30, SemVer impact: none
 
 ### Changed
 
-- Changed: record merged range compression and next V1 decision ([f27861f](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/f27861f53357f39f37f437eae71cde5e78062d45) by Julio Leon). SemVer impact: none
-- Changed: adopt approved research and technical report guidance ([5419800](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/541980055c16a9cae7992720dd6e5be393463d44) by Julio Leon). SemVer impact: none
-- Changed: clarify how agents interpret user intent ([210bd95](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/210bd951dc4a8cdd22225c46a3cc552eecf35259) by Julio Leon). SemVer impact: none
-- Changed: route writer assignments by artifact and audience ([e139d61](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/e139d616328c3c08430e714c62e126371cccb268) by Julio Leon).
-- Changed: use native task discovery for routine dispatch ([a922ae7](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/a922ae7c7426dd3998523460a161f470a924ce02) by Julio Leon). SemVer impact: none
-- Changed: clarify native dispatch preflight and authorize writer trial ([597ca33](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/597ca338b0d4a748440d9744c77e146fb6913c66) by Julio Leon). SemVer impact: none
-- Changed: delegate research and report authoring by role ([7ec2b71](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/7ec2b716258efa0b048093dc0e314b4a753662e0) by Julio Leon).
-- Changed: make Mermaid authoring a shared agent skill ([44ba0cd](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/44ba0cd0596909067fed01b3e95ba3775aab23f4) by Julio Leon). Refs: #29, #30, SemVer impact: none
-- Changed: default the documentation validator to Sol ([eb24c1d](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/eb24c1d5d2351963bb7088f8ccfd0f20eda0e07c) by Julio Leon). SemVer impact: none
-- Changed: update OMP specialist model defaults ([791f9c6](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/791f9c668da3eb08ff8a7589ac361c9893a23baa) by Julio Leon). SemVer impact: none
-- Changed: keep status logs local to each worktree ([6e14765](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/6e1476558c1c7c9034803219a662c5ea23297323) by Julio Leon). SemVer impact: none
-- Changed: simplify native agent orchestration ([c31f30d](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c31f30dfa1333e62d3aedc836fd3c8b07f117a4c) by Julio Leon). SemVer impact: none
+- Changed: record merged range compression and next V1 decision
+  ([f27861f](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/f27861f53357f39f37f437eae71cde5e78062d45)
+  by Julio Leon). SemVer impact: none
+- Changed: adopt approved research and technical report guidance
+  ([5419800](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/541980055c16a9cae7992720dd6e5be393463d44)
+  by Julio Leon). SemVer impact: none
+- Changed: clarify how agents interpret user intent
+  ([210bd95](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/210bd951dc4a8cdd22225c46a3cc552eecf35259)
+  by Julio Leon). SemVer impact: none
+- Changed: route writer assignments by artifact and audience
+  ([e139d61](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/e139d616328c3c08430e714c62e126371cccb268)
+  by Julio Leon).
+- Changed: use native task discovery for routine dispatch
+  ([a922ae7](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/a922ae7c7426dd3998523460a161f470a924ce02)
+  by Julio Leon). SemVer impact: none
+- Changed: clarify native dispatch preflight and authorize writer trial
+  ([597ca33](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/597ca338b0d4a748440d9744c77e146fb6913c66)
+  by Julio Leon). SemVer impact: none
+- Changed: delegate research and report authoring by role
+  ([7ec2b71](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/7ec2b716258efa0b048093dc0e314b4a753662e0)
+  by Julio Leon).
+- Changed: make Mermaid authoring a shared agent skill
+  ([44ba0cd](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/44ba0cd0596909067fed01b3e95ba3775aab23f4)
+  by Julio Leon). Refs: #29, #30, SemVer impact: none
+- Changed: default the documentation validator to Sol
+  ([eb24c1d](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/eb24c1d5d2351963bb7088f8ccfd0f20eda0e07c)
+  by Julio Leon). SemVer impact: none
+- Changed: update OMP specialist model defaults
+  ([791f9c6](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/791f9c668da3eb08ff8a7589ac361c9893a23baa)
+  by Julio Leon). SemVer impact: none
+- Changed: keep status logs local to each worktree
+  ([6e14765](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/6e1476558c1c7c9034803219a662c5ea23297323)
+  by Julio Leon). SemVer impact: none
+- Changed: simplify native agent orchestration
+  ([c31f30d](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c31f30dfa1333e62d3aedc836fd3c8b07f117a4c)
+  by Julio Leon). SemVer impact: none
 
 ### Fixed
 
-- Fixed: clarify writer trial evidence provenance ([c564a52](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c564a52abe6e9d5c7a025cb16d040af6b56c475d) by Julio Leon). SemVer impact: none
-- Fixed: enforce Markdown line length on changed files ([49c4f2a](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/49c4f2aabb672091ab911398fc5c259216ba43ae) by Julio Leon). SemVer impact: none
+- Fixed: clarify writer trial evidence provenance
+  ([c564a52](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/c564a52abe6e9d5c7a025cb16d040af6b56c475d)
+  by Julio Leon). SemVer impact: none
+- Fixed: enforce Markdown line length on changed files
+  ([49c4f2a](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/49c4f2aabb672091ab911398fc5c259216ba43ae)
+  by Julio Leon). SemVer impact: none
 
 ### Merged
 
-- Merge pull request #36 from JulioLeonPhd/integration/writer-genres ([86e6e01](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/86e6e01165182a11e8e3f94a418c87d40dd3eb0a) by Julio León).
-- Merge technical report trial evidence (#35) ([2658a20](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/2658a203285188b2d03d2e1d0c424e156359c04e) by Julio Leon).
-- Merge branch 'infra/agent-handoff-optimisation' into ticket/33-writer-routing ([290d1c2](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/290d1c28542e3f885a8e4a1ba6fbadb3f4c11407) by Julio Leon).
-- Merge pull request #27 from JulioLeonPhd/feature/omp-native-orchestration ([5cdcaf3](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/5cdcaf3c7144340a87c8e912f6d94fd7f9cabc8c) by Julio León).
+- Merge pull request #36 from JulioLeonPhd/integration/writer-genres
+  ([86e6e01](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/86e6e01165182a11e8e3f94a418c87d40dd3eb0a)
+  by Julio León).
+- Merge technical report trial evidence (#35)
+  ([2658a20](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/2658a203285188b2d03d2e1d0c424e156359c04e)
+  by Julio Leon).
+- Merge branch 'infra/agent-handoff-optimisation' into ticket/33-writer-routing
+  ([290d1c2](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/290d1c28542e3f885a8e4a1ba6fbadb3f4c11407)
+  by Julio Leon).
+- Merge pull request #27 from JulioLeonPhd/feature/omp-native-orchestration
+  ([5cdcaf3](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/5cdcaf3c7144340a87c8e912f6d94fd7f9cabc8c)
+  by Julio León).
 
 ### Misc
 
-- Updated research records. ([7e5f126](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/7e5f12643bc5cd076771682cb0fa9aeebfd84f39) by Julio Leon).
+- Updated research records.
+  ([7e5f126](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/commit/7e5f12643bc5cd076771682cb0fa9aeebfd84f39)
+  by Julio Leon).
 
 ## [v0.9.0][release-v090] - 2026-11-13
 
