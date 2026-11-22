@@ -259,6 +259,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `drawing-mermaid-diagrams` (#29).
 - Replaced the Edge prerequisite for Mermaid verification with Puppeteer's
   managed headless shell and per-diagram output checks (#30).
+- Redesigned the historical receive-processing Mermaid diagram and added
+  accessible titles and descriptions to the two DDC diagrams (#31).
 - Replaced the active nine-role/deep-profile governance with the approved
   six-role OMP-native topology and direct single-agent Codex fallback;
   recorded Julio's 2026-11-13 removal of demonstrated pre-V1 payback as an

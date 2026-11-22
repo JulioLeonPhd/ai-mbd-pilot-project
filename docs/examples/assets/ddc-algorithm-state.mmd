@@ -1,4 +1,7 @@
 flowchart TB
+    accTitle: Per-PRI DDC scan loop
+    accDescr: Each scan record is either a transition gap, kept on the timeline without a DDC call, or a physical PRI that receives one fresh-state DDC call. The loop ends after the last record.
+
     select{"Next scan record?"}
     gap["Transition gap<br/>Keep on timeline; skip DDC"]
     pri["Physical PRI<br/>One DDC call; fresh local state"]

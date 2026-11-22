@@ -141,20 +141,27 @@ evaluation.
 The earlier proposed data flow was:
 
 1. MATLAB generates waveform and scenario-driven test vectors, recording exact
- configuration and scenario versions.
+ configuration and scenario versions. Its 2.99792458 GHz RF phase model drives
+ 64 real 16-bit ADC channels at 150 MS/s with a 50 MHz IF.
 2. ADC inputs provide digitized samples for each channel.
-3. The DUT applies DDC and decimation.
+3. The DUT applies DDC and decimation: a complex mixer, then low-pass filter and
+ /3 to 50 MS/s, then low-pass filter and /4 to 12.5 MS/s complex baseband with
+ Nyquist +/-6.25 MHz.
 4. For each commanded azimuth look, receive beamforming coherently sums the 16
  azimuth elements independently for each of the four elevation rows, reducing
- 64 DDC channels to four complex elevation streams. Fast-time processing then
- produces per-pulse range data. Before coherent
+ 64 DDC channels to four complex elevation streams. Fast-time processing on
+ the 10 MHz waveform then produces per-pulse range data with nominal ~15 m
+ resolution. Before coherent
  slow-time processing, those results receive migration-aware alignment or
  handling for the moving-target hypotheses under consideration. Slow-time
  processing then forms Doppler data from the usable pulse ensemble for each
  azimuth look.
-5. Ambiguity projection/unfolding preserves the five PRF layers. Per-PRF CFAR
- decisions feed non-coherent 3-of-5 binary integration; clustering consumes
- the fused hypotheses and the DUT emits a detection list.
+5. Ambiguity projection/unfolding preserves the five PRF layers (1700, 1900,
+ 2150, 2450, and 2700 Hz). The per-PRF candidate seam carries folded range and
+ velocity plus PRF identity. Per-PRF CFAR decisions feed non-coherent 3-of-5
+ binary integration; clustering consumes the fused hypotheses and the DUT
+ emits a detection list. Fusion retains masks and source cells; each detection
+ reports range, radial velocity, azimuth, elevation, and detection statistic.
 
 The earlier proposed signal chain and its rate boundaries are shown below for
 historical context only.
@@ -168,43 +175,42 @@ Whether migration compensation uses candidate true-velocity hypotheses,
 iteration, or another approved method, along with its exact sequencing, is an
 open WP6e choice.
 
-<!-- markdownlint-disable MD013 -->
 ```mermaid
-flowchart LR
-    GEN["MVP target generator<br/>direct 64-channel ADC vectors<br/>2.99792458 GHz RF phase model"] --> ADC["DUT input: 64 real 16-bit ADC channels<br/>150 MS/s/channel; 50 MHz IF"]
-    ADC --> DDC["Multistage DDC<br/>complex mix/filter + /3 to 50 MS/s<br/>filter + /4 to 12.5 MS/s"]
-    DDC --> BB["Complex baseband candidate<br/>12.5 MS/s/channel; Nyquist +/-6.25 MHz"]
-    BB --> ABF["Commanded-look azimuth beamforming<br/>16 elements summed per row<br/>64 channels -> 4 elevation streams"]
-    ABF --> FT["Fast-time/range processing<br/>10 MHz waveform; nominal ~15 m resolution"]
-    FT --> ST["Migration-aware alignment/handling<br/>then slow-time/Doppler processing<br/>usable fast-time pulse results for each azimuth look;<br/>five PRFs: 1700, 1900, 2150, 2450, 2700 Hz<br/>Phase 4 verified [22,25,28,32,35] usable-pulse schedule"]
-    ST --> RD["Range-Doppler feature formation<br/>aligned pulse ensemble to Doppler map"]
-    RD --> EL["Elevation processing at selected range-Doppler candidates"]
-    EL --> CAND["Per-PRF candidate seam<br/>folded range/velocity + PRF identity<br/>azimuth = commanded look"]
-    CAND --> UNFOLD["Ambiguity projection/unfolding<br/>five PRF layers retained"]
-    UNFOLD --> CFAR["Per-PRF CFAR decisions"]
-    CFAR --> FUSE["Non-coherent binary fusion<br/>3-of-5 baseline; masks and source cells"]
-    FUSE --> CLUST["Clustering<br/>consumes fused hypotheses"]
-    CLUST --> DL["Detection list<br/>range, radial velocity, azimuth,<br/>elevation, detection statistic"]
-    CAND -. "design-time decision boundary" .-> ORDER["WP6e compares alternative<br/>orders and ambiguity methods"]
+flowchart TB
+    accTitle: Historical V1 receive processing boundary
+    accDescr {
+      Historical proposal from 64 ADC channels through DDC and
+      commanded-look beamforming, then range, Doppler, and detection
+      processing inside the DUT. WP6e alternative ordering remains an
+      open decision.
+    }
+
+    GEN["Target generator<br/>64 ADC vectors"] --> ADC
+    ORDER["WP6e decision<br/>order and method"]
 
     subgraph DUT["DUT boundary: ADC samples to detection list"]
-        ADC
-        DDC
-        BB
-        ABF
-        FT
-        ST
-        RD
-        EL
-        CAND
-        UNFOLD
-        CFAR
-        FUSE
-        CLUST
-        DL
+        ADC["64 ADC channels<br/>150 MS/s, 50 MHz IF"]
+        DDC["DDC<br/>150 to 50 to 12.5 MS/s"]
+        BB["Complex baseband<br/>candidate, 12.5 MS/s"]
+        ABF["Beamforming<br/>commanded look, 64 to 4"]
+        FT["Fast-time / range"]
+        ST["Migration-aware alignment,<br/>then slow-time / Doppler"]
+        RD["Range-Doppler<br/>feature formation"]
+        EL["Elevation at<br/>range-Doppler cells"]
+        CAND["Per-PRF candidates<br/>folded range, velocity"]
+        UNFOLD["Ambiguity unfolding"]
+        CFAR["Per-PRF CFAR"]
+        FUSE["Non-coherent<br/>3-of-5 fusion"]
+        CLUST["Clustering"]
+        DL["Detection list"]
     end
+
+    ADC --> DDC --> BB --> ABF --> FT --> ST
+    ST --> RD --> EL --> CAND
+    CAND --> UNFOLD --> CFAR --> FUSE
+    FUSE --> CLUST --> DL
+    CAND -. "WP6e decision boundary" .-> ORDER
 ```
-<!-- markdownlint-enable MD013 -->
 
 The channel order is row-major across the 16 azimuth by 4 elevation array:
 
