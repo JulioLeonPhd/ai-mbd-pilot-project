@@ -6,13 +6,33 @@ Product progress > AI infrastructure progress until v1.
 
 ## Now
 
-1. Range-acceptance issues #24 and #23 closed on 2026-11-10; see the final [#24 resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6762277382) and [#23 resolution](https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23#issuecomment-6762278228). The candidate evidence remains bounded to the approved 200 m², 20 km point-target fixture; historical reports and JSON remain unchanged.
-2. Julio authorized the approved MATLAB `processPri` component on 2026-11-12; implementation is `radardemo.rangeCompression.processPri`, with focused tests in [TestProcessPri.m](../../tests/rangeCompression/TestProcessPri.m), the [walkthrough](../../examples/runRangeCompressionWalkthrough.m), and fixture-scoped production results in [the recorded report](../../tests/rangeCompression/range-production-acceptance-results.json). Independent numerical and documentation reviews are complete within scope, with no unresolved errors; root executed MATLAB, while the numerical reviewer did not independently rerun it. Julio has approved both the walkthrough and component; next is PR review and merge, not automatic merge or gate advancement.
-3. Run the focused suite with `matlab -batch "results = runtests('tests/rangeCompression/TestProcessPri.m'); assertSuccess(results)"`, the production fixture runner with `matlab -batch "run('tests/rangeCompression/runRangeProductionAcceptance.m')"`, and the walkthrough with `matlab -batch "run('examples/runRangeCompressionWalkthrough.m')"`. The runner writes `tests/rangeCompression/range-production-acceptance-results.json`; these bounded checks do not establish full-range, hardware, or WP8 acceptance.
+### Completed evidence
 
-Completed context: the DDC PRI baseline merged in PR #17, and Julio accepted
-the redrawn architecture diagrams on 2026-10-26; neither result grants range
-implementation authorization or settles open architecture choices.
+- Range-acceptance issues [#24] and [#23] closed on 2026-11-10. Candidate
+  evidence remains bounded to the approved 200 m², 20 km point-target fixture.
+- Julio approved the per-PRI MATLAB range compressor and walkthrough.
+  [PR #26] merged on 2026-11-13. The implementation is
+  `radardemo.rangeCompression.processPri`; see the [focused tests],
+  [walkthrough], and [fixture-scoped production results]. Independent reviews
+  found no unresolved errors within scope. Root ran MATLAB; the numerical
+  reviewer did not independently rerun it. The merge does not establish
+  full-range, hardware, or WP8 acceptance.
+- The DDC PRI baseline merged in PR #17. Julio accepted the redrawn architecture
+  diagrams on 2026-10-26; visual approval did not settle open design choices.
+
+### Next decision
+
+Julio selects the next component question and confirms its expected behavior
+and acceptance observation using [step 5 of the human-led development plan].
+Do not infer implementation authorization or gate advancement from PR #26.
+
+[#24]: https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/24#issuecomment-6762277382
+[#23]: https://github.com/JulioLeonPhd/ai-mbd-pilot-project/issues/23#issuecomment-6762278228
+[PR #26]: https://github.com/JulioLeonPhd/ai-mbd-pilot-project/pull/26
+[focused tests]: ../../tests/rangeCompression/TestProcessPri.m
+[walkthrough]: ../../examples/runRangeCompressionWalkthrough.m
+[fixture-scoped production results]: ../../tests/rangeCompression/range-production-acceptance-results.json
+[step 5 of the human-led development plan]: human-led-development.md#5-repeat-the-component-workflow
 
 ## Then
 
