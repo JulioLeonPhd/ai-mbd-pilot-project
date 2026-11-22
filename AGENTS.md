@@ -6,6 +6,13 @@
 
 ## Authority and safety
 
+Identify the user's intended outcome before acting. Use the conversation and
+project context to interpret shorthand or imperfect wording rather than
+following a literal reading that would miss the goal. Ask a focused question
+if materially different interpretations remain. Inferred intent never
+overrides an explicit instruction or constraint: “do not modify any files”
+means leave all files unchanged.
+
 Julio owns architecture decisions: system decomposition, interfaces, algorithm
 choices, state and timing behavior, and consequential requirement changes.
 Agents may investigate and propose alternatives with evidence, then implement
@@ -100,15 +107,17 @@ restoration.
 The Researcher has no write authority, cannot author the report itself, and
 cannot dispatch validators or any other role.
 
-Before each root OMP dispatch, use the active session's native `/agents`
-inventory to confirm all seven project roles, their project sources, and
-selected models. Check declared thinking levels, tools, and spawn permissions
-in the role files from those sources. Declarations and static checks do not
-prove effective runtime permissions or execution.
+For routine OMP dispatch, select the role from the active session's native
+`task` roster. For project roles, check the role file for declared model,
+thinking level, tools, and spawn permissions. Dispatch only through that
+`task` tool; OMP resolves the role against current settings at launch. This
+replaces ADR 0029's mandatory `/agents` inspection. Reserve `/agents` and
+desktop inspection for developing or repairing agent definitions.
 
-Dispatch only through the active session's `task` tool. At launch, record the
-resolved model and thinking level where observable. If a required value is
-unverified or mismatched, block the assignment and do not accept its output.
+Record the resolved model and thinking level from native launch evidence
+where observable. If a required value is unverified or mismatched, block the
+assignment and do not accept its output. Roster entries, role declarations,
+and static checks do not prove effective runtime policy or execution.
 
 Before a Researcher dispatches a child, verify the native identity, active task
 route, and absence of an identity/task collision through observable inventory
