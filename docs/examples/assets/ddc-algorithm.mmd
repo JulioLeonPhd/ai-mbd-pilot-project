@@ -1,4 +1,7 @@
 flowchart TB
+    accTitle: One-PRI DDC sample path
+    accDescr: One physical PRI at 150 MS/s per channel passes through complex mixing, two low-pass filters, decimation by 3 and 4, and factor-two gain compensation to produce complex output at 12.5 MS/s.
+
     input["One complete physical PRI<br/>real double [N,C]<br/>150 MS/s per channel"]
     mix["Complex mixer<br/>multiply by exp(−j 2π · 50 MHz · n / 150 MHz)<br/>complex, 150 MS/s"]
     fir1["FIR 1 low-pass<br/>order 24 · 25 taps · cutoff 25 MHz<br/>150 MS/s"]

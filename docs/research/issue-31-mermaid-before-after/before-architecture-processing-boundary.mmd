@@ -1,0 +1,34 @@
+%% Frozen transcription of the branch-start fence; evidence only.
+flowchart LR
+    GEN["MVP target generator<br/>direct 64-channel ADC vectors<br/>2.99792458 GHz RF phase model"] --> ADC["DUT input: 64 real 16-bit ADC channels<br/>150 MS/s/channel; 50 MHz IF"]
+    ADC --> DDC["Multistage DDC<br/>complex mix/filter + /3 to 50 MS/s<br/>filter + /4 to 12.5 MS/s"]
+    DDC --> BB["Complex baseband candidate<br/>12.5 MS/s/channel; Nyquist +/-6.25 MHz"]
+    BB --> ABF["Commanded-look azimuth beamforming<br/>16 elements summed per row<br/>64 channels -> 4 elevation streams"]
+    ABF --> FT["Fast-time/range processing<br/>10 MHz waveform; nominal ~15 m resolution"]
+    FT --> ST["Migration-aware alignment/handling<br/>then slow-time/Doppler processing<br/>usable fast-time pulse results for each azimuth look;<br/>five PRFs: 1700, 1900, 2150, 2450, 2700 Hz<br/>Phase 4 verified [22,25,28,32,35] usable-pulse schedule"]
+    ST --> RD["Range-Doppler feature formation<br/>aligned pulse ensemble to Doppler map"]
+    RD --> EL["Elevation processing at selected range-Doppler candidates"]
+    EL --> CAND["Per-PRF candidate seam<br/>folded range/velocity + PRF identity<br/>azimuth = commanded look"]
+    CAND --> UNFOLD["Ambiguity projection/unfolding<br/>five PRF layers retained"]
+    UNFOLD --> CFAR["Per-PRF CFAR decisions"]
+    CFAR --> FUSE["Non-coherent binary fusion<br/>3-of-5 baseline; masks and source cells"]
+    FUSE --> CLUST["Clustering<br/>consumes fused hypotheses"]
+    CLUST --> DL["Detection list<br/>range, radial velocity, azimuth,<br/>elevation, detection statistic"]
+    CAND -. "design-time decision boundary" .-> ORDER["WP6e compares alternative<br/>orders and ambiguity methods"]
+
+    subgraph DUT["DUT boundary: ADC samples to detection list"]
+        ADC
+        DDC
+        BB
+        ABF
+        FT
+        ST
+        RD
+        EL
+        CAND
+        UNFOLD
+        CFAR
+        FUSE
+        CLUST
+        DL
+    end
