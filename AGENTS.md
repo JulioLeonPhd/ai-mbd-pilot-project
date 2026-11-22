@@ -30,21 +30,37 @@ correctness; the root decides whether acceptance criteria are satisfied.
 
 In OMP, dispatch only through the active session's `task` tool. A separate
 headless OMP process, shell command, or external agent CLI is not a dispatch
-route; if the active tool is unavailable, return `blocked`. Root alone
-dispatches. Use the active host's native waiting control; this contract sets no
-timeout.
+route; if the active tool is unavailable, return `blocked`. Root owns dispatch,
+sequencing, and acceptance. The only specialist delegation exceptions are an
+assigned `researcher` dispatching the bundled `scout` for bounded, read-only
+primary-source collection, or dispatching the project `technical-writer` for a
+requested Markdown report under the rules below. Scouts do not spawn.
+Use the active host's native waiting control; this contract sets no timeout.
 
-When assigning a generic worker to bounded reconnaissance, source-evidence
-collection, mechanical comparison, or prescribed checks, explicitly instruct it
-not to spawn child tasks. Specialists work independently and never spawn subagents.
-This assignment policy is not runtime enforcement: bundled native workers may
-expose task or child-spawning capability, even though all six project-role
-definitions set `spawns: ""` and forbid delegation by other means.
+Specialist delegation is denied by default and allowed only by the role's native
+child allowlist. Specialists work independently and never spawn subagents except
+that Researcher may dispatch the bundled scout and technical-writer within this
+contract. Generic workers must be explicitly instructed not to spawn child tasks.
+
+The researcher-to-writer handoff is limited to a requested Markdown report.
+Root records the exact report target in the Researcher task's `constraints` and
+leaves the Researcher's `allowed_mutations` empty. The Researcher passes only
+that target in the writer task's `allowed_mutations`. The Researcher sends the
+writer cited findings and synthesis; the writer authors from supplied material
+and does not research. Missing evidence returns to the assigning Researcher, or
+to root when root assigned the writer. Before either child dispatch, verify
+through observable native inventory and task information that the identity is
+the bundled `scout` or project `technical-writer`, respectively, the task route
+is the active native route, and there is no identity/task collision. If
+identity, route, or collision status cannot be established, return `blocked`;
+do not use another harness. A child-name allowlist does not prove identity
+provenance. Neither this routing policy nor native declarations establish
+filesystem isolation.
 
 Architects and validators are inspection-only. Writable roles remain limited to
 their task's `allowed_mutations`; repairs or checks requiring writes need a
-separately bounded, authorized writer or implementer assignment. The six native
-`.omp/agents/*.md` files are authoritative for per-role tool and spawn
+separately bounded, authorized writer or implementer assignment. The seven
+native `.omp/agents/*.md` files are authoritative for per-role tool and spawn
 declarations. MCP, extension, and custom tools may add capabilities, so role
 declarations do not establish filesystem isolation. OMP frontmatter does not
 reproduce an operating-system sandbox; use applicable platform controls when
@@ -58,32 +74,48 @@ assigned artifact scope. This is not a specialist handoff.
 
 | Agent | Route when the task is... |
 | --- | --- |
-| `technical-writer` | Markdown or manifest JSON authoring |
 | `matlab-architect` | Non-trivial MATLAB/Simulink design, including solver, timing, numerical, and code-generation concerns |
-| `technical-writer-validator` | Complex-document review, including safety or intricate architecture documentation |
 | `matlab-implementer` | MATLAB changes or simple, localized Simulink edits |
-| `simulink-implementer` | Model topology, interfaces, or configuration |
 | `matlab-validator` | Complex MATLAB/Simulink validation, including control, solver, numerical, safety, and code-generation concerns |
+| `researcher` | Evidence-dependent research and synthesis; may hand cited findings to `technical-writer` for an authorized Markdown report |
+| `simulink-implementer` | Model topology, interfaces, or configuration |
+| `technical-writer` | Markdown or manifest JSON authoring from supplied material; not evidence collection |
+| `technical-writer-validator` | Complex-document review, including safety or intricate architecture documentation |
 
-OMP discovers the six project roles from `.omp/agents`; they are the only
+OMP discovers the seven project roles from `.omp/agents`; they are the only
 specialist identities. Codex uses the direct fallback above. Before changing or
 reviewing an OMP specialist, read its matching `.omp/agents` definition. The
 defaults stay in those native role files; do not cache or change them here.
 
-Before each OMP dispatch, inspect the native `/agents` inventory for all six
-project roles. Confirm their selected models, thinking levels, tools, and denied
-child spawning; static checker success is not native-discovery or execution
-proof.
-Verify the selected role and active session's `task` tool are available, then
-record the role and observable reason in the bounded task packet.
-For higher-capability work, use the same responsibility identity with an exact
-approved native per-task selector only when supported and permitted. Compare
-observed resolved capability with the approved task need.
-If a required role, tool, selector, permission, or capability is unavailable,
-unapproved, or insufficient, return `blocked` to the root; never silently fall
-back.
-Preserve supplied execution metadata in results; report unavailable metadata as
-`unknown`.
+ADR 0030 adopts ongoing per-role delegation only for the Researcher and its two
+permitted child edges: bundled `scout` and project `technical-writer` under the
+conditions above. It does not authorize other roles to delegate. ADR 0029
+retains the Researcher defaults, approved escalation tier, and selector gates;
+the post-trial pause and root-only writer route are superseded. Restore ADR
+0029's named pre-trial role and dispatch baseline only if native evidence
+confirms a wrong required Researcher default or a delegation-boundary violation.
+An unverified preflight or route prerequisite, or unavailable or mismatched
+optional Astra escalation, blocks only that assignment and does not trigger
+restoration.
+The Researcher has no write authority, cannot author the report itself, and
+cannot dispatch validators or any other role.
+
+Before each root OMP dispatch, inspect the native `/agents` inventory for all
+seven project roles. Confirm selected models, thinking levels, tools, and spawn
+declarations; static checker success is not native-discovery or execution proof.
+
+Before a Researcher dispatches a child, verify the native identity, active task
+route, and absence of an identity/task collision through observable inventory
+and task information. For scout, confirm bundled provenance; for writer, confirm
+the project `technical-writer` identity. If any condition cannot be established,
+return `blocked`; do not use another harness.
+
+Root alone selects and applies an approved per-task selector to the Researcher
+when needed; never apply the Researcher selector to a scout. Check selector
+availability and approval before dispatch, then observe and record the launched
+task's resolved model and effort. If a required selection is unavailable or
+mismatched, block that assignment without substitution. Preserve supplied
+execution metadata in results; report unavailable metadata as `unknown`.
 
 ## Task and result packets
 
@@ -181,8 +213,7 @@ classify as complex.
 | --- | --- | --- |
 | Trivial MATLAB/Simulink | Assign an appropriate implementer, usually `matlab-implementer`; root reviews implementation evidence, a diff or model inspection, and requested smoke checks. Omit `matlab-validator` unless independent validation is requested or the change becomes complex. | Requested implementation, evidence, and lightweight review recorded. |
 | Complex MATLAB/Simulink | Route design to `matlab-architect`; resolve `needs-input` and obtain Julio's explicit decision for choices crossing his boundary. Then assign `matlab-implementer`, or `simulink-implementer` for substantive model topology, interfaces, configuration, or multi-step MCP edits. Route results and criteria to `matlab-validator`; revise design or assign a bounded fix for errors, then repeat validation. Route implementation notes to `technical-writer` when needed. | Approved architecture, coherent implementation, independent validation without unresolved errors, and disclosed warnings or limitations. |
-| Documentation | Give `technical-writer` the approved brief, sources, and target paths. For Mermaid authoring, any agent, including root, may use the repository `drawing-mermaid-diagrams` skill within its assigned artifact scope; no specialist handoff is needed. Run `markdownlint-cli2` on every touched repository-authored Markdown file; exclude a third-party Markdown snapshot only when it is byte-for-byte verified against its pinned source hash. Route complex documents or explicitly requested independent review to `technical-writer-validator`; assign revisions to the writer. | Traceable artifacts, passing Markdown lint, and required independent review without unresolved errors. |
-| Manifest JSON | Give `technical-writer` the approved schema, target path, exact agent/tool names, and required values. Run the specified JSON syntax and schema checker; review semantics and activate only after the manifest satisfies the contract. | Valid manifest and disclosed checker result. Markdown lint is not required; an unavailable checker is not a pass. |
+| Documentation | Route authoring-only work directly to `technical-writer` when the approved brief and evidence are sufficient; document format does not determine who researches. When a Markdown report needs evidence, root assigns a `researcher` one topic and may batch independent topics. The researcher owns source evaluation and synthesis, may inspect primary sources directly, and may dispatch only bundled `scout` workers for bounded, read-only primary-source collection or the project `technical-writer` when a Markdown report is requested. Root puts the exact report target in the Researcher task's `constraints` and leaves its `allowed_mutations` empty; the writer's `allowed_mutations` contains only that target. The researcher sends cited findings and synthesis to the writer, which drafts from supplied findings and does not research. Missing evidence returns to the assigning Researcher, or root if root assigned the writer. Scouts return citations and observations and do not spawn. For Mermaid authoring, any agent, including root, may use the repository `drawing-mermaid-diagrams` skill within its assigned artifact scope; no specialist handoff is needed. Run `markdownlint-cli2` on every touched repository-authored Markdown file; exclude a third-party Markdown snapshot only when it is byte-for-byte verified against its pinned source hash. Route complex documents or explicitly requested independent review to `technical-writer-validator` through root; the Researcher does not dispatch validators. Assign revisions to the writer. | Traceable artifacts, passing Markdown lint, and required independent review without unresolved errors. |
 | Validation-only | Send the artifact, requirements, and requested checks to the relevant validator. Validators return findings and evidence only; repair requires a new bounded implementation assignment. | Findings and evidence; no repair is performed under the inspection assignment. |
 | Codex direct fallback | When no project specialist is dispatched, perform authorized source/document work and requested checks directly. Apply the same repository standards and platform controls. A specialist-result requirement applies only to a dispatched specialist. | Required work and checks are complete. Do not substitute self-review for required independent review; if that review is unavailable, return `blocked`. |
 

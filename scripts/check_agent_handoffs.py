@@ -1,4 +1,4 @@
-"""Validate the repository's agent handoff and flat-orchestration contract."""
+"""Validate the repository's agent handoff and bounded orchestration contract."""
 
 from __future__ import annotations
 
@@ -38,8 +38,9 @@ RESULT_STATUSES = ("complete", "needs-input", "blocked", "failed")
 NATIVE_ROLES = (
     "matlab-architect",
     "matlab-implementer",
-    "simulink-implementer",
     "matlab-validator",
+    "researcher",
+    "simulink-implementer",
     "technical-writer",
     "technical-writer-validator",
 )
@@ -80,6 +81,13 @@ NATIVE_DECLARATIONS = {
             "findings",
         ),
     ),
+    "researcher": (
+        None,
+        "openai-codex/gpt-6.2-sol",
+        "xhigh",
+        False,
+        ("primary sources", "synthesis", "technical-writer"),
+    ),
     "technical-writer": (
         "Produce concise Markdown documents and manifest JSON files.",
         "openai-codex/gpt-6-luna",
@@ -109,7 +117,6 @@ OMP_WRITE_POLICY_MARKERS = (
 _MERMAID_SKILL = ".agents/skills/drawing-mermaid-diagrams/SKILL.md"
 OMP_PROMPT_MARKERS = (
     "Read the repository root `AGENTS.md` before acting",
-    "do not spawn subagents",
     "`allowed_mutations`",
     "`requested_checks`",
     "`agent.name`, `agent.model`, `agent.reasoning_effort`",
@@ -182,7 +189,7 @@ def _parse_omp_agent(content: str) -> dict[str, object]:
 
 
 def _check_omp_agents(root: Path, registry: list[str]) -> Check:
-    """Check the six native roles and their declared controls, not isolation."""
+    """Check native roles and their declared controls, not isolation."""
 
     errors: list[str] = []
     paths = sorted((root / ".omp/agents").glob("*.md"))
@@ -228,12 +235,18 @@ def _check_omp_agents(root: Path, registry: list[str]) -> Check:
             errors.append(f"{label}: unexpected OMP role {name!r}")
             continue
         description, model, effort, writable, scope_markers = expected
+        researcher = name == "researcher"
+        actual = agent.get("description")
+        if description is None:
+            if not isinstance(actual, str) or not actual.strip():
+                errors.append(f"{label}: incorrect description; expected nonempty text")
+        elif actual != description:
+            errors.append(f"{label}: incorrect description; expected {description!r}")
         for key, value in (
             ("name", name),
-            ("description", description),
             ("model", model),
             ("thinking-level", effort),
-            ("spawns", ""),
+            ("spawns", "scout,technical-writer" if researcher else ""),
         ):
             if agent.get(key) != value:
                 errors.append(f"{label}: incorrect {key}; expected {value!r}")
@@ -256,7 +269,17 @@ def _check_omp_agents(root: Path, registry: list[str]) -> Check:
         policy_markers = (
             OMP_WRITE_POLICY_MARKERS if writable else OMP_READ_POLICY_MARKERS
         )
-        for marker in (*OMP_PROMPT_MARKERS, *policy_markers, *scope_markers):
+        spawn_marker = (
+            "do not spawn subagents other than the bundled scout and technical-writer"
+            if researcher
+            else "do not spawn subagents"
+        )
+        for marker in (
+            *OMP_PROMPT_MARKERS,
+            spawn_marker,
+            *policy_markers,
+            *scope_markers,
+        ):
             if not re.search(
                 r"(?<!\w)" + re.escape(marker) + r"(?!\w)", normalized_body
             ):
@@ -271,7 +294,7 @@ def _check_omp_agents(root: Path, registry: list[str]) -> Check:
                 sentence,
                 flags=re.IGNORECASE,
             ):
-                errors.append(f"{label}: may not spawn or delegate subagents")
+                errors.append(f"{label}: unauthorized spawn or delegation instruction")
         if name in {"matlab-validator", "technical-writer-validator"}:
             if (
                 "inspection-only" not in body
@@ -361,7 +384,7 @@ def collect_checks(
     registry_set = set(registry)
     if len(registry) == len(NATIVE_ROLES) and registry_set == set(NATIVE_ROLES):
         checks.append(
-            _passed("specialist registry", "contains exactly six native roles")
+            _passed("specialist registry", "contains exactly seven native roles")
         )
     else:
         duplicates = sorted({name for name in registry if registry.count(name) > 1})
@@ -393,13 +416,23 @@ def collect_checks(
             _passed("packet contract", "required field names and status tokens found")
         )
 
-    if "Specialists work independently and never spawn subagents." not in contract:
+    spawn_policy = (
+        "Specialist delegation is denied by default and allowed only by the role's "
+        "native child allowlist."
+    )
+    if spawn_policy not in " ".join(contract.split()):
         checks.append(
-            _failed("flat orchestration", "missing root-only spawning policy")
+            _failed(
+                "per-role delegation",
+                f"missing deny-by-default delegation policy: {spawn_policy}",
+            )
         )
     else:
         checks.append(
-            _passed("flat orchestration", "contract declares root-only spawning")
+            _passed(
+                "per-role delegation",
+                "contract requires deny-by-default native child allowlists",
+            )
         )
 
     mermaid_skill_present = (root / _MERMAID_SKILL).is_file()

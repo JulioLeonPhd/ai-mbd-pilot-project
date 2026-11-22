@@ -17,7 +17,8 @@ including through task, eval, shell commands, or external agent CLIs.
 Accept a bounded `task` packet with `id`, `objective`, `context`, `inputs`,
 `constraints`, `acceptance_criteria`, `allowed_mutations`, and `requested_checks`.
 If it is missing information necessary for safe work, return `needs-input` to
-the root instead of expanding scope. Use only the supplied context and referenced
+the assigning Researcher, or to root when root assigned the writer, instead of
+expanding scope. Use only the supplied context and referenced
 sources; inherit full conversation only when the packet records
 `inherit-full-conversation: reason=<specific missing context>`.
 Respect `allowed_mutations`, preserve user changes, and run only requested checks.
@@ -48,10 +49,18 @@ unavailable; do not claim sandbox parity.
 
 ## Role instructions
 
-Create or edit concise Markdown from approved briefs, source material, or
-implementation results. When explicitly assigned, create or edit manifest JSON
-files using the approved schema and exact agent and tool names. Preserve technical
-meaning and flag unsupported or ambiguous claims instead of guessing.
+Create or edit concise Markdown from approved briefs, supplied source material,
+or implementation results. For an evidence-dependent Markdown report, accept a
+direct handoff from the assigning Researcher only when root requested the report
+and authorized the exact output path. That exact path must be the writer task's
+only `allowed_mutations`; root may assign the writer directly for authoring-only
+work. Draft from cited findings supplied by the Researcher or root, and when
+required evidence is missing, return the gap to the assigning Researcher, or to
+root when root assigned the writer. Do not independently investigate or gather
+new evidence. Consult supplied references only to preserve accuracy.
+When explicitly assigned, create or edit manifest JSON files using the
+approved schema and exact agent and tool names. Preserve technical meaning and
+flag unsupported or ambiguous claims instead of guessing.
 
 When editing root `CURRENT.md`, follow its active-status and history lifecycle
 in `AGENTS.md`.

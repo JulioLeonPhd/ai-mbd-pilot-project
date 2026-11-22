@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -205,17 +206,32 @@ task:
             with self.subTest(content=content), self.assertRaises(ValueError):
                 CHECKER._parse_omp_agent(content)
 
-    def test_checker_accepts_exact_six_native_roles(self) -> None:
+    def test_checker_accepts_exact_seven_native_roles(self) -> None:
         root = self._fixture()
         for name in (
             "specialist registry",
             "OMP native agents",
             "packet contract",
-            "flat orchestration",
+            "per-role delegation",
             "Mermaid boundary",
         ):
             with self.subTest(check=name):
                 self.assertEqual(self._check(root, name).status, "passed")
+
+    def test_per_role_delegation_requires_deny_by_default_policy(self) -> None:
+        root = self._fixture()
+        path = root / "AGENTS.md"
+        content = path.read_text(encoding="utf-8")
+        content, replacements = re.subn(
+            r"Specialist\s+delegation\s+is\s+denied\s+by\s+default",
+            "Specialist delegation is permitted by default",
+            content,
+        )
+        self.assertEqual(replacements, 1)
+        path.write_text(content, encoding="utf-8")
+        check = self._check(root, "per-role delegation")
+        self.assertEqual(check.status, "failed")
+        self.assertIn("missing deny-by-default delegation policy", check.evidence)
 
     def test_mermaid_boundary_requires_new_skill(self) -> None:
         root = self._fixture()
@@ -331,7 +347,79 @@ task:
         path.write_text(content, encoding="utf-8")
         self.assertEqual(self._check(root, "OMP native agents").status, "failed")
 
-    def test_native_checker_preserves_safety_and_root_only_policy(self) -> None:
+    def test_researcher_declarations_reject_default_and_tool_drift(self) -> None:
+        for field, value in (
+            ("model", '"openai-codex/gpt-6.2-astra"'),
+            ("thinking-level", '"high"'),
+            ("tools", '["read", "grep", "glob", "web_search", "task"]'),
+        ):
+            with self.subTest(field=field):
+                root = self._fixture()
+                path = root / ".omp/agents/researcher.md"
+                content = self._replace_frontmatter(
+                    path.read_text(encoding="utf-8"), field, value
+                )
+                path.write_text(content, encoding="utf-8")
+                check = self._check(root, "OMP native agents")
+                self.assertEqual(check.status, "failed")
+                self.assertIn("researcher.md: incorrect", check.evidence)
+
+    def test_native_spawns_require_exact_per_role_allowlists(self) -> None:
+        for role, spawns in (
+            ("researcher", '""'),
+            ("researcher", '"*"'),
+            ("researcher", '"technical-writer"'),
+            ("researcher", '"scout"'),
+            ("researcher", '"scout,technical-writer,matlab-validator"'),
+            ("researcher", '"technical-writer,scout"'),
+            ("matlab-architect", '"scout"'),
+            ("technical-writer", '"scout"'),
+        ):
+            with self.subTest(role=role, spawns=spawns):
+                root = self._fixture()
+                path = root / f".omp/agents/{role}.md"
+                content = self._replace_frontmatter(
+                    path.read_text(encoding="utf-8"), "spawns", spawns
+                )
+                path.write_text(content, encoding="utf-8")
+                check = self._check(root, "OMP native agents")
+                self.assertEqual(check.status, "failed")
+                expected = "scout,technical-writer" if role == "researcher" else ""
+                self.assertIn(
+                    f"{role}.md: incorrect spawns; expected {expected!r}",
+                    check.evidence,
+                )
+
+    def test_researcher_role_requires_exact_spawn_guard(self) -> None:
+        root = self._fixture()
+        path = root / ".omp/agents/researcher.md"
+        content, replacements = re.subn(
+            r"do\s+not\s+spawn\s+subagents\s+other\s+than\s+the\s+bundled\s+scout"
+            r"\s+and\s+technical-writer",
+            "do not spawn subagents other than the bundled scout",
+            path.read_text(encoding="utf-8"),
+        )
+        self.assertEqual(replacements, 1)
+        path.write_text(content, encoding="utf-8")
+        check = self._check(root, "OMP native agents")
+        self.assertEqual(check.status, "failed")
+        self.assertIn(
+            "missing operating boundary 'do not spawn subagents other than the "
+            "bundled scout and technical-writer'",
+            check.evidence,
+        )
+
+    def test_researcher_role_requires_synthesis_boundary(self) -> None:
+        root = self._fixture()
+        path = root / ".omp/agents/researcher.md"
+        content = path.read_text(encoding="utf-8")
+        self.assertIn("synthesis", content)
+        path.write_text(content.replace("synthesis", "analysis"), encoding="utf-8")
+        check = self._check(root, "OMP native agents")
+        self.assertEqual(check.status, "failed")
+        self.assertIn("missing operating boundary 'synthesis'", check.evidence)
+
+    def test_native_checker_preserves_safety_and_no_child_roles(self) -> None:
         root = self._fixture()
         path = root / ".omp/agents/matlab-validator.md"
         content = path.read_text(encoding="utf-8").replace(
