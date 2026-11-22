@@ -100,9 +100,15 @@ restoration.
 The Researcher has no write authority, cannot author the report itself, and
 cannot dispatch validators or any other role.
 
-Before each root OMP dispatch, inspect the native `/agents` inventory for all
-seven project roles. Confirm selected models, thinking levels, tools, and spawn
-declarations; static checker success is not native-discovery or execution proof.
+Before each root OMP dispatch, use the active session's native `/agents`
+inventory to confirm all seven project roles, their project sources, and
+selected models. Check declared thinking levels, tools, and spawn permissions
+in the role files from those sources. Declarations and static checks do not
+prove effective runtime permissions or execution.
+
+Dispatch only through the active session's `task` tool. At launch, record the
+resolved model and thinking level where observable. If a required value is
+unverified or mismatched, block the assignment and do not accept its output.
 
 Before a Researcher dispatches a child, verify the native identity, active task
 route, and absence of an identity/task collision through observable inventory
