@@ -26,23 +26,41 @@ existing `task.context`. For manifest assignments, include the consumer
 schema in the packet and name the existing JSON syntax and consumer schema
 checks in `requested_checks`.
 
-- **Human reports:** Use the assigned report brief and supplied evidence.
-  Preserve source attribution and distinguish findings from recommendations.
-- **Human instructions and README quickstarts:** Give prerequisites, the
-  shortest working path, and what the reader should see on success.
-- **Supporting reference:** Organize by what the reader needs to look up,
-  not by the order in which the work happened.
-- **Agent-directed Markdown:** Consult `writing-for-agents` regardless of
-  filename. Make triggers and completion criteria explicit.
-- **Manifest JSON:** Follow the supplied consumer schema. Include required
-  fields and necessary overrides; omit values already owned elsewhere unless
-  required. Use the existing syntax and consumer schema checks as requested.
-- **Planned tickets:** Apply the project guidance on
-  [tickets and evidence](human-led-workflow.md#tickets-and-evidence) and the
-  `to-tickets` draft format: a verifiable outcome, acceptance criteria, and
-  actual blockers or none. Draft only; publication is a separate action.
-- **Raw defects:** Distinguish expected from observed behavior. Record the
-  supplied reproduction details without treating a suspected cause as fact.
+- **Human reports:** Use the assigned brief and supplied evidence; preserve
+  source attribution and distinguish findings from recommendations. Keep the
+  two report genres below distinct.
+- **Research reports:** Use numbered, descriptive section headings throughout,
+  including the references section. Open with a short, standalone survey-style
+  abstract stating the question, principal finding, and material limit.
+  Introduce the question and scope; describe the evidence base or state of the
+  art; synthesize comparative findings; state limits; and conclude with a
+  direct answer. For commissioned research, attribute the Researcher's
+  recommendation, explain its rationale from the supplied evidence, and give
+  next steps. Do not add research or invent an opinion; return material
+  evidence gaps to the assigner.
+- **Research citations:** Number sources in order of first citation using
+  bracketed IEEE-style numbers; reuse each number on later citations. Link
+  every in-text number directly to the source URL listed in its matching
+  bibliography entry while preserving its printed number, for example
+  `[[1]][source-1]` with `[source-1]: https://example.org/source`. Include a
+  complete numbered bibliography with usable source links, and check that
+  links resolve. Avoid adjacent ambiguous Markdown links. These structural
+  and numbering choices are house guidance, not IEEE requirements.
+- **Technical reports:** Open with a standalone TL;DR stating the result and
+  its consequential limit. Use numbered, descriptive section headings
+  throughout, including Sources/References and a numbered closing
+  **Blockers and next steps** section whenever work encountered a blocker or
+  failure, even if resolved. Connect motivation and goal, work carried out,
+  observations, findings, and conclusion. In the opening, distinguish tool
+  behavior, gate result, and unchecked conditions when consequential; separate
+  automated checks from human observations. Support material claims with
+  supplied sources and procedures in a linked Sources/References section
+  before the final blocker section. The blocker section states the disposition
+  and what remains blocked, if anything; give a suggested next action only
+  when warranted. Prefer tables for at-a-glance comparison or exposition
+  across common dimensions; do not force unrelated tables. Use the
+  `drawing-mermaid-diagrams` skill for relationships a diagram helps explain.
+  These structural choices are house guidance, not publisher requirements.
 
 ## Mathematical documentation
 
