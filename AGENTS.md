@@ -6,6 +6,13 @@
 
 ## Authority and safety
 
+Identify the user's intended outcome before acting. Use the conversation and
+project context to interpret shorthand or imperfect wording rather than
+following a literal reading that would miss the goal. Ask a focused question
+if materially different interpretations remain. Inferred intent never
+overrides an explicit instruction or constraint: “do not modify any files”
+means leave all files unchanged.
+
 Julio owns architecture decisions: system decomposition, interfaces, algorithm
 choices, state and timing behavior, and consequential requirement changes.
 Agents may investigate and propose alternatives with evidence, then implement
