@@ -1,7 +1,9 @@
 # Historical evidence snapshot — 25 September 2026
 
 This is dated snapshot of previously recorded evidence and replay details. It
-does not describe current status; see [CURRENT.md](../../CURRENT.md).
+does not describe current status; see the tracked
+[V1 delivery action plan](../plans/v1-delivery-action-plan.md), and the optional
+local `CURRENT.md` checkpoint when present.
 
 ## Last verified result
 

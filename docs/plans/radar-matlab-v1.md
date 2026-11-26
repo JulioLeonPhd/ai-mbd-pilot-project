@@ -87,7 +87,7 @@ In MATLAB R2026a Update 5 (PID 75572), all 26 focused tests passed and Code Anal
 The production runner `tests/rangeCompression/runRangeProductionAcceptance.m` completed 96/96 records and 384/384 stream evaluations with all fixture-scoped physical gates passing; correlation, validity, and peak self-checks passed. Its report is `tests/rangeCompression/range-production-acceptance-results.json`.
 All 32 coordinate records passed the tolerance check, with a maximum residual-to-budget ratio of `0.062455592152661873`.
 Independent deep numerical and documentation reviews are complete within their assigned scopes with no unresolved errors. The numerical reviewer inspected source, tests, oracle, runner, and regenerated JSON, while root performed MATLAB execution; the reviewer did not independently execute MATLAB.
-Julio has approved both the walkthrough and MATLAB `processPri` component. The next step is PR review and merge, not automatic merge; this remains limited to the approved per-PRI MATLAB contract and fixture-scoped evidence and does not advance a gate or establish full configured-range acceptance, hardware behavior, WP8 acceptance, or broader production evidence.
+Julio has approved both the walkthrough and MATLAB `processPri` component. PR #26 merged on 2026-11-13; the next step is Julio's selection of the next component question. This remains limited to the approved per-PRI MATLAB contract and fixture-scoped evidence and does not advance a gate or establish full configured-range acceptance, hardware behavior, WP8 acceptance, or broader production evidence.
 <!-- markdownlint-enable MD013 -->
 
 WP7 may use synthetic resolved candidates, while WP6f may use synthetic

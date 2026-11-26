@@ -10,8 +10,9 @@ Julio approved DDC walkthrough 2026-10-08. Issue 6 cascade
 stopband-coverage blocker fixed and independently validated 2026-10-10; three
 standards-warning categories resolved and independently validated 2026-10-11.
 Julio accepted the architecture diagrams and authorized PR #17 commit, push,
-and merge on 2026-10-26; see [current status](../../CURRENT.md) for the incomplete
-full-branch review scope. Dated review entries below retain their historical status.
+and merge on 2026-10-26; the incomplete full-branch review scope remains open
+and untracked. The optional local `CURRENT.md` checkpoint may record it when
+present. Dated review entries below retain their historical status.
 On 2026-10-14 Julio approved fixed factor-two compensation on the final
 decimated output. The v2 fixture migration and MATLAB checks listed below
 passed on 2026-10-15; independent MATLAB validation passed as recorded below.
@@ -256,9 +257,9 @@ Prior implementation steps complete:
 
 ## Prior `independent-pri-v1` validated acceptance criteria
 
-Prior `independent-pri-v1` evidence: independent numerical review accepts unchanged `5e-11` input-peak-
-normalized tolerance for bounded five-PRI comparison. Measured
-`3.34852e-11` maximum leaves `1.65148e-11` margin. Not
+Prior `independent-pri-v1` evidence: independent numerical review accepts
+unchanged `5e-11` input-peak-normalized tolerance for bounded five-PRI
+comparison. Measured `3.34852e-11` maximum leaves `1.65148e-11` margin. Not
 full-CPI, global-tick, or hardware error bound. Validation covered all five PRI
 lengths, one and 64 channels, channel isolation, exact zero, first/last-sample
 impulses, 40-microsecond boundary chirps, multitone and seeded noise, output

@@ -36,14 +36,29 @@ and fixture-preservation audit. new per-PRI evidence is distinct from
 historical continuous-state evidence; neither scope establishes hardware or
 real-time performance, full FIR precursor/waveform retention, or detection
 performance. complete ADC-to-detection floating-point reference, fixed-point
-design, and Simulink representation are incomplete. See the [per-PRI implementation plan](docs/plans/ddc-pri-processing.md)
+design, and Simulink representation are incomplete. See the
+[per-PRI implementation plan](docs/plans/ddc-pri-processing.md)
 for evidence and limitations; an optional local `CURRENT.md` checkpoint may be
 present in some worktrees.
-The approved MATLAB per-PRI range-compression API is implemented at `radardemo.rangeCompression.processPri`, with four complex elevation streams, a matching logical validity mask, and caller-supplied range origin in metres.
-Run the [executable MATLAB walkthrough](examples/runRangeCompressionWalkthrough.m) with `matlab -batch "run('examples/runRangeCompressionWalkthrough.m')"` to inspect one PRI's range-compression outputs and validity metadata.
-The focused API tests passed 26/26 cases, and the bounded production fixture runner passed 96/96 records and 384/384 stream evaluations; the [production report](tests/rangeCompression/range-production-acceptance-results.json) records those observations.
-Julio approved the walkthrough and MATLAB `processPri` component after review. The next step is PR review and merge; these approvals do not imply automatic merge, gate advancement, hardware acceptance, WP8 acceptance, or broader receiver claims.
-The call contract and its numerical, coordinate, and validity semantics are recorded in [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md), [ADR 0026](docs/adr/0026-adopt-per-pri-range-compression-api.md), and [ADR 0027](docs/adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md).
+The approved MATLAB per-PRI range-compression API is implemented at
+`radardemo.rangeCompression.processPri`, with four complex elevation streams, a
+matching logical validity mask, and caller-supplied range origin in metres.
+Run the [executable MATLAB walkthrough](examples/runRangeCompressionWalkthrough.m)
+with `matlab -batch "run('examples/runRangeCompressionWalkthrough.m')"` to
+inspect one PRI's range-compression outputs and validity metadata.
+The focused API tests passed 26/26 cases, and the bounded production fixture
+runner passed 96/96 records and 384/384 stream evaluations; the
+[production report](tests/rangeCompression/range-production-acceptance-results.json)
+records those observations.
+Julio approved the walkthrough and MATLAB `processPri` component after review.
+PR #26 merged the component on 2026-11-13; the next step is Julio's selection of
+the next component question and its acceptance observation. These approvals do
+not imply automatic merge, gate advancement, hardware acceptance, WP8
+acceptance, or broader receiver claims.
+The call contract and its numerical, coordinate, and validity semantics are
+recorded in [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md),
+[ADR 0026](docs/adr/0026-adopt-per-pri-range-compression-api.md), and
+[ADR 0027](docs/adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md).
 
 ## Architecture
 

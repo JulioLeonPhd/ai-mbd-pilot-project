@@ -41,11 +41,12 @@ historical fixture hashes remain unchanged. Independent numerical validation
 passed, including exact-zero and inactive-channel checks. Julio approved the
 DDC walkthrough on 2026-10-08. The DDC PRI baseline was merged in PR #17; this
 does not mean all reviews passed. Full-branch Standards/Spec assessments remain
-incomplete, and MATLAB source review was blocked by Graphify's missing MATLAB
-extractor. These bounded results do not establish complete-receiver or
-hardware performance. The repeat-component workflow remains incomplete. The
-optional local `CURRENT.md` may contain the active range-boundary milestone and
-authorization checkpoint; tracked context is in the [V1 delivery action plan](v1-delivery-action-plan.md).
+incomplete, and no completed full-branch MATLAB source review is recorded; the
+recorded Graphify extractor limitation no longer applies. These bounded results
+do not establish complete-receiver or hardware performance. The
+repeat-component workflow remains incomplete. The optional local `CURRENT.md`
+may contain the active range-boundary milestone and authorization checkpoint;
+tracked context is in the [V1 delivery action plan](v1-delivery-action-plan.md).
 
 ## Ordered work
 
@@ -78,8 +79,8 @@ Revise `README.md`, `GLOSSARY.md`, and, when maintaining a local checkpoint,
   concepts. Preserve mathematical conventions. Move workflow vocabulary to an
   appropriate workflow reference rather than mixing it into domain terms.
 - Optional, worktree-local `CURRENT.md` identifies only the active work package,
-  gate, or milestone, its approval and evidence state, pending human decisions or reviews,
-  and the next authorized step.
+  gate, or milestone, its approval and evidence state, pending human decisions
+  or reviews, and the next authorized step.
 - Follow the status and archival lifecycle in [Active status and history](../agents/task-guidance.md#active-status-and-history).
 
 Completion: readers can find project orientation, domain terms, and current
@@ -356,7 +357,8 @@ working tree; its three PlantUML views passed syntax/render checks and preview
 inspection. The documents passed independent review, and Julio accepted the
 redrawn diagrams on 2026-10-26. The DDC PRI baseline was merged in PR #17, but
 the merge does not mean all reviews passed. Full-branch Standards/Spec
-assessments remain incomplete; MATLAB source review was blocked by Graphify's
-missing MATLAB extractor. The repeat-component workflow remains incomplete.
+assessments remain incomplete, and no completed full-branch MATLAB source
+review is recorded; the recorded Graphify extractor limitation no longer
+applies. The repeat-component workflow remains incomplete.
 Steps 4 and 5 remain incomplete. Completion still requires each step's stated
 acceptance criteria and required reviews.

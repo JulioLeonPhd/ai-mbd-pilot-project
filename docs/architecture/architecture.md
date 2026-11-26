@@ -258,11 +258,12 @@ with fresh local state, as recorded in
 suites pass, all 23 historical fixture hashes are preserved, and
 pinned DDC-002 replay passed strict 1/1 at its historical revision. Independent
 numerical validation passed for the per-PRI profile, including explicit exact-
-zero and inactive-channel checks. The per-PRI MATLAB implementation is ready
-for Julio's implementation and walkthrough review. Preserve the historical
-contract and evidence for replay; DDC-002 does not accept the new profile. The
-range-processing boundary is the next component review. Simulink execution,
-fixed-point, end-to-end, and hardware claims remain outside this DDC evidence.
+zero and inactive-channel checks. Julio approved the per-PRI MATLAB
+implementation and walkthrough; PR #26 merged it on 2026-11-13. Preserve the
+historical contract and evidence for replay; DDC-002 does not accept the new
+profile. The range-processing boundary is the next component review. Simulink
+execution, fixed-point, end-to-end, and hardware claims remain outside this DDC
+evidence.
 Under the historical profile, mixer, FIR, and decimator state were
 zero-initialized at scan start and retained across PRIs and transitions,
 including continuous `/3` then `/4` decimator phase. Independent full-CPI

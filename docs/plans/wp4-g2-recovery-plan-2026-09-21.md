@@ -13,7 +13,8 @@ integer-tick schedule are recorded in [ADR 0018](../adr/0018-freeze-wp4-g2-phase
 contract and existing WP4 materials are in
 [the radar data contracts](../contracts/radar-v1-data-contracts.md) and
 [`contracts/wp4/`](../../contracts/wp4/). preceding transition context is
-in [the WP3/WP4 handoff](../handoffs/wp3-wp4-handoff-2026-09-19.md) and [CURRENT.md](../../CURRENT.md).
+in [the WP3/WP4 handoff](../handoffs/wp3-wp4-handoff-2026-09-19.md) and the
+optional local `CURRENT.md` checkpoint.
 
 Keep strict distinction between frozen design intent and executable evidence:
 the former is approved direction; the latter must be generated, independently
@@ -224,7 +225,8 @@ current committed source/evidence pair is source
 `0fe89d45fa20a9f0f68ae6908855dbc61835b083` and evidence
 `9675b2f2de654d6701fc6001552c23318e0db87e`, with
 `CreatedUtc=2026-09-24T13:56:08Z`. Git verified pair. Use canonical
-replay and semantic comparison procedure in [CURRENT.md](../../CURRENT.md).
+replay and semantic comparison procedure in the optional local `CURRENT.md`
+checkpoint when it is present.
 manifest checker’s synthetic 40-hex revision limitation remains tracked
 under issue #3.
 
