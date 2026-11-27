@@ -1,156 +1,101 @@
-# AI-assisted model-based design pilot
 
-This public reference project explores how AI agents can support model-based
-design while human engineer retains architectural authority. radar
-processing demonstrator gives workflow concrete engineering problem and
-supports learning about requirements, architecture, data contracts, quantitative
-evidence, implementation, and independent review. It is demonstrator, not a
-mission system.
+<!-- markdownlint-disable MD033 -->
+<h1 align="center">AI-assisted model-based design pilot</h1>
 
-## Learning goals
+<p align="center"><strong>Design the system. Learn one component at a
+time.</strong></p>
 
-- Follow decisions from system requirements through data contracts and
-  implementation evidence.
-- Compare analytic studies, ideal simulations, and measured implementation
-  behavior without treating them as interchangeable evidence.
-- Learn how bounded agent tasks, explicit human decisions, and independent
-  validation support reviewable engineering workflow.
+<p align="center">
+  A pilot in human-led model-based design with AI. Radar is the test case.
+</p>
 
-## System boundary and current capability
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)"
+      srcset="docs/assets/pilot-hero-dark.svg">
+    <source media="(prefers-color-scheme: light)"
+      srcset="docs/assets/pilot-hero-light.svg">
+    <img src="docs/assets/pilot-hero-light.svg" width="488"
+      alt="Workflow: the engineer approves system architecture, including
+      component boundaries. For each component, the engineer approves the
+      design. AI implements it and writes a runnable walkthrough in parallel.
+      The engineer approves both before closing via pull request.">
+  </picture>
+</p>
 
-planned device under test (DUT) processes digitized ADC samples into a
-detection list. Its processing path includes DDC and decimation, fast-time range
-processing, slow-time Doppler processing, receive beamforming, CFAR, clustering,
-and report conversion. Stimulus generation is outside DUT and uses
-versioned JSON radar configuration and target-scenario data; generated test
-vectors are MAT files. Tracking and classification are outside current
-scope.
+<p align="center">
+  <a href="docs/agents/human-led-workflow.md">Human-led workflow</a> ·
+  <a href="docs/examples/ddc-walkthrough.md">See a worked component</a>
+</p>
+<!-- markdownlint-enable MD033 -->
 
-bounded analytic and ideal simulation baseline passed revised G1. WP3 data
-contracts and WP4 DSP/timing evidence are accepted at G2. current WP4
-evidence verifies schedule timing, priming, post-CFAR 3-of-5 fusion, and
-historical single-channel DDC streaming within stated limits. approved
-per-PRI MATLAB implementation passed scoped core and WP4 suites, full-scan
-walkthrough checks, independent numerical validation, pinned DDC-002 replay,
-and fixture-preservation audit. new per-PRI evidence is distinct from
-historical continuous-state evidence; neither scope establishes hardware or
-real-time performance, full FIR precursor/waveform retention, or detection
-performance. complete ADC-to-detection floating-point reference, fixed-point
-design, and Simulink representation are incomplete. See the
-[per-PRI implementation plan](docs/plans/ddc-pri-processing.md)
-for evidence and limitations; an optional local `CURRENT.md` checkpoint may be
-present in some worktrees.
-The approved MATLAB per-PRI range-compression API is implemented at
-`radardemo.rangeCompression.processPri`, with four complex elevation streams, a
-matching logical validity mask, and caller-supplied range origin in metres.
-Run the [executable MATLAB walkthrough](examples/runRangeCompressionWalkthrough.m)
-with `matlab -batch "run('examples/runRangeCompressionWalkthrough.m')"` to
-inspect one PRI's range-compression outputs and validity metadata.
-The focused API tests passed 26/26 cases, and the bounded production fixture
-runner passed 96/96 records and 384/384 stream evaluations; the
-[production report](tests/rangeCompression/range-production-acceptance-results.json)
-records those observations.
-Julio approved the walkthrough and MATLAB `processPri` component after review.
-PR #26 merged the component on 2026-11-13; the next step is Julio's selection of
-the next component question and its acceptance observation. These approvals do
-not imply automatic merge, gate advancement, hardware acceptance, WP8
-acceptance, or broader receiver claims.
-The call contract and its numerical, coordinate, and validity semantics are
-recorded in [ADR 0025](docs/adr/0025-adopt-range-compression-numerical-and-validity-contract.md),
-[ADR 0026](docs/adr/0026-adopt-per-pri-range-compression-api.md), and
-[ADR 0027](docs/adr/0027-adopt-range-acceptance-fixtures-and-evidence-boundary.md).
+## Quickstart
 
-## Architecture
+Run a synthetic pulse-accumulation walkthrough with MATLAB R2025a or newer
+and Base MATLAB. No toolbox, hardware, or external data is required.
 
-The [radar overview](docs/architecture/radar-overview.md) presents context,
-processing, data, and timing views. existing
-[architecture document](docs/architecture/architecture.md) records system
-boundary, processing stages, and interfaces. human-confirmed module and
-ADC decisions are recorded in [ADR 0019](docs/adr/0019-adopt-human-led-module-design-and-simulink-staging.md),
-[ADR 0020](docs/adr/0020-adopt-pilot-adc-storage-and-sample-integrity.md), and
-[ADR 0021](docs/adr/0021-adopt-dsp-responsibilities-and-ambiguity-baseline.md);
-independent document review passed on 2026-09-26 with no unresolved semantic
-findings. Julio accepted the redrawn diagrams on 2026-10-26; see the
-[V1 delivery action plan](docs/plans/v1-delivery-action-plan.md) for the
-separate code-review limits. These
-decisions do not claim complete ADC-to-detection implementation exists.
-Proposed architecture changes
-require Julio's review before code is restructured.
+From the repository root, with `matlab` on `PATH`:
 
-## Human and agent roles
+```sh
+matlab -batch "run('examples/runPulseAccumulationWalkthrough.m')"
+```
 
-Julio owns architecture decisions, including system decomposition, interfaces,
-algorithm choices, state and timing behavior, and consequential requirement
-changes. Agents may investigate, propose concrete alternatives, prepare
-evidence, and implement within decisions Julio has approved. Routine work
-inside approved design can proceed autonomously. Independent verification
-supplies evidence; it does not imply human approval. Historical decisions stay
-in force until Julio explicitly revises them. See the
-[human-led workflow](docs/agents/human-led-workflow.md) and
-[agent orchestration contract](AGENTS.md).
+The walkthrough reorders three synthetic range-result records by scheduled
+pulse slot and displays the assembled samples, validity mask, range centers,
+and ticks. It then shows a duplicate slot being rejected. The sample values
+and ticks are teaching inputs, not measurements or acceptance results.
 
-## Start here
+## Project scope
 
-1. Start with tracked plans, decisions, and evidence: the [V1 implementation
-   plan](docs/plans/radar-matlab-v1.md), relevant [architecture decisions](docs/adr/),
-   and [range-acceptance evidence](tests/rangeCompression/range-production-acceptance-results.json).
-   An optional local `CURRENT.md` checkpoint may be consulted when present.
-2. Start with the [ideal range-resolution sweep](evidence/radar_v1_range_resolution_study.m)
-   and its [recorded results](evidence/radar_v1_range_resolution_results.json).
-   finite coherent sinc point-spread study varies bandwidth in Hz, range
-   grid spacing in meters, relative phase in degrees, and reports valley depth
-   in dB. It shows how those ideal assumptions affect a two-target valley
-   criterion; it does not exercise sampled ADC data, DDC, matched filtering, or
-   measured hardware. To run it without rewriting tracked result, copy the
-   script to temporary directory and run it there (MATLAB with valid
-   license must be available on `PATH`):
+The intended demonstrator boundary runs from digitized ADC samples to a
+detection list. Tracking and classification are outside scope. Development is
+staged from a floating-point MATLAB reference toward fixed-point design and
+then a Simulink representation.
 
-   ```sh
-   study_dir="$(mktemp -d)"
-   cp evidence/radar_v1_range_resolution_study.m "$study_dir/"
-   (cd "$study_dir" && matlab -batch radar_v1_range_resolution_study)
-   ```
+> [!IMPORTANT]
+> Available component-level implementations and evidence do not amount to a
+> complete end-to-end MATLAB, fixed-point, or Simulink reference. This project
+> makes no claims of hardware behavior, real-time performance, or detection
+> performance.
 
-   run should print `B250 Q4: 5760/5760 ideal-grid cases; headline match: 1.`
-   and write JSON result beside temporary copy. That observation
-   reproduces saved headline for ideal model; it is not evidence of
-   end-to-end receiver or detection performance. If MATLAB is unavailable,
-   inspect checked-in source and result instead.
-3. Use the [V1 implementation plan](docs/plans/radar-matlab-v1.md) for work
-   packages and gates, then consult the [architecture](docs/architecture/architecture.md),
-   [requirements](docs/requirements/radar-matlab-v1.md), and [data contracts](docs/contracts/radar-v1-data-contracts.md)
-   when you need their specific details.
-4. Run the [DDC learning walkthrough](docs/examples/ddc-walkthrough.md) in
-   MATLAB to inspect one aligned PRI's frequency translation, filtering,
-   decimation, startup, and fresh local state. plan links separate
-   full-scan integration check.
-5. See the [domain glossary](GLOSSARY.md) for vocabulary and the
-   [radar equations reference](docs/reference/radar-equations.md) for equations
-   and technical limits.
+The pulse-accumulation API,
+`radardemo.pulseAccumulation.accumulateCpi`, orders per-PRI range results and
+preserves samples alongside their validity masks, range coordinates, and source
+ticks. Successful accumulation does not verify uniform pulse spacing or
+establish Doppler readiness. See its
+[contract](docs/contracts/pulse-accumulation.md) and
+[focused tests](tests/pulseAccumulation/TestAccumulateCpi.m).
 
-## Repository guide
+## Examples and evidence
 
-- Optional, worktree-local `CURRENT.md` — concise checkpoint when present;
-  see tracked plans and decisions first.
-- [docs/examples](docs/examples) — runnable learning examples and figures.
-- [docs/reference](docs/reference) — dated evidence snapshots and technical
-  reference material.
-- [docs/architecture](docs/architecture) — system boundary, stages, and
-  interfaces.
-- [docs/requirements](docs/requirements) — observable V1 requirements and
-  evidence.
-- [docs/plans](docs/plans) — work packages, gates, and delivery sequence.
-- [docs/contracts](docs/contracts) — versioned interchange contracts.
-- [docs/adr](docs/adr) — accepted decisions and their rationale.
-- [docs/agents](docs/agents) — contribution workflow, agent guidance, and
-  handoffs.
-- [AGENTS.md](AGENTS.md) — routing, authority, validation, and completion
-  contract for AI-assisted contributions.
-- [LICENSE](LICENSE) — Apache License 2.0.
+| Start with | What it demonstrates |
+| --- | --- |
+| [Pulse accumulation walkthrough](examples/runPulseAccumulationWalkthrough.m) | Scheduled-slot ordering, preserved masks, and duplicate rejection using synthetic data. |
+| [Range-compression walkthrough](examples/runRangeCompressionWalkthrough.m) | One synthetic PRI through the public per-PRI range-compression API. Requires MATLAB R2025a+ and Base MATLAB; run from the repository root with `matlab -batch "run('examples/runRangeCompressionWalkthrough.m')"` or use Live Editor. |
+| [DDC walkthrough](docs/examples/ddc-walkthrough.md) | One synthetic ADC record spanning a complete PRI through the DDC, including frequency translation, filtering, decimation, and startup. Requires MATLAB R2025a+ and Signal Processing Toolbox. |
+| [Ideal range-resolution study](evidence/radar_v1_range_resolution_study.m) and [saved results](evidence/radar_v1_range_resolution_results.json) | Read the recorded JSON without MATLAB; running the study script rewrites it. This ideal point-spread study is not receiver or hardware evidence. |
 
-project uses `uv` for repository tooling. MATLAB and Simulink setup
-instructions will be added as those artifacts are built.
+The [range-compression fixture report](tests/rangeCompression/range-production-acceptance-results.json)
+records 96 completed records and 384 stream evaluations within that fixture's
+scope. These counts do not establish end-to-end detection performance.
+Walkthroughs explain behavior; consult each test and evidence artifact for its
+own scope and limitations.
 
-## License
+## Reviewing the project
 
-Copyright © Julio León. Released under the [Apache License 2.0](LICENSE).
+| Question | Start here |
+| --- | --- |
+| What is the system boundary and what are the module responsibilities? | [Radar architecture overview](docs/architecture/radar-overview.md) |
+| What behavior and data are specified? | [V1 requirements](docs/requirements/radar-matlab-v1.md) and [data contracts](docs/contracts/radar-v1-data-contracts.md) |
+| Why were design choices made? | [Architecture decision records](docs/adr/) |
+| How do agents work with the human owner? | [Human-led workflow](docs/agents/human-led-workflow.md) and [agent contract](AGENTS.md) |
+| What do project terms mean? | [Domain glossary](GLOSSARY.md) |
+
+Julio owns architectural decisions. Agents may investigate, prepare
+evidence, and implement within approved choices; independent verification is
+evidence, not human approval.
+
+`uv` supports repository tooling only; the MATLAB walkthroughs do not require
+a Python package install. Tracked plans and decisions provide durable project
+context; an optional local `CURRENT.md` checkpoint may exist in some
+worktrees.
